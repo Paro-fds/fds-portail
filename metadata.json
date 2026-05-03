@@ -1,6 +1,6 @@
 {
   "name": "FDS Portail",
-  "description": "Portail institutionnel de la Faculté des Sciences (UEH) pour l'orientation et les candidatures académiques.",
+  "description": "Portail institutionnel de la Faculté des Sciences (UEH) — programmes d'études, candidatures en ligne et informations d'admission.",
   "requestFramePermissions": [],
   "majorCapabilities": []
 }

@@ -5,8 +5,7 @@
 
 import { Link } from "react-router-dom";
 import { PROGRAMS } from "../constants";
-import { ArrowRight, Sigma, Building2, Beaker, Info, Calendar, School, Clock } from "lucide-react";
-import { motion } from "motion/react";
+import { ArrowRight, Building2, Beaker, Info, Calendar, School, Clock } from "lucide-react";
 
 export default function Home() {
   return (
@@ -39,7 +38,7 @@ export default function Home() {
           <div className="flex items-center gap-3 mb-6">
             <Calendar className="text-primary-container w-6 h-6" />
             <h2 className="font-display font-bold uppercase tracking-widest text-primary-container">
-              Dates Clés - Admission 2024
+              Dates Clés — Admission 2026
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -47,21 +46,21 @@ export default function Home() {
               <div className="bg-primary-container/10 p-2 text-primary-container"><Calendar className="w-5 h-5" /></div>
               <div>
                 <span className="fds-label-caps block mb-1">Ouverture</span>
-                <span className="font-display font-bold text-lg">15 Juillet 2024</span>
+                <span className="font-display font-bold text-lg">15 Juillet 2026</span>
               </div>
             </div>
             <div className="bg-white p-4 border border-outline-variant flex items-start gap-4">
               <div className="bg-error-container/20 p-2 text-error"><Clock className="w-5 h-5" /></div>
               <div>
                 <span className="fds-label-caps block mb-1">Clôture</span>
-                <span className="font-display font-bold text-lg">30 Août 2024</span>
+                <span className="font-display font-bold text-lg">30 Août 2026</span>
               </div>
             </div>
             <div className="bg-primary-container text-on-primary p-4 shadow-md flex items-start gap-4">
               <div className="bg-white/20 p-2"><School className="w-5 h-5" /></div>
               <div>
                 <span className="text-xs font-bold uppercase text-white/70 block mb-1">Concours</span>
-                <span className="font-display font-bold text-lg">15 Septembre 2024</span>
+                <span className="font-display font-bold text-lg">15 Septembre 2026</span>
               </div>
             </div>
           </div>
@@ -87,7 +86,7 @@ export default function Home() {
                 </span>
               </div>
               <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
-                Formation de base rigoureuse en Mathématiques, Physique et Chimie (MPC1 & MPC2). Ce cycle est le passage obligé pour accéder aux spécialisations en ingénierie et aux licences scientifiques.
+                Formation de base rigoureuse en Mathématiques, Physique et Chimie (MPC1 &amp; MPC2). Ce cycle est le passage obligé pour accéder aux spécialisations en ingénierie et aux licences scientifiques.
               </p>
             </div>
           </div>

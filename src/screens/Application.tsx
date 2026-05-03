@@ -5,10 +5,10 @@
 
 import { useState } from "react";
 import { 
-  User, Mail, Phone, MapPin, 
-  ChevronRight, ArrowRight, Upload, 
+  Mail, Phone, MapPin, 
+  ArrowRight, Upload, 
   FileCheck, AlertCircle, BadgeCheck, 
-  Home, RefreshCw, BadgeInfo, FileText,
+  Home, RefreshCw, FileText, Lock,
   School
 } from "lucide-react";
 import { Link } from "react-router-dom";
@@ -19,10 +19,10 @@ type Step = "info" | "upload" | "success";
 export default function Application() {
   const [step, setStep] = useState<Step>("info");
   const [formData, setFormData] = useState({
-    nom: "Dupont",
-    prenom: "Jean",
-    email: "jean.dupont@",
-    telephone: "+509 34 56 78 90",
+    nom: "",
+    prenom: "",
+    email: "",
+    telephone: "",
     ville: "Port-au-Prince"
   });
 
@@ -63,6 +63,7 @@ export default function Application() {
                   <label className="fds-label-caps" htmlFor="nom">Nom</label>
                   <input 
                     type="text" id="nom" 
+                    placeholder="Votre nom de famille"
                     className="h-11 border border-outline-variant px-4 focus:outline-none focus:border-primary-container hover:border-outline transition-colors"
                     value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})}
                   />
@@ -71,6 +72,7 @@ export default function Application() {
                   <label className="fds-label-caps" htmlFor="prenom">Prénom</label>
                   <input 
                     type="text" id="prenom" 
+                    placeholder="Votre prénom"
                     className="h-11 border border-outline-variant px-4 focus:outline-none focus:border-primary-container"
                     value={formData.prenom} onChange={e => setFormData({...formData, prenom: e.target.value})}
                   />
@@ -78,39 +80,42 @@ export default function Application() {
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="fds-label-caps text-error" htmlFor="email">Email</label>
+                <label className="fds-label-caps" htmlFor="email">Email</label>
                 <div className="relative">
                   <input 
                     type="email" id="email" 
-                    className="w-full h-11 border border-error bg-error-container/10 px-4 pr-12 focus:outline-none focus:ring-1 focus:ring-error"
+                    placeholder="votre.email@exemple.com"
+                    className="w-full h-11 border border-outline-variant px-4 pr-12 focus:outline-none focus:border-primary-container transition-colors"
                     value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
                   />
-                  <AlertCircle className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-error" />
                 </div>
-                <p className="text-xs text-error font-medium flex items-center gap-1 mt-1">
-                  <AlertCircle className="w-3 h-3" /> Format d'adresse institutionnelle suggéré
-                </p>
               </div>
 
               <div className="flex flex-col gap-2">
-                <label className="fds-label-caps text-success" htmlFor="tel">Téléphone</label>
+                <label className="fds-label-caps" htmlFor="tel">Téléphone</label>
                 <div className="relative">
                   <input 
                     type="tel" id="tel" 
-                    className="w-full h-11 border border-success px-4 pr-12 focus:outline-none"
+                    placeholder="+509 XX XX XX XX"
+                    className="w-full h-11 border border-outline-variant px-4 pr-12 focus:outline-none focus:border-primary-container transition-colors"
                     value={formData.telephone} onChange={e => setFormData({...formData, telephone: e.target.value})}
                   />
-                  <FileCheck className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-success fill-current" />
                 </div>
               </div>
 
               <div className="flex flex-col gap-2">
                 <label className="fds-label-caps" htmlFor="ville">Ville</label>
-                <select id="ville" className="h-11 border border-outline-variant px-2 bg-surface focus:outline-none">
+                <select id="ville" className="h-11 border border-outline-variant px-2 bg-surface focus:outline-none"
+                  value={formData.ville} onChange={e => setFormData({...formData, ville: e.target.value})}
+                >
                   <option>Port-au-Prince</option>
                   <option>Cap-Haïtien</option>
                   <option>Jacmel</option>
                   <option>Gonaïves</option>
+                  <option>Les Cayes</option>
+                  <option>Jérémie</option>
+                  <option>Hinche</option>
+                  <option>Autre</option>
                 </select>
               </div>
 
@@ -151,7 +156,7 @@ export default function Application() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              {/* Document 1 */}
+              {/* Document 1 - Pièce d'identité */}
               <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
                 <div className="flex justify-between items-start">
                   <div>
@@ -169,8 +174,8 @@ export default function Application() {
                 </div>
               </div>
 
-              {/* Document 2 Error state */}
-              <div className="bg-surface-container-low border border-error p-6 flex flex-col gap-6">
+              {/* Document 2 - Baccalauréat */}
+              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
                  <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-display font-bold flex items-center gap-2">
@@ -178,18 +183,12 @@ export default function Application() {
                     </h3>
                     <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
                   </div>
-                  <span className="bg-error-container/20 px-2 py-0.5 text-[8px] font-black uppercase text-error ring-1 ring-error/20 tracking-tighter">Requis</span>
+                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
                 </div>
-                <div className="border-2 border-dashed border-error bg-error-container/5 min-h-[160px] flex flex-col items-center justify-center p-4 text-center relative group">
-                   <div className="absolute top-2 right-2 text-error"><AlertCircle className="w-4 h-4" /></div>
-                   <img 
-                    src="https://img.icons8.com/color/96/pdf.png" 
-                    alt="Error" 
-                    className="w-12 h-12 grayscale opacity-50 mb-2"
-                   />
-                   <span className="font-mono text-[10px] text-error font-black">ERR_MIME_UNSUPPORTED</span>
-                   <p className="text-[10px] text-on-error-container mt-1 max-w-[180px]">Format d'image non supporté. Veuillez convertir en PDF.</p>
-                   <button className="mt-4 border border-error bg-white px-4 py-1.5 fds-label-caps text-[10px] text-error hover:bg-error-container/20 transition-colors">Réessayer</button>
+                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
+                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
+                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
                 </div>
               </div>
             </div>
@@ -246,7 +245,7 @@ export default function Application() {
 
             <div className="pt-8 border-t border-outline-variant w-full mt-4 flex items-center justify-center gap-2 opacity-50 grayscale">
                <Lock className="w-4 h-4" />
-               <span className="fds-label-caps text-[10px]">Portail Sécurisé - Faculté des Sciences (UEH)</span>
+               <span className="fds-label-caps text-[10px]">Portail Sécurisé — Faculté des Sciences (UEH)</span>
             </div>
           </motion.div>
         )}
