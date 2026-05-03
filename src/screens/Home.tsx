@@ -70,34 +70,41 @@ export default function Home() {
       {/* Catalog Grid */}
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
         {/* Cycle Propédeutique */}
-        <section className="md:col-span-12 bg-surface border border-outline-variant p-6 hover:border-primary-container transition-colors group">
-          <div className="flex items-start gap-4 mb-4">
-            <div className="w-12 h-12 bg-surface-container-highest flex items-center justify-center text-primary-container shrink-0">
-              <span className="text-2xl font-bold">Σ</span>
-            </div>
-            <div>
-              <h2 className="font-display text-2xl font-bold text-on-surface mb-1 group-hover:text-primary-container">
-                Cycle Propédeutique
-              </h2>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="bg-secondary-container text-on-secondary-container px-2 py-0.5 text-[10px] font-bold uppercase">Tronc Commun</span>
-                <span className="text-on-surface-variant text-sm flex items-center gap-1 font-mono">
-                  <Clock className="w-4 h-4" /> 2 ans
-                </span>
-              </div>
-              <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
-                Formation de base rigoureuse en Mathématiques, Physique et Chimie (MPC1 &amp; MPC2). Ce cycle est le passage obligé pour accéder aux spécialisations en ingénierie et aux licences scientifiques.
-              </p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 border-t border-outline-variant/30 pt-6">
-            {["Maths", "Physique", "Chimie"].map(sub => (
-              <div key={sub} className="bg-surface-container-low border border-outline-variant/50 p-3 text-center font-display font-bold text-primary-container">
-                {sub}
-              </div>
-            ))}
-          </div>
-        </section>
+        {(() => {
+          const propProgram = PROGRAMS.find(p => p.category === "Propédeutique");
+          return propProgram ? (
+            <section className="md:col-span-12 bg-surface border border-outline-variant p-6 hover:border-primary-container transition-colors group">
+              <Link to={`/programme/${propProgram.id}`} className="block">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="w-12 h-12 bg-surface-container-highest flex items-center justify-center text-primary-container shrink-0">
+                    <span className="text-2xl font-bold">Σ</span>
+                  </div>
+                  <div>
+                    <h2 className="font-display text-2xl font-bold text-on-surface mb-1 group-hover:text-primary-container">
+                      {propProgram.name}
+                    </h2>
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="bg-secondary-container text-on-secondary-container px-2 py-0.5 text-[10px] font-bold uppercase">Tronc Commun</span>
+                      <span className="text-on-surface-variant text-sm flex items-center gap-1 font-mono">
+                        <Clock className="w-4 h-4" /> {propProgram.duration.toLowerCase()}
+                      </span>
+                    </div>
+                    <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
+                      {propProgram.description}
+                    </p>
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 border-t border-outline-variant/30 pt-6">
+                  {["Maths", "Physique", "Chimie"].map(sub => (
+                    <div key={sub} className="bg-surface-container-low border border-outline-variant/50 p-3 text-center font-display font-bold text-primary-container">
+                      {sub}
+                    </div>
+                  ))}
+                </div>
+              </Link>
+            </section>
+          ) : null;
+        })()}
 
         {/* Spécialisations en Génie */}
         <section className="md:col-span-8 bg-surface border border-outline-variant p-6">
@@ -106,7 +113,7 @@ export default function Home() {
             <h2 className="font-display text-xl font-bold">Spécialisations en Génie</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {PROGRAMS.map(prog => (
+            {PROGRAMS.filter(p => p.category === "Génie").map(prog => (
               <Link 
                 key={prog.id} 
                 to={`/programme/${prog.id}`}

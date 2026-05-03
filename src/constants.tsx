@@ -16,7 +16,53 @@ export interface Program {
   imageUrl?: string;
 }
 
+// Types pour les données de cursus
+export interface CoursMPC {
+  item: number;
+  titre: string;
+  heures_theorie: number | null;
+  heures_tp: number | null;
+}
+
+export interface CoursIngenierie {
+  item: number;
+  titre: string;
+  heures: number;
+  code: string;
+}
+
+export interface NiveauMPC {
+  [niveau: string]: CoursMPC[];
+}
+
+export interface NiveauIngenierie {
+  [niveau: string]: CoursIngenierie[];
+}
+
+export interface CursusMPC {
+  filiere: string;
+  duree_annees: number;
+  niveaux: NiveauMPC;
+}
+
+export interface CursusIngenierie {
+  filiere: string;
+  duree_annees: number;
+  niveaux: NiveauIngenierie;
+}
+
+export type CursusData = CursusMPC | CursusIngenierie;
+
 export const PROGRAMS: Program[] = [
+  {
+    id: "mpc",
+    name: "Mathématiques, Physique, Chimie (MPC)",
+    description: "Cycle propédeutique préparatoire aux études d'ingénierie. Formation de base rigoureuse en sciences fondamentales.",
+    category: "Propédeutique",
+    duration: "4 Semestres",
+    credits: "120 ECTS",
+    code: "MPC-24"
+  },
   {
     id: "genie-electronique",
     name: "Génie Électronique",

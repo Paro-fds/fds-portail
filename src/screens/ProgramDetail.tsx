@@ -4,8 +4,9 @@
  */
 
 import { useParams, Link } from "react-router-dom";
-import { PROGRAMS } from "../constants";
-import { ArrowLeft, CheckCircle, Download, Calendar, FileText, Send, Bolt, Cpu, RadioTower, Terminal, type LucideIcon } from "lucide-react";
+import { PROGRAMS, CursusData, CoursMPC, CoursIngenierie } from "../constants";
+import { allCursus } from "../data/cursus";
+import { ArrowLeft, CheckCircle, Download, Calendar, FileText, Send, Bolt, Cpu, RadioTower, Terminal, type LucideIcon, BookOpen, Clock } from "lucide-react";
 
 const areaIcons: Record<string, LucideIcon> = {
   bolt: Bolt,
@@ -14,9 +15,15 @@ const areaIcons: Record<string, LucideIcon> = {
   terminal: Terminal
 };
 
+// Helper function to check if cursus is MPC type
+const isCursusMPC = (cursus: CursusData): cursus is import("../constants").CursusMPC => {
+  return 'niveaux' in cursus && Object.keys(cursus.niveaux).some(key => key.startsWith('MPC'));
+};
+
 export default function ProgramDetail() {
   const { id } = useParams();
   const program = PROGRAMS.find(p => p.id === id);
+  const cursus = allCursus[id as keyof typeof allCursus] as CursusData | undefined;
 
   if (!program) {
     return (
@@ -82,6 +89,80 @@ export default function ProgramDetail() {
                     </div>
                   );
                 })}
+              </div>
+            </section>
+          )}
+
+          {/* Cours du programme */}
+          {cursus && (
+            <section className="bg-surface-container border border-outline-variant p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <BookOpen className="w-6 h-6 text-primary-container" />
+                <h2 className="font-display text-2xl font-bold">Programme d'Études</h2>
+              </div>
+
+              <div className="space-y-8">
+                {Object.entries(cursus.niveaux).map(([niveau, cours]) => (
+                  <div key={niveau} className="border border-outline-variant rounded-lg p-6">
+                    <h3 className="font-display text-xl font-bold text-primary-container mb-4 flex items-center gap-2">
+                      <span className="bg-primary-container/10 px-3 py-1 rounded-full text-sm font-mono">
+                        {niveau}
+                      </span>
+                      {isCursusMPC(cursus) ? `Année ${niveau.slice(-1)}` : `Semestre ${niveau.slice(-1)}`}
+                    </h3>
+
+                    <div className="grid gap-3">
+                      {cours.map((course) => (
+                        <div key={course.item} className="bg-surface border border-outline-variant/50 p-4 hover:bg-surface-container-low transition-colors">
+                          <div className="flex items-start justify-between gap-4">
+                            <div className="flex-1">
+                              <div className="flex items-center gap-3 mb-2">
+                                <span className="bg-primary-container/10 text-primary-container px-2 py-0.5 text-xs font-mono font-bold rounded">
+                                  {course.item}
+                                </span>
+                                <h4 className="font-display font-bold text-on-surface text-sm">
+                                  {course.titre}
+                                </h4>
+                              </div>
+                              {'code' in course && (
+                                <span className="text-xs text-on-surface-variant font-mono bg-surface-container-high px-2 py-0.5 rounded">
+                                  {course.code}
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center gap-4 text-sm">
+                              {isCursusMPC(cursus) ? (
+                                <>
+                                  {course.heures_theorie && (
+                                    <div className="flex items-center gap-1 text-on-surface-variant">
+                                      <BookOpen className="w-4 h-4" />
+                                      <span className="font-mono">{course.heures_theorie}h</span>
+                                      <span className="text-xs">théorie</span>
+                                    </div>
+                                  )}
+                                  {course.heures_tp && (
+                                    <div className="flex items-center gap-1 text-on-surface-variant">
+                                      <Clock className="w-4 h-4" />
+                                      <span className="font-mono">{course.heures_tp}h</span>
+                                      <span className="text-xs">TP</span>
+                                    </div>
+                                  )}
+                                </>
+                              ) : (
+                                <div className="flex items-center gap-1 text-on-surface-variant">
+                                  <Clock className="w-4 h-4" />
+                                  <span className="font-mono">{course.heures}h</span>
+                                  <span className="text-xs">total</span>
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             </section>
           )}
