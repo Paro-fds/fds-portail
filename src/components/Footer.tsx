@@ -56,9 +56,9 @@ export default function Footer() {
             </h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to="/" className="text-white/60 hover:text-white transition-colors">
+                <a href="/#catalogue" className="text-white/60 hover:text-white transition-colors">
                   Catalogue des programmes
-                </Link>
+                </a>
               </li>
               <li>
                 <Link to="/candidature" className="text-white/60 hover:text-white transition-colors">

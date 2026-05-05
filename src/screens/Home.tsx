@@ -5,20 +5,30 @@
 
 import { Link } from "react-router-dom";
 import { PROGRAMS } from "../constants";
-import { ArrowRight, Building2, Beaker, Info, Calendar, School, Clock } from "lucide-react";
+import { ArrowRight, Building2, Beaker, Info, Calendar, School, Clock, Newspaper, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
+import { useState } from "react";
 
 export default function Home() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+  
+  const faqs = [
+    { q: "Quelles sont les conditions d'admission au cycle propédeutique ?", a: "Vous devez être titulaire d'un baccalauréat (NS4) et réussir le concours d'admission organisé chaque année par la faculté." },
+    { q: "Quels sont les frais de scolarité ?", a: "La FDS étant une entité de l'Université d'État d'Haïti, la scolarité est subventionnée. Seuls des frais annuels d'inscription sont requis." },
+    { q: "Comment se déroule le concours d'admission ?", a: "Le concours comporte des épreuves écrites en mathématiques, physique et français. Les dates exactes sont publiées dans la section Dates Clés." },
+    { q: "La FDS offre-t-elle des possibilités de logement ?", a: "La Faculté ne dispose pas de campus d'hébergement. Les étudiants de province doivent s'organiser pour le logement à Port-au-Prince." },
+  ];
   return (
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero Section */}
       <section className="mb-12">
         <div className="bg-surface-container rounded-none p-8 border border-outline-variant flex flex-col md:flex-row items-center gap-8 justify-between relative overflow-hidden">
           <div className="relative z-10 max-w-2xl">
+            <span className="fds-label-caps text-primary-container mb-2 block">Faculté des Sciences — UEH</span>
             <h1 className="font-display text-4xl font-black text-primary-container mb-4">
-              Catalogue des Programmes
+              Portail d'Admission & d'Information
             </h1>
             <p className="text-lg text-on-surface-variant mb-6 leading-relaxed">
-              Explorez nos cycles de formation, spécialisations en génie et filières scientifiques. La Faculté des Sciences (UEH) offre un enseignement rigoureux pour former les cadres techniques et scientifiques de demain.
+              Bienvenue sur la porte d'entrée numérique de la FDS. Explorez nos cycles de formation, suivez les actualités, consultez les dates clés et soumettez votre candidature en ligne.
             </p>
             <Link 
               to="/candidature" 
@@ -100,8 +110,41 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Actualités & Blog */}
+      <section className="mb-12">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Newspaper className="text-primary-container w-6 h-6" />
+            <h2 className="font-display text-2xl font-bold">Actualités & Annonces</h2>
+          </div>
+          <button className="text-sm font-bold text-primary-container hover:underline hidden sm:block">Voir tout</button>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[
+            { tag: "Concours", title: "Ouverture des inscriptions 2026", date: "10 Mai 2026", desc: "Les inscriptions pour le nouveau cycle propédeutique débuteront officiellement en juillet." },
+            { tag: "Infrastructures", title: "Nouveau laboratoire de génie civil", date: "2 Mai 2026", desc: "La FDS inaugure son nouveau laboratoire de résistance des matériaux financé par nos partenaires." },
+            { tag: "Recherche", title: "Conférence sur l'IA appliquée", date: "28 Avril 2026", desc: "Venez assister à notre séminaire sur les applications de l'intelligence artificielle en Haïti." }
+          ].map((news, idx) => (
+            <div key={idx} className="bg-surface border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col h-full">
+              <div className="h-32 bg-surface-container-high relative overflow-hidden flex items-center justify-center border-b border-outline-variant">
+                 <Newspaper className="w-10 h-10 text-outline opacity-20" />
+                 <span className="absolute top-2 right-2 bg-surface text-xs font-bold px-2 py-1 uppercase">{news.tag}</span>
+              </div>
+              <div className="p-4 flex flex-col flex-1">
+                <span className="text-[10px] font-mono text-outline mb-2">{news.date}</span>
+                <h3 className="font-display font-bold text-lg mb-2 line-clamp-2">{news.title}</h3>
+                <p className="text-sm text-on-surface-variant line-clamp-3 mb-4 flex-1">{news.desc}</p>
+                <button className="text-primary-container text-sm font-bold inline-flex items-center gap-1 group w-max">
+                  Lire l'article <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Catalog Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-12 gap-6 scroll-mt-20">
         {/* Cycle Propédeutique */}
         {(() => {
           const propProgram = PROGRAMS.find(p => p.category === "Propédeutique");
@@ -185,6 +228,49 @@ export default function Home() {
           </div>
         </section>
       </div>
+
+      {/* FAQ Section */}
+      <section className="mb-12 mt-16 pt-12 border-t border-outline-variant">
+        <div className="max-w-3xl mx-auto">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-4">
+               <HelpCircle className="w-6 h-6 text-primary-container" />
+            </div>
+            <h2 className="font-display text-3xl font-bold mb-2">Foire Aux Questions</h2>
+            <p className="text-on-surface-variant">Les réponses aux questions les plus fréquentes posées par nos candidats.</p>
+          </div>
+          
+          <div className="flex flex-col gap-3">
+            {faqs.map((faq, idx) => (
+              <div key={idx} className="bg-surface border border-outline-variant overflow-hidden">
+                <button 
+                  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
+                  className="w-full p-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
+                >
+                  <span className="font-display font-bold pr-4">{faq.q}</span>
+                  {openFaq === idx ? (
+                    <ChevronUp className="w-5 h-5 text-primary-container shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-5 h-5 text-outline shrink-0" />
+                  )}
+                </button>
+                {openFaq === idx && (
+                  <div className="p-4 pt-0 text-on-surface-variant text-sm bg-surface-container-low border-t border-outline-variant/30">
+                    {faq.a}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+          
+          <div className="mt-8 text-center bg-surface-container-low p-6 border border-outline-variant/50">
+            <p className="text-sm text-on-surface-variant mb-4">Vous n'avez pas trouvé la réponse à votre question ?</p>
+            <Link to="/aide" className="fds-button-secondary inline-flex items-center gap-2">
+               Contacter l'administration
+            </Link>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

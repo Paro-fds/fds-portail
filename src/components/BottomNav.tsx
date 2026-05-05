@@ -11,7 +11,7 @@ export default function BottomNav() {
 
   const navItems = [
     { name: "Candidature", path: "/candidature", icon: ClipboardList },
-    { name: "Programmes", path: "/", icon: GraduationCap },
+    { name: "Accueil", path: "/", icon: GraduationCap },
     { name: "Aide", path: "/aide", icon: LifeBuoy },
   ];
 

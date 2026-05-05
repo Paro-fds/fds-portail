@@ -9,15 +9,15 @@ import {
   ArrowRight, Upload, 
   FileCheck, AlertCircle, BadgeCheck, 
   Home, RefreshCw, FileText, Lock,
-  School
+  School, Image, User
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
-type Step = "info" | "upload" | "success";
+type Step = "prerequis" | "info" | "upload" | "success";
 
 export default function Application() {
-  const [step, setStep] = useState<Step>("info");
+  const [step, setStep] = useState<Step>("prerequis");
   const [formData, setFormData] = useState({
     nom: "",
     prenom: "",
@@ -34,6 +34,93 @@ export default function Application() {
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
       <AnimatePresence mode="wait">
+        {step === "prerequis" && (
+          <motion.div
+            key="prerequis"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="bg-surface border border-outline-variant p-6 md:p-10"
+          >
+             <div className="mb-10">
+              <div className="flex justify-between items-center mb-4">
+                <h1 className="font-display text-2xl font-bold text-primary-container uppercase">Prérequis</h1>
+                <span className="font-mono text-sm text-outline">Avant de commencer</span>
+              </div>
+              <div className="h-1.5 w-full bg-surface-container-highest">
+                <div className="h-full w-1/4 bg-primary-container" />
+              </div>
+            </div>
+
+            <div className="mb-10 border-b border-outline-variant pb-6">
+              <h2 className="font-display text-3xl font-bold mb-2">Documents Requis</h2>
+              <p className="text-on-surface-variant">Pour soumettre votre candidature, vous aurez besoin de numériser les documents suivants. Assurez-vous de les avoir à disposition avant de commencer.</p>
+              <div className="mt-4 flex items-start gap-3 bg-error-container/10 text-error p-4 border border-error/20">
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                <p className="text-sm">Votre candidature ne pourra pas être finalisée sans ces documents.</p>
+              </div>
+            </div>
+
+            <div className="grid gap-4 mb-10">
+              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                  <User className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold">Acte de Naissance</h3>
+                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                  <School className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold">Certificat Baccalauréat</h3>
+                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                  <FileCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold">Relevés de Notes (NS4)</h3>
+                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                  <FileText className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold">Pièce d'identité (CIN/NIF)</h3>
+                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                  <Image className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="font-display font-bold">Photo d'Identité</h3>
+                  <p className="text-sm text-on-surface-variant">Format JPG/PNG uniquement (Max 2MB)</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-8 border-t border-outline-variant flex justify-end">
+              <button 
+                type="button" onClick={() => setStep("info")}
+                className="fds-button-primary flex items-center gap-2 group"
+              >
+                J'ai préparé ces documents
+                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+              </button>
+            </div>
+          </motion.div>
+        )}
+
         {step === "info" && (
           <motion.div
             key="info"
@@ -156,12 +243,12 @@ export default function Application() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              {/* Document 1 - Pièce d'identité */}
+              {/* Document 1 - Acte de naissance */}
               <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-display font-bold flex items-center gap-2">
-                       <FileText className="w-5 h-5 text-outline" /> Pièce d'identité
+                       <User className="w-5 h-5 text-outline" /> Acte de Naissance
                     </h3>
                     <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
                   </div>
@@ -179,9 +266,63 @@ export default function Application() {
                  <div className="flex justify-between items-start">
                   <div>
                     <h3 className="font-display font-bold flex items-center gap-2">
-                       <School className="w-5 h-5 text-outline" /> Baccalauréat
+                       <School className="w-5 h-5 text-outline" /> Certificat Baccalauréat
                     </h3>
                     <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
+                  </div>
+                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
+                </div>
+                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
+                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
+                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
+                </div>
+              </div>
+
+              {/* Document 3 - Relevés de notes */}
+              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
+                 <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-display font-bold flex items-center gap-2">
+                       <FileCheck className="w-5 h-5 text-outline" /> Relevés de Notes (NS4)
+                    </h3>
+                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
+                  </div>
+                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
+                </div>
+                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
+                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
+                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
+                </div>
+              </div>
+
+              {/* Document 4 - Pièce d'identité */}
+              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-display font-bold flex items-center gap-2">
+                       <FileText className="w-5 h-5 text-outline" /> Pièce d'identité (CIN/NIF)
+                    </h3>
+                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
+                  </div>
+                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
+                </div>
+                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
+                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
+                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
+                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
+                </div>
+              </div>
+
+              {/* Document 5 - Photo d'identité */}
+              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6 md:col-span-2 lg:col-span-1">
+                 <div className="flex justify-between items-start">
+                  <div>
+                    <h3 className="font-display font-bold flex items-center gap-2">
+                       <Image className="w-5 h-5 text-outline" /> Photo d'Identité
+                    </h3>
+                    <span className="text-[10px] font-mono text-outline mt-1 block">JPG/PNG uniquement (Max 2MB)</span>
                   </div>
                   <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
                 </div>
