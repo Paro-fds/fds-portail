@@ -32,6 +32,39 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Présentation de la Faculté */}
+      <section className="mb-12">
+        <div className="bg-surface border border-outline-variant p-8 rounded-3xl shadow-sm">
+          <div className="flex flex-col md:flex-row gap-8 items-start">
+            <div className="flex-1">
+              <span className="fds-label-caps text-primary-container mb-3 inline-block">À propos de la FDS</span>
+              <h2 className="font-display text-3xl font-bold text-on-surface mb-4">La Faculté des Sciences de l’UEH</h2>
+              <p className="text-on-surface-variant leading-relaxed text-lg mb-6">
+                La FDS est le pôle scientifique de l’Université d’État d’Haïti, formant des ingénieurs, des chercheurs et des techniciens capables de répondre aux enjeux du développement national. Elle associe rigueur académique, innovation et ancrage local pour permettre aux étudiants de réussir dans les domaines des sciences fondamentales et appliquées.
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                {[
+                  { title: "Rigueur scientifique", text: "Programmes solides et encadrement académique" },
+                  { title: "Ouverture métier", text: "Parcours orientés vers l’ingénierie, la recherche et le secteur technique" },
+                  { title: "Accès national", text: "Un portail pensé pour les candidats en province et en ville" }
+                ].map((item) => (
+                  <div key={item.title} className="bg-surface-container-low border border-outline-variant p-4 rounded-3xl">
+                    <h3 className="font-display text-sm font-bold text-primary-container mb-2">{item.title}</h3>
+                    <p className="text-sm text-on-surface-variant leading-relaxed">{item.text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="flex-1 bg-primary-container/5 border border-primary-container/20 rounded-3xl p-6">
+              <div className="text-primary-container font-display font-bold uppercase tracking-wide mb-4">Mission</div>
+              <p className="text-on-surface-variant leading-relaxed">
+                Offrir une visibilité claire et accessible aux programmes de formation, simplifier l’accès à l’information et réduire la dépendance aux contacts physiques pour les futurs candidats.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Dates Clés - Important institutional block */}
       <section className="mb-12">
         <div className="bg-surface-container-high border-2 border-primary-container/10 p-6">
