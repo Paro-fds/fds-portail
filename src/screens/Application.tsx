@@ -3,32 +3,114 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Mail, Phone, MapPin, 
   ArrowRight, Upload, 
   FileCheck, AlertCircle, BadgeCheck, 
   Home, RefreshCw, FileText, Lock,
-  School, Image, User
+  School, Image, User, Loader2, CheckCircle2
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
 type Step = "prerequis" | "info" | "upload" | "success";
 
+interface DocumentRequis {
+  id: string;
+  nom: string;
+  description: string | null;
+  format_accepte: string;
+  est_obligatoire: boolean;
+}
+
+const getIconForDoc = (nom: string) => {
+  const lowerNom = nom.toLowerCase();
+  if (lowerNom.includes("naissance")) return <User className="w-6 h-6" />;
+  if (lowerNom.includes("bac")) return <School className="w-6 h-6" />;
+  if (lowerNom.includes("notes")) return <FileCheck className="w-6 h-6" />;
+  if (lowerNom.includes("photo")) return <Image className="w-6 h-6" />;
+  return <FileText className="w-6 h-6" />;
+};
+
 export default function Application() {
   const [step, setStep] = useState<Step>("prerequis");
   const [formData, setFormData] = useState({
-    nom: "",
-    prenom: "",
-    email: "",
-    telephone: "",
-    ville: "Port-au-Prince"
+    nom: "", prenom: "", email: "", telephone: "", ville: "Port-au-Prince"
   });
+  
+  // Nouveaux états dynamiques
+  const [documentsRequis, setDocumentsRequis] = useState<DocumentRequis[]>([]);
+  const [files, setFiles] = useState<Record<string, File>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [referenceDossier, setReferenceDossier] = useState<string | null>(null);
+
+  // Appel API pour récupérer les règles de la BDD (Phase 4)
+  useEffect(() => {
+    fetch('/api/documents-requis')
+      .then(res => res.json())
+      .then(data => setDocumentsRequis(data))
+      .catch(err => console.error("Erreur chargement documents:", err));
+  }, []);
 
   const handleNext = () => {
     if (step === "info") setStep("upload");
     else if (step === "upload") setStep("success");
+  };
+
+  const handleFileChange = (docId: string, file: File | null) => {
+    if (!file) return;
+    setFiles(prev => ({ ...prev, [docId]: file }));
+  };
+
+  const handleFinalSubmit = async () => {
+    // Vérification : tous les documents sont-ils présents ?
+    if (Object.keys(files).length < documentsRequis.length) {
+      setError("Veuillez téléverser tous les documents requis avant de soumettre.");
+      return;
+    }
+    
+    setIsSubmitting(true);
+    setError(null);
+
+    try {
+      // 1. Création du candidat
+      const candRes = await fetch('/api/candidature', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...formData, notifications_actives: true })
+      });
+      if (!candRes.ok) throw new Error("Erreur lors de la création du candidat.");
+      
+      const candData = await candRes.json();
+      const candidatId = candData.id;
+      setReferenceDossier(candData.reference_dossier);
+
+      // 2. Upload des fichiers vers Cloudinary via FastAPI
+      const uploadPromises = Object.entries(files).map(async ([docId, file]) => {
+        const payload = new FormData();
+        payload.append('candidat_id', candidatId);
+        payload.append('document_requis_id', docId);
+        payload.append('file', file);
+        
+        const uploadRes = await fetch('/api/upload', {
+          method: 'POST',
+          body: payload
+        });
+        if (!uploadRes.ok) throw new Error(`Erreur lors de l'upload d'un document`);
+        return uploadRes.json();
+      });
+
+      await Promise.all(uploadPromises);
+      
+      // 3. Succès
+      setStep("success");
+    } catch (e: any) {
+      setError(e.message || "Une erreur inconnue est survenue.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -54,7 +136,7 @@ export default function Application() {
 
             <div className="mb-10 border-b border-outline-variant pb-6">
               <h2 className="font-display text-3xl font-bold mb-2">Documents Requis</h2>
-              <p className="text-on-surface-variant">Pour soumettre votre candidature, vous aurez besoin de numériser les documents suivants. Assurez-vous de les avoir à disposition avant de commencer.</p>
+              <p className="text-on-surface-variant">Pour soumettre votre candidature, vous aurez besoin de numériser les documents suivants. Ces exigences proviennent de la base de données officielle.</p>
               <div className="mt-4 flex items-start gap-3 bg-error-container/10 text-error p-4 border border-error/20">
                 <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
                 <p className="text-sm">Votre candidature ne pourra pas être finalisée sans ces documents.</p>
@@ -62,57 +144,27 @@ export default function Application() {
             </div>
 
             <div className="grid gap-4 mb-10">
-              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                  <User className="w-6 h-6" />
+              {documentsRequis.map((doc) => (
+                <div key={doc.id} className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
+                  <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
+                    {getIconForDoc(doc.nom)}
+                  </div>
+                  <div>
+                    <h3 className="font-display font-bold">{doc.nom}</h3>
+                    <p className="text-sm text-on-surface-variant">Format {doc.format_accepte} uniquement</p>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="font-display font-bold">Acte de Naissance</h3>
-                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                  <School className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold">Certificat Baccalauréat</h3>
-                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                  <FileCheck className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold">Relevés de Notes (NS4)</h3>
-                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                  <FileText className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold">Pièce d'identité (CIN/NIF)</h3>
-                  <p className="text-sm text-on-surface-variant">Format PDF uniquement (Max 5MB)</p>
-                </div>
-              </div>
-              <div className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                  <Image className="w-6 h-6" />
-                </div>
-                <div>
-                  <h3 className="font-display font-bold">Photo d'Identité</h3>
-                  <p className="text-sm text-on-surface-variant">Format JPG/PNG uniquement (Max 2MB)</p>
-                </div>
-              </div>
+              ))}
+              {documentsRequis.length === 0 && (
+                <div className="p-8 text-center text-outline animate-pulse">Chargement des documents depuis la BDD...</div>
+              )}
             </div>
 
             <div className="pt-8 border-t border-outline-variant flex justify-end">
               <button 
                 type="button" onClick={() => setStep("info")}
                 className="fds-button-primary flex items-center gap-2 group"
+                disabled={documentsRequis.length === 0}
               >
                 J'ai préparé ces documents
                 <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
@@ -240,113 +292,83 @@ export default function Application() {
             <div className="mb-10 border-b border-outline-variant pb-6">
               <h2 className="font-display text-3xl font-bold mb-2">Dossier Académique</h2>
               <p className="text-on-surface-variant">Veuillez fournir les documents requis ci-dessous pour l'analyse de votre dossier.</p>
+              {error && (
+                <div className="mt-4 flex items-center gap-2 text-error bg-error/10 p-4 border border-error/20">
+                  <AlertCircle className="w-5 h-5" />
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-              {/* Document 1 - Acte de naissance */}
-              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display font-bold flex items-center gap-2">
-                       <User className="w-5 h-5 text-outline" /> Acte de Naissance
-                    </h3>
-                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
-                  </div>
-                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
-                </div>
-                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
-                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
-                </div>
-              </div>
+              {documentsRequis.map((doc, index) => {
+                const hasFile = !!files[doc.id];
+                const fileObj = files[doc.id];
+                
+                return (
+                  <div key={doc.id} className={`bg-surface-container-low border p-6 flex flex-col gap-6 ${hasFile ? 'border-primary-container/50' : 'border-outline-variant'} ${index === documentsRequis.length - 1 && index % 2 === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h3 className="font-display font-bold flex items-center gap-2">
+                           {getIconForDoc(doc.nom)} {doc.nom}
+                        </h3>
+                        <span className="text-[10px] font-mono text-outline mt-1 block">Format: {doc.format_accepte}</span>
+                      </div>
+                      <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">
+                        {doc.est_obligatoire ? "Requis" : "Optionnel"}
+                      </span>
+                    </div>
 
-              {/* Document 2 - Baccalauréat */}
-              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
-                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display font-bold flex items-center gap-2">
-                       <School className="w-5 h-5 text-outline" /> Certificat Baccalauréat
-                    </h3>
-                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
+                    <label className={`border-2 border-dashed bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all group relative overflow-hidden ${hasFile ? 'border-primary-container bg-primary-container/5' : 'border-outline-variant hover:border-primary-container hover:bg-primary-container/5'}`}>
+                       <input 
+                         type="file" className="hidden" 
+                         accept={doc.format_accepte.includes('PDF') ? '.pdf' : 'image/*'}
+                         onChange={(e) => handleFileChange(doc.id, e.target.files?.[0] || null)}
+                       />
+                       
+                       {hasFile ? (
+                         <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-2 text-primary">
+                           <CheckCircle2 className="w-8 h-8 text-primary-container" />
+                           <span className="text-xs font-bold truncate max-w-[200px]">{fileObj.name}</span>
+                           <span className="text-[10px] text-outline">{(fileObj.size / 1024 / 1024).toFixed(2)} MB</span>
+                         </motion.div>
+                       ) : (
+                         <>
+                           <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
+                           <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
+                           <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
+                         </>
+                       )}
+                    </label>
                   </div>
-                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
-                </div>
-                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
-                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
-                </div>
-              </div>
-
-              {/* Document 3 - Relevés de notes */}
-              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
-                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display font-bold flex items-center gap-2">
-                       <FileCheck className="w-5 h-5 text-outline" /> Relevés de Notes (NS4)
-                    </h3>
-                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
-                  </div>
-                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
-                </div>
-                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
-                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
-                </div>
-              </div>
-
-              {/* Document 4 - Pièce d'identité */}
-              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6">
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display font-bold flex items-center gap-2">
-                       <FileText className="w-5 h-5 text-outline" /> Pièce d'identité (CIN/NIF)
-                    </h3>
-                    <span className="text-[10px] font-mono text-outline mt-1 block">PDF uniquement (Max 5MB)</span>
-                  </div>
-                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
-                </div>
-                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
-                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
-                </div>
-              </div>
-
-              {/* Document 5 - Photo d'identité */}
-              <div className="bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-6 md:col-span-2 lg:col-span-1">
-                 <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-display font-bold flex items-center gap-2">
-                       <Image className="w-5 h-5 text-outline" /> Photo d'Identité
-                    </h3>
-                    <span className="text-[10px] font-mono text-outline mt-1 block">JPG/PNG uniquement (Max 2MB)</span>
-                  </div>
-                  <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">Requis</span>
-                </div>
-                <div className="border-2 border-dashed border-outline-variant bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer hover:bg-primary-container/5 hover:border-primary-container transition-all group">
-                   <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                   <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                   <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
-                </div>
-              </div>
+                );
+              })}
             </div>
 
             <div className="pt-8 border-t border-outline-variant flex justify-between">
               <button 
                 type="button" onClick={() => setStep("info")}
                 className="fds-button-secondary text-sm"
+                disabled={isSubmitting}
               >
                 Précédent
               </button>
               <button 
-                type="button" onClick={handleNext}
-                className="fds-button-primary flex items-center gap-2 group"
+                type="button" onClick={handleFinalSubmit}
+                disabled={isSubmitting}
+                className="fds-button-primary flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Soumettre le dossier
-                <BadgeCheck className="w-5 h-5 transition-transform group-hover:scale-110" />
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Téléversement en cours...
+                  </>
+                ) : (
+                  <>
+                    Soumettre le dossier
+                    <BadgeCheck className="w-5 h-5 transition-transform group-hover:scale-110" />
+                  </>
+                )}
               </button>
             </div>
           </motion.div>
@@ -368,15 +390,15 @@ export default function Application() {
 
             <div className="w-full max-w-sm bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-2">
                <span className="fds-label-caps text-on-surface-variant text-[10px]">Référence Officielle du Dossier</span>
-               <span className="font-mono text-2xl font-black text-primary-container tracking-[.25em] select-all">CAN-2026-0089</span>
+               <span className="font-mono text-2xl font-black text-primary-container tracking-[.25em] select-all">{referenceDossier || "EN-ATTENTE"}</span>
             </div>
 
             <p className="text-on-surface-variant leading-relaxed max-w-md">
-              Un email de confirmation sécurisé a été envoyé. Votre dossier est enregistré dans notre base centralisée, aucun déplacement à la Faculté n'est requis à ce stade.
+              Un email de confirmation sécurisé a été envoyé. Vos {documentsRequis.length} documents ont été téléversés avec succès sur notre plateforme Cloudinary et liés à votre base de données PostgreSQL.
             </p>
 
             <div className="w-full flex flex-col sm:flex-row gap-4 mt-4">
-               <Link to="/" className="flex-1 fds-button-primary flex items-center justify-center gap-2">
+               <Link to="/suivi" className="flex-1 fds-button-primary flex items-center justify-center gap-2">
                  <RefreshCw className="w-4 h-4" /> Suivi du dossier
                </Link>
                <Link to="/" className="flex-1 fds-button-secondary flex items-center justify-center gap-2">

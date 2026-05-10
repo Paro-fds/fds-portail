@@ -68,7 +68,7 @@ export const PROGRAMS: Program[] = [
     name: "Génie Électronique",
     description: "Formation polyvalente intégrant l'électrique, l'électronique, les télécommunications et l'informatique.",
     category: "Génie",
-    duration: "10 Semestres",
+    duration: "5 Semestres",
     credits: "300 ECTS",
     code: "GEL-24",
     areas: [
@@ -84,7 +84,7 @@ export const PROGRAMS: Program[] = [
     name: "Génie Civil",
     description: "Conception, construction et entretien d'infrastructures. Bâtiments, ponts, routes.",
     category: "Génie",
-    duration: "10 Semestres",
+    duration: "5 Semestres",
     credits: "300 ECTS",
     code: "GCV-24"
   },
@@ -93,7 +93,7 @@ export const PROGRAMS: Program[] = [
     name: "Génie Électromécanique",
     description: "Systèmes combinant mécanique et électricité. Énergie, machines thermiques.",
     category: "Génie",
-    duration: "10 Semestres",
+    duration: "5 Semestres",
     credits: "300 ECTS",
     code: "GEM-24"
   },
@@ -102,7 +102,7 @@ export const PROGRAMS: Program[] = [
     name: "Architecture",
     description: "Art et technique de la conception d'espaces bâtis, urbanisme et aménagement.",
     category: "Génie",
-    duration: "10 Semestres",
+    duration: "10 Semestres", // Je garde 10 pour l'architecture car le message mentionne "génie"
     credits: "300 ECTS",
     code: "ARC-24"
   }

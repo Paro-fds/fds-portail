@@ -108,7 +108,10 @@ export default function ProgramDetail() {
                       <span className="bg-primary-container/10 px-3 py-1 rounded-full text-sm font-mono">
                         {niveau}
                       </span>
-                      {isCursusMPC(cursus) ? `Année ${niveau.slice(-1)}` : `Semestre ${niveau.slice(-1)}`}
+                      {isCursusMPC(cursus) 
+                        ? `Année ${niveau.slice(-1)}` 
+                        : (niveau === 'EN1' ? 'Semestre 1 et 2' : `Semestre ${niveau.slice(-1)}`)
+                      }
                     </h3>
 
                     <div className="grid gap-3">

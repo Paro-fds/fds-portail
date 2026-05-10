@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GraduationCap, ClipboardList, LifeBuoy } from "lucide-react";
+import { GraduationCap, ClipboardList, LifeBuoy, Search } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function BottomNav() {
@@ -12,6 +12,7 @@ export default function BottomNav() {
   const navItems = [
     { name: "Candidature", path: "/candidature", icon: ClipboardList },
     { name: "Accueil", path: "/", icon: GraduationCap },
+    { name: "Suivi", path: "/suivi", icon: Search },
     { name: "Aide", path: "/aide", icon: LifeBuoy },
   ];
 
