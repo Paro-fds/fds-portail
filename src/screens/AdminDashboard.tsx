@@ -94,18 +94,18 @@ export default function AdminDashboard() {
         </button>
       </div>
 
-      {/* Modal de prévisualisation */}
-      {previewUrl && (
+      {/* Modal de prévisualisation — Images uniquement */}
+      {previewUrl && !isPdf(previewUrl) && (
         <div
-          className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewUrl(null)}
         >
           <div
-            className="bg-surface w-full max-w-4xl max-h-[90vh] flex flex-col rounded-lg overflow-hidden shadow-2xl"
+            className="bg-surface max-w-3xl w-full rounded-lg overflow-hidden shadow-2xl"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center p-4 border-b border-outline-variant shrink-0">
-              <span className="font-display font-bold">Prévisualisation du document</span>
+            <div className="flex justify-between items-center p-4 border-b border-outline-variant">
+              <span className="font-display font-bold">Prévisualisation</span>
               <div className="flex gap-2">
                 <a
                   href={previewUrl}
@@ -113,30 +113,22 @@ export default function AdminDashboard() {
                   rel="noreferrer"
                   className="fds-button-secondary text-xs flex items-center gap-1 h-8 px-3"
                 >
-                  <ExternalLink className="w-3 h-3" /> Ouvrir dans un nouvel onglet
+                  <ExternalLink className="w-3 h-3" /> Ouvrir
                 </a>
                 <button
                   onClick={() => setPreviewUrl(null)}
-                  className="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface border border-outline-variant hover:bg-surface-container-low transition-colors"
+                  className="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface border border-outline-variant"
                 >
                   ✕
                 </button>
               </div>
             </div>
-            <div className="flex-1 overflow-auto bg-surface-container-lowest">
-              {isPdf(previewUrl) ? (
-                <iframe
-                  src={getPdfViewerUrl(previewUrl)}
-                  className="w-full h-full min-h-[70vh]"
-                  title="Prévisualisation PDF"
-                />
-              ) : (
-                <img
-                  src={previewUrl}
-                  alt="Prévisualisation"
-                  className="max-w-full max-h-[75vh] object-contain mx-auto block p-4"
-                />
-              )}
+            <div className="bg-surface-container-lowest p-4 flex items-center justify-center min-h-[300px]">
+              <img
+                src={previewUrl}
+                alt="Prévisualisation"
+                className="max-w-full max-h-[70vh] object-contain"
+              />
             </div>
           </div>
         </div>
@@ -190,32 +182,51 @@ export default function AdminDashboard() {
                           </div>
 
                           {/* Miniature ou icône PDF */}
-                          <div
-                            className="bg-surface-container-low border border-outline-variant h-24 flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors group"
-                            onClick={() => setPreviewUrl(doc.fichier_url)}
-                            title="Cliquer pour prévisualiser"
-                          >
-                            {isPdf(doc.fichier_url) ? (
-                              <div className="flex flex-col items-center gap-1 text-outline group-hover:text-primary-container transition-colors">
-                                <FileText className="w-8 h-8" />
-                                <span className="text-[10px] font-mono uppercase">PDF</span>
-                              </div>
-                            ) : (
+                          {isPdf(doc.fichier_url) ? (
+                            // PDF → ouvre dans un nouvel onglet (rendu natif navigateur)
+                            <a
+                              href={doc.fichier_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="bg-surface-container-low border border-outline-variant h-24 flex flex-col items-center justify-center gap-1 hover:bg-primary-container/10 hover:border-primary-container/30 transition-colors group"
+                              title="Cliquer pour ouvrir le PDF"
+                            >
+                              <FileText className="w-8 h-8 text-outline group-hover:text-primary-container transition-colors" />
+                              <span className="text-[10px] font-mono uppercase text-outline group-hover:text-primary-container">Ouvrir PDF</span>
+                            </a>
+                          ) : (
+                            // Image → ouvre le modal de prévisualisation
+                            <div
+                              className="bg-surface-container-low border border-outline-variant h-24 flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors overflow-hidden"
+                              onClick={() => setPreviewUrl(doc.fichier_url)}
+                              title="Cliquer pour prévisualiser"
+                            >
                               <img
                                 src={doc.fichier_url}
                                 alt={doc.nom_document}
-                                className="h-full w-full object-contain"
+                                className="h-full w-full object-cover"
                               />
-                            )}
-                          </div>
+                            </div>
+                          )}
                           
                           <div className="flex items-center justify-between mt-auto pt-2">
-                            <button
-                              onClick={() => setPreviewUrl(doc.fichier_url)}
-                              className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
-                            >
-                              <Eye className="w-3 h-3" /> Prévisualiser
-                            </button>
+                            {isPdf(doc.fichier_url) ? (
+                              <a
+                                href={doc.fichier_url}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
+                              >
+                                <ExternalLink className="w-3 h-3" /> Ouvrir le PDF
+                              </a>
+                            ) : (
+                              <button
+                                onClick={() => setPreviewUrl(doc.fichier_url)}
+                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
+                              >
+                                <Eye className="w-3 h-3" /> Prévisualiser
+                              </button>
+                            )}
                             <div className="flex gap-2">
                               <button 
                                 onClick={() => updateDocumentStatus(doc.id, "valide")}
