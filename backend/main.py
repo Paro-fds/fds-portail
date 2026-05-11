@@ -12,7 +12,7 @@ from datetime import datetime, timezone
 from database import engine, get_db, Base
 from models import Candidat, DocumentRequis, DocumentSoumis, Utilisateur
 from services.upload import upload_file_to_cloudinary
-from services.email import send_confirmation_email
+from services.email import send_confirmation_email, send_document_validated_email, send_document_rejected_email
 from core.security import verify_password, create_access_token, SECRET_KEY, ALGORITHM
 from jose import JWTError, jwt
 
@@ -257,4 +257,25 @@ def update_document_statut(doc_id: str, payload: StatutUpdate, db: Session = Dep
     doc.date_validation = datetime.now(timezone.utc)
     
     db.commit()
+
+    # Notification email au candidat selon le nouveau statut
+    candidat = doc.candidat
+    nom_document = doc.document_requis.nom
+    if payload.statut == "valide" and candidat.notifications_actives:
+        send_document_validated_email(
+            to_email=candidat.email,
+            prenom=candidat.prenom,
+            nom=candidat.nom,
+            reference_dossier=candidat.reference_dossier,
+            nom_document=nom_document,
+        )
+    elif payload.statut == "rejete" and candidat.notifications_actives:
+        send_document_rejected_email(
+            to_email=candidat.email,
+            prenom=candidat.prenom,
+            nom=candidat.nom,
+            reference_dossier=candidat.reference_dossier,
+            nom_document=nom_document,
+        )
+
     return {"message": "Statut mis à jour et audité"}
