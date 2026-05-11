@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.responses import Response
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
@@ -8,6 +9,7 @@ import uuid
 import random
 import filetype
 from datetime import datetime, timezone
+import requests as http_requests
 
 from database import engine, get_db, Base
 from models import Candidat, DocumentRequis, DocumentSoumis, Utilisateur
@@ -281,3 +283,27 @@ def update_document_statut(doc_id: str, payload: StatutUpdate, db: Session = Dep
         )
 
     return {"message": "Statut mis à jour et audité"}
+
+
+@app.get("/api/admin/proxy-document")
+def proxy_document(url: str, admin: Utilisateur = Depends(get_current_admin)):
+    """
+    Proxy sécurisé pour afficher les documents Cloudinary inline dans le navigateur.
+    Corrige le problème de Content-Type: application/octet-stream des fichiers 'raw'.
+    Accessible uniquement aux administrateurs authentifiés.
+    """
+    try:
+        resp = http_requests.get(url, timeout=30)
+        resp.raise_for_status()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Impossible de récupérer le document : {e}")
+
+    is_pdf = url.lower().endswith(".pdf") or "/raw/" in url.lower()
+    content_type = "application/pdf" if is_pdf else resp.headers.get("content-type", "image/jpeg")
+
+    return Response(
+        content=resp.content,
+        media_type=content_type,
+        headers={"Content-Disposition": "inline; filename=document.pdf" if is_pdf else "inline"}
+    )
+

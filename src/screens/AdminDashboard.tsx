@@ -20,9 +20,9 @@ interface Candidature {
   documents: DocumentSoumis[];
 }
 
-/** Retourne l'URL Google Docs Viewer pour afficher un PDF inline dans le navigateur */
-function getPdfViewerUrl(url: string): string {
-  return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
+/** Retourne l'URL du proxy backend pour afficher un document avec le bon Content-Type */
+function getProxyUrl(url: string, token: string): string {
+  return `/api/admin/proxy-document?url=${encodeURIComponent(url)}`;
 }
 
 function isPdf(url: string): boolean {
@@ -183,9 +183,9 @@ export default function AdminDashboard() {
 
                           {/* Miniature ou icône PDF */}
                           {isPdf(doc.fichier_url) ? (
-                            // PDF → ouvre dans un nouvel onglet (rendu natif navigateur)
+                            // PDF → proxy backend → nouvel onglet avec Content-Type correct
                             <a
-                              href={doc.fichier_url}
+                              href={getProxyUrl(doc.fichier_url, token!)}
                               target="_blank"
                               rel="noreferrer"
                               className="bg-surface-container-low border border-outline-variant h-24 flex flex-col items-center justify-center gap-1 hover:bg-primary-container/10 hover:border-primary-container/30 transition-colors group"
@@ -212,7 +212,7 @@ export default function AdminDashboard() {
                           <div className="flex items-center justify-between mt-auto pt-2">
                             {isPdf(doc.fichier_url) ? (
                               <a
-                                href={doc.fichier_url}
+                                href={getProxyUrl(doc.fichier_url, token!)}
                                 target="_blank"
                                 rel="noreferrer"
                                 className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
