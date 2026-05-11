@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Search, Loader2, CheckCircle2, Clock, XCircle, FileText, ArrowLeft } from "lucide-react";
+import { useState, useRef } from "react";
+import { Search, Loader2, CheckCircle2, Clock, XCircle, FileText, ArrowLeft, Upload, RefreshCw, AlertCircle } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
 interface DocumentSoumis {
   id: string;
+  document_requis_id: string;
   nom_document: string;
   statut_validation: "en_attente" | "valide" | "rejete";
   soumis_le: string;
@@ -12,6 +13,7 @@ interface DocumentSoumis {
 
 interface TrackingData {
   reference_dossier: string;
+  candidat_id: string;
   prenom: string;
   nom: string;
   documents: DocumentSoumis[];
@@ -23,6 +25,12 @@ export default function Tracking() {
   const [error, setError] = useState<string | null>(null);
   const [data, setData] = useState<TrackingData | null>(null);
 
+  // États pour le remplacement de document
+  const [uploadingDocId, setUploadingDocId] = useState<string | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<string | null>(null);
+  const fileInputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!reference.trim()) return;
@@ -30,6 +38,8 @@ export default function Tracking() {
     setIsSearching(true);
     setError(null);
     setData(null);
+    setUploadError(null);
+    setUploadSuccess(null);
 
     try {
       const res = await fetch(`/api/candidature/${reference}`);
@@ -43,6 +53,51 @@ export default function Tracking() {
       setError(err.message);
     } finally {
       setIsSearching(false);
+    }
+  };
+
+  const handleReplaceDocument = async (doc: DocumentSoumis, file: File) => {
+    if (!data) return;
+
+    setUploadingDocId(doc.id);
+    setUploadError(null);
+    setUploadSuccess(null);
+
+    // Vérifications côté client (miroir des règles backend)
+    const allowedExts = [".pdf", ".jpg", ".jpeg"];
+    const ext = file.name.toLowerCase().slice(file.name.lastIndexOf("."));
+    if (!allowedExts.includes(ext)) {
+      setUploadError("Format invalide. Seuls PDF, JPG et JPEG sont acceptés.");
+      setUploadingDocId(null);
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError("Le fichier dépasse la limite de 5 Mo.");
+      setUploadingDocId(null);
+      return;
+    }
+
+    try {
+      const payload = new FormData();
+      payload.append("candidat_id", data.candidat_id);
+      payload.append("document_requis_id", doc.document_requis_id);
+      payload.append("file", file);
+
+      const res = await fetch("/api/upload", { method: "POST", body: payload });
+      if (!res.ok) {
+        const errData = await res.json();
+        throw new Error(errData.detail || "Erreur lors du remplacement.");
+      }
+
+      // Rafraîchir les données du dossier après succès
+      const refreshRes = await fetch(`/api/candidature/${data.reference_dossier}`);
+      const refreshed = await refreshRes.json();
+      setData(refreshed);
+      setUploadSuccess(`Le document "${doc.nom_document}" a été remplacé. Il est de nouveau en attente de validation.`);
+    } catch (err: any) {
+      setUploadError(err.message);
+    } finally {
+      setUploadingDocId(null);
     }
   };
 
@@ -121,18 +176,81 @@ export default function Tracking() {
               </div>
             </div>
 
+            {/* Messages de feedback upload */}
+            {uploadSuccess && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-2 bg-success/10 text-success border border-success/20 p-4 mb-6 text-sm font-medium"
+              >
+                <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5" />
+                {uploadSuccess}
+              </motion.div>
+            )}
+            {uploadError && (
+              <motion.div
+                initial={{ opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="flex items-start gap-2 bg-error/10 text-error border border-error/20 p-4 mb-6 text-sm font-medium"
+              >
+                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                {uploadError}
+              </motion.div>
+            )}
+
             <h2 className="fds-label-caps mb-4">Statut des Documents Soumis</h2>
             
             <div className="grid gap-3">
               {data.documents.map((doc) => (
-                <div key={doc.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-outline-variant bg-surface-container-low gap-4">
-                  <div className="flex items-center gap-3">
-                    <FileText className="w-5 h-5 text-outline" />
-                    <span className="font-medium">{doc.nom_document}</span>
-                  </div>
-                  <div>
+                <div
+                  key={doc.id}
+                  className={`flex flex-col p-4 border bg-surface-container-low gap-3 transition-colors ${
+                    doc.statut_validation === "rejete"
+                      ? "border-error/30 bg-error/5"
+                      : "border-outline-variant"
+                  }`}
+                >
+                  {/* Ligne principale : nom + statut */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <FileText className="w-5 h-5 text-outline shrink-0" />
+                      <span className="font-medium">{doc.nom_document}</span>
+                    </div>
                     {getStatusBadge(doc.statut_validation)}
                   </div>
+
+                  {/* Zone de remplacement — uniquement si rejeté */}
+                  {doc.statut_validation === "rejete" && (
+                    <div className="border-t border-error/20 pt-3">
+                      <p className="text-xs text-error mb-3 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3" />
+                        Ce document a été rejeté. Vous pouvez le remplacer ci-dessous (PDF, JPG, JPEG — max 5 Mo).
+                      </p>
+                      <label
+                        className={`flex items-center justify-center gap-2 border-2 border-dashed border-error/40 p-3 cursor-pointer text-sm font-medium text-error hover:bg-error/10 transition-colors ${
+                          uploadingDocId === doc.id ? "opacity-50 pointer-events-none" : ""
+                        }`}
+                      >
+                        <input
+                          type="file"
+                          className="hidden"
+                          accept=".pdf,.jpg,.jpeg"
+                          ref={(el) => { fileInputRefs.current[doc.id] = el; }}
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleReplaceDocument(doc, file);
+                            // Reset input pour permettre de re-sélectionner le même fichier
+                            e.target.value = "";
+                          }}
+                        />
+                        {uploadingDocId === doc.id ? (
+                          <><Loader2 className="w-4 h-4 animate-spin" /> Envoi en cours...</>
+                        ) : (
+                          <><Upload className="w-4 h-4" /> Remplacer ce document</>
+                        )}
+                      </label>
+                    </div>
+                  )}
                 </div>
               ))}
               {data.documents.length === 0 && (
@@ -140,12 +258,18 @@ export default function Tracking() {
               )}
             </div>
 
-            <div className="mt-10 pt-6 border-t border-outline-variant text-center">
+            <div className="mt-10 pt-6 border-t border-outline-variant flex flex-col sm:flex-row gap-3 justify-between items-center">
               <button 
-                onClick={() => {setData(null); setReference("");}}
+                onClick={() => { setData(null); setReference(""); setUploadError(null); setUploadSuccess(null); }}
                 className="fds-button-secondary inline-flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" /> Faire une autre recherche
+              </button>
+              <button
+                onClick={() => handleSearch({ preventDefault: () => {} } as React.FormEvent)}
+                className="fds-button-secondary inline-flex items-center gap-2 text-sm"
+              >
+                <RefreshCw className="w-4 h-4" /> Actualiser
               </button>
             </div>
           </motion.div>

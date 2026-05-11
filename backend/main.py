@@ -191,6 +191,7 @@ def get_candidature_tracking(reference_dossier: str, db: Session = Depends(get_d
     for doc in candidat.documents_soumis:
         docs_soumis.append({
             "id": doc.id,
+            "document_requis_id": doc.document_requis_id,
             "nom_document": doc.document_requis.nom,
             "statut_validation": doc.statut_validation,
             "soumis_le": doc.soumis_le
@@ -198,6 +199,7 @@ def get_candidature_tracking(reference_dossier: str, db: Session = Depends(get_d
         
     return {
         "reference_dossier": candidat.reference_dossier,
+        "candidat_id": candidat.id,
         "prenom": candidat.prenom,
         "nom": candidat.nom,
         "documents": docs_soumis
