@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { LogOut, CheckCircle2, XCircle, Clock, Eye, ExternalLink, FileText, Image as ImageIcon } from "lucide-react";
+import { LogOut, CheckCircle2, XCircle, Clock, Eye, ExternalLink, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface DocumentSoumis {
   id: string;
@@ -35,6 +35,31 @@ export default function AdminDashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [openingPdf, setOpeningPdf] = useState<string | null>(null);
+
+  /**
+   * Fetch le PDF via le proxy authentifié → crée une Blob URL → ouvre dans un nouvel onglet.
+   * C'est la seule méthode fiable pour envoyer le token et afficher le PDF inline.
+   */
+  const openPdf = async (cloudinaryUrl: string) => {
+    setOpeningPdf(cloudinaryUrl);
+    try {
+      const res = await fetch(`/api/admin/proxy-document?url=${encodeURIComponent(cloudinaryUrl)}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error("Accès refusé");
+      const blob = await res.blob();
+      const blobUrl = URL.createObjectURL(blob);
+      window.open(blobUrl, "_blank");
+      // Libérer la mémoire après 60s
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
+    } catch (e) {
+      alert("Impossible d'ouvrir le document. Vérifiez votre connexion.");
+    } finally {
+      setOpeningPdf(null);
+    }
+  };
+
 
   const fetchCandidatures = async () => {
     try {
@@ -183,17 +208,19 @@ export default function AdminDashboard() {
 
                           {/* Miniature ou icône PDF */}
                           {isPdf(doc.fichier_url) ? (
-                            // PDF → proxy backend → nouvel onglet avec Content-Type correct
-                            <a
-                              href={getProxyUrl(doc.fichier_url, token!)}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="bg-surface-container-low border border-outline-variant h-24 flex flex-col items-center justify-center gap-1 hover:bg-primary-container/10 hover:border-primary-container/30 transition-colors group"
+                            // PDF → fetch authentifié → Blob URL → nouvel onglet
+                            <button
+                              onClick={() => openPdf(doc.fichier_url)}
+                              disabled={openingPdf === doc.fichier_url}
+                              className="w-full bg-surface-container-low border border-outline-variant h-24 flex flex-col items-center justify-center gap-1 hover:bg-primary-container/10 hover:border-primary-container/30 transition-colors group disabled:opacity-60"
                               title="Cliquer pour ouvrir le PDF"
                             >
-                              <FileText className="w-8 h-8 text-outline group-hover:text-primary-container transition-colors" />
-                              <span className="text-[10px] font-mono uppercase text-outline group-hover:text-primary-container">Ouvrir PDF</span>
-                            </a>
+                              {openingPdf === doc.fichier_url ? (
+                                <><Loader2 className="w-6 h-6 animate-spin text-primary-container" /><span className="text-[10px] font-mono text-outline">Chargement...</span></>
+                              ) : (
+                                <><FileText className="w-8 h-8 text-outline group-hover:text-primary-container transition-colors" /><span className="text-[10px] font-mono uppercase text-outline group-hover:text-primary-container">Ouvrir PDF</span></>
+                              )}
+                            </button>
                           ) : (
                             // Image → ouvre le modal de prévisualisation
                             <div
@@ -211,14 +238,14 @@ export default function AdminDashboard() {
                           
                           <div className="flex items-center justify-between mt-auto pt-2">
                             {isPdf(doc.fichier_url) ? (
-                              <a
-                                href={getProxyUrl(doc.fichier_url, token!)}
-                                target="_blank"
-                                rel="noreferrer"
-                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
+                              <button
+                                onClick={() => openPdf(doc.fichier_url)}
+                                disabled={openingPdf === doc.fichier_url}
+                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline disabled:opacity-50"
                               >
-                                <ExternalLink className="w-3 h-3" /> Ouvrir le PDF
-                              </a>
+                                <ExternalLink className="w-3 h-3" />
+                                {openingPdf === doc.fichier_url ? "Chargement..." : "Ouvrir le PDF"}
+                              </button>
                             ) : (
                               <button
                                 onClick={() => setPreviewUrl(doc.fichier_url)}
