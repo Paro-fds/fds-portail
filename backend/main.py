@@ -12,6 +12,7 @@ from datetime import datetime, timezone
 from database import engine, get_db, Base
 from models import Candidat, DocumentRequis, DocumentSoumis, Utilisateur
 from services.upload import upload_file_to_cloudinary
+from services.email import send_confirmation_email
 from core.security import verify_password, create_access_token, SECRET_KEY, ALGORITHM
 from jose import JWTError, jwt
 
@@ -104,6 +105,16 @@ def create_candidature(candidat: CandidatCreate, db: Session = Depends(get_db)):
     db.add(new_candidat)
     db.commit()
     db.refresh(new_candidat)
+
+    # Envoi de l'email de confirmation (non bloquant)
+    if new_candidat.notifications_actives:
+        send_confirmation_email(
+            to_email=new_candidat.email,
+            prenom=new_candidat.prenom,
+            nom=new_candidat.nom,
+            reference_dossier=new_candidat.reference_dossier,
+        )
+
     return {"id": new_candidat.id, "reference_dossier": new_candidat.reference_dossier, "message": "Candidat créé avec succès"}
 
 @app.post("/api/upload")
@@ -143,6 +154,21 @@ async def upload_document(
         secure_url = upload_file_to_cloudinary(file_bytes, file.filename)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Erreur Cloudinary: {str(e)}")
+
+    # Upsert : si ce type de document existe déjà pour ce candidat, on le remplace
+    existing_doc = db.query(DocumentSoumis).filter(
+        DocumentSoumis.candidat_id == candidat.id,
+        DocumentSoumis.document_requis_id == doc_requis.id
+    ).first()
+
+    if existing_doc:
+        existing_doc.fichier_url = secure_url
+        existing_doc.statut_validation = "en_attente"
+        existing_doc.valide_par = None
+        existing_doc.date_validation = None
+        db.commit()
+        db.refresh(existing_doc)
+        return {"id": existing_doc.id, "url": secure_url, "message": "Document remplacé avec succès"}
 
     doc_soumis = DocumentSoumis(
         candidat_id=candidat.id,
