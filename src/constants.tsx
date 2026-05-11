@@ -102,7 +102,7 @@ export const PROGRAMS: Program[] = [
     name: "Architecture",
     description: "Art et technique de la conception d'espaces bâtis, urbanisme et aménagement.",
     category: "Génie",
-    duration: "10 Semestres", // Je garde 10 pour l'architecture car le message mentionne "génie"
+    duration: "5 Semestres", // Je garde 10 pour l'architecture car le message mentionne "génie"
     credits: "300 ECTS",
     code: "ARC-24"
   }
