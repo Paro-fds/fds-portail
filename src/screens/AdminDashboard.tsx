@@ -20,14 +20,9 @@ interface Candidature {
   documents: DocumentSoumis[];
 }
 
-/** Transforme une URL Cloudinary pour forcer l'affichage inline dans le navigateur */
-function getInlineUrl(url: string): string {
-  if (!url.includes("cloudinary.com")) return url;
-  // Ajoute fl_attachment:false pour les PDFs et force le rendu navigateur
-  if (url.toLowerCase().includes(".pdf") || url.toLowerCase().includes("/raw/")) {
-    return url.replace("/upload/", "/upload/fl_attachment:false/");
-  }
-  return url;
+/** Retourne l'URL Google Docs Viewer pour afficher un PDF inline dans le navigateur */
+function getPdfViewerUrl(url: string): string {
+  return `https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`;
 }
 
 function isPdf(url: string): boolean {
@@ -131,7 +126,7 @@ export default function AdminDashboard() {
             <div className="flex-1 overflow-auto bg-surface-container-lowest">
               {isPdf(previewUrl) ? (
                 <iframe
-                  src={getInlineUrl(previewUrl)}
+                  src={getPdfViewerUrl(previewUrl)}
                   className="w-full h-full min-h-[70vh]"
                   title="Prévisualisation PDF"
                 />
