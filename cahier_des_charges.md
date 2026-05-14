@@ -59,9 +59,14 @@ Déduit des interviews, voici le parcours d'un candidat sans la plateforme :
 - Génération d'un numéro de référence de dossier (ex: `CAN-2026-X`).
 - Suivi du dossier (tracking) en ligne par le candidat via sa référence.
 - Interface sécurisée pour l'administration (changer le statut d'un document).
+- **Notifications automatiques par email** au candidat :
+  - Confirmation de réception après soumission (avec la référence `CAN-2026-X`).
+  - Notification de validation d'un document par l'administration.
+  - Notification de rejet d'un document (avec lien pour le remplacer).
+- Possibilité pour le candidat de **remplacer un document rejeté** depuis la page de suivi.
 
 ### 🟡 Should Have (Important)
-- Notifications automatiques par email (confirmation de réception).
+- Notifications push (SMS) en complément de l'email.
 
 ### 🔴 Won't Have (Hors Scope Phase 1)
 - Paiement en ligne (délégué au Module FDS Pay).
@@ -72,7 +77,7 @@ Déduit des interviews, voici le parcours d'un candidat sans la plateforme :
 ## §5. MVP et Walking Skeleton
 
 ### Le Walking Skeleton (Le parcours minimal de bout en bout)
-> Louismy ouvre le portail FDS sur son téléphone Android. Il consulte la page du cursus Ingénierie. Il clique sur "Postuler", remplit ses informations (nom, prénom, email), et uploade une photo de son diplôme du baccalauréat. Il clique sur "Soumettre". Le système lui affiche immédiatement son numéro de référence `CAN-2026-0089`. Plus tard, Louismy saisit cette référence dans l'espace de suivi et voit que son dossier est en statut **"en attente de validation"**. L'administration voit le dossier apparaître dans son tableau de bord et met à jour son statut.
+> Louismy ouvre le portail FDS sur son téléphone Android. Il consulte la page du cursus Ingénierie. Il clique sur "Postuler", remplit ses informations (nom, prénom, email), et uploade une photo de son diplôme du baccalauréat. Il clique sur "Soumettre". Le système lui affiche immédiatement son numéro de référence `CAN-2026-0089` **et lui envoie un email de confirmation** contenant ce même numéro et un lien vers la page de suivi. Plus tard, Louismy saisit cette référence dans l'espace de suivi et voit que son dossier est en statut **"en attente de validation"**. L'administration voit le dossier apparaître dans son tableau de bord, valide ou rejette un document — **Louismy reçoit immédiatement un email** lui indiquant le statut. Si un document est rejeté, il peut le remplacer directement depuis la page de suivi.
 
 ---
 
@@ -111,6 +116,9 @@ usecaseDiagram
 - **US1 :** En tant que candidat, je veux consulter la liste des documents requis afin de préparer mon dossier d'admission.
 - **US2 :** En tant que candidat, je veux téléverser mes fichiers (PDF/JPG) en ligne afin de ne pas avoir à les apporter physiquement au secrétariat.
 - **US3 :** En tant qu'administrateur, je veux modifier le statut d'un document (`valide`, `rejete`) afin que le candidat connaisse l'état de sa demande.
+- **US4 :** En tant que candidat, je veux recevoir un email de confirmation après soumission afin d'avoir une trace officielle de mon dossier.
+- **US5 :** En tant que candidat, je veux être notifié par email lorsqu'un document est validé ou rejeté afin de réagir rapidement.
+- **US6 :** En tant que candidat, je veux pouvoir remplacer un document rejeté depuis la page de suivi afin de corriger mon dossier sans me déplacer.
 
 ---
 
@@ -147,13 +155,14 @@ stateDiagram-v2
     Examen_Admin --> [*]
 ```
 
-### 7.2 Diagramme de Séquence (Appel API Upload)
+### 7.2 Diagramme de Séquence (Appel API Upload + Notification Email)
 ```mermaid
 sequenceDiagram
     participant C as Candidat (React)
     participant API as FastAPI (Backend)
     participant DB as PostgreSQL
     participant Cloud as Cloudinary
+    participant Mail as Resend (Email)
     
     C->>API: POST /api/upload (Fichier Binaire)
     activate API
@@ -163,9 +172,14 @@ sequenceDiagram
     deactivate Cloud
     API->>DB: INSERT document_soumis (URL, statut='en_attente')
     DB-->>API: OK
-    DB-->>API: reference_dossier
-    API-->>C: 201 Created + reference
+    API->>Mail: send_confirmation_email(email, ref)
+    Mail-->>C: Email HTML (Référence + lien suivi)
+    API-->>C: 201 Created + reference_dossier
     deactivate API
+
+    Note over API,Mail: Lors de la validation/rejet par l'admin
+    API->>Mail: send_document_validated/rejected_email()
+    Mail-->>C: Email HTML (statut du document)
 ```
 
 ---
@@ -277,10 +291,25 @@ flowchart TB
 Le portail applique plusieurs mécanismes de sécurité afin de protéger les données des candidats et l’intégrité du système.
 
 - **Validation des fichiers uploadés :** seuls les formats PDF, JPG et JPEG sont acceptés.
-- **Contrôle du type MIME réel :** le backend vérifie le type effectif du fichier et ne se fie pas uniquement à l’extension.
+- **Contrôle du type MIME réel :** le backend vérifie le type effectif du fichier et ne se fie pas uniquement à l'extension.
 - **Limitation de taille :** chaque fichier est limité à **5 Mo**.
 - **Stockage indirect :** les fichiers ne sont pas exposés directement depuis le serveur applicatif ; ils sont stockés via un service externe avec URL sécurisée.
-- **Références de dossier uniques :** chaque soumission reçoit une référence unique afin d’éviter toute ambiguïté de suivi.
-- **Contrôle d’accès administrateur :** seuls les utilisateurs authentifiés disposant du rôle approprié peuvent accéder au back-office.
-- **Authentification centralisée :** l’accès des administrateurs repose sur des jetons JWT validés à partir de la table partagée `Utilisateur`.
+- **Références de dossier uniques :** chaque soumission reçoit une référence unique afin d'éviter toute ambiguïté de suivi.
+- **Contrainte d'unicité en base :** la table `documents_soumis` possède une contrainte `UNIQUE(candidat_id, document_requis_id)` empêchant les doublons au niveau SQL.
+- **Contrôle d'accès administrateur :** seuls les utilisateurs authentifiés disposant du rôle approprié peuvent accéder au back-office.
+- **Authentification centralisée :** l'accès des administrateurs repose sur des jetons JWT validés à partir de la table partagée `Utilisateur`.
 - **Validation côté backend :** toutes les règles métier critiques sont vérifiées côté serveur, indépendamment des contrôles frontend.
+
+### Système de notification par email
+
+Le portail intègre un service de notification transactionnel par email via **Resend** (API REST). Trois événements déclenchent automatiquement un envoi :
+
+| Événement | Destinataire | Contenu de l'email |
+|---|---|---|
+| Soumission de candidature | Candidat | Confirmation HTML avec numéro de référence `CAN-XXXX` et lien vers la page de suivi |
+| Document **validé** par l'admin | Candidat | Notification verte indiquant le nom du document validé |
+| Document **rejeté** par l'admin | Candidat | Notification rouge avec le nom du document et un bouton **"Remplacer le document →"** |
+
+- Les emails sont **conditionnels** : l'envoi ne se produit que si `notifications_actives = true` sur le profil du candidat.
+- Le service est **non-bloquant** : une erreur d'envoi email ne fait pas échouer la requête API principale.
+- L'implémentation se trouve dans `backend/services/email.py`.

@@ -55,7 +55,14 @@ export default function Application() {
   }, []);
 
   const handleNext = () => {
-    if (step === "info") setStep("upload");
+    setError(null);
+    if (step === "info") {
+      if (!formData.nom.trim() || !formData.prenom.trim() || !formData.email.trim() || !formData.telephone.trim()) {
+        setError("Veuillez remplir tous les champs (Nom, Prénom, Email, Téléphone) avant de continuer.");
+        return;
+      }
+      setStep("upload");
+    }
     else if (step === "upload") setStep("success");
   };
 
@@ -92,7 +99,7 @@ export default function Application() {
         const payload = new FormData();
         payload.append('candidat_id', candidatId);
         payload.append('document_requis_id', docId);
-        payload.append('file', file);
+        payload.append('file', file as File);
         
         const uploadRes = await fetch('/api/upload', {
           method: 'POST',
@@ -194,6 +201,12 @@ export default function Application() {
             <div className="mb-10 border-b border-outline-variant pb-6">
               <h2 className="font-display text-3xl font-bold mb-2">Informations Personnelles</h2>
               <p className="text-on-surface-variant">Veuillez remplir vos informations de base pour commencer votre candidature.</p>
+              {error && (
+                <div className="mt-4 flex items-center gap-2 text-error bg-error/10 p-4 border border-error/20">
+                  <AlertCircle className="w-5 h-5 shrink-0" />
+                  <span className="text-sm font-medium">{error}</span>
+                </div>
+              )}
             </div>
 
             <form className="space-y-6">
