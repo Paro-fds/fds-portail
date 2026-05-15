@@ -3,7 +3,6 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { Lock } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function Header() {
@@ -24,12 +23,12 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-14 w-full border-b border-outline-variant bg-surface px-4 flex items-center justify-between">
-      <Link to="/" className="flex items-center gap-2 group">
-        <div className="bg-primary-container p-1 rounded-none transition-transform group-hover:scale-105">
-          <Lock className="w-4 h-4 text-on-primary fill-current" />
+    <header className="sticky top-0 z-50 h-16 w-full bg-surface/80 backdrop-blur-md px-8 flex items-center justify-between">
+      <Link to="/" className="flex items-center gap-3 group">
+        <div className="bg-primary p-1.5 rounded-md transition-transform group-hover:scale-105 flex items-center justify-center">
+          <span className="material-symbols-outlined text-white text-sm">lock</span>
         </div>
-        <span className="font-display text-lg font-black uppercase tracking-tighter text-primary-container">
+        <span className="font-headline text-lg font-extrabold uppercase tracking-tight text-primary">
           FDS Portail
         </span>
       </Link>
@@ -39,10 +38,10 @@ export default function Header() {
           <Link
             key={item.path}
             to={item.path}
-            className={`h-full flex items-center px-2 font-display text-sm font-bold uppercase tracking-tight transition-colors border-b-2 ${
+            className={`h-full flex items-center px-4 font-headline text-sm font-semibold transition-all rounded-md my-2 ${
               isActive(item.path)
-                ? "text-primary-container border-primary-container"
-                : "text-on-surface-variant border-transparent hover:text-primary-container hover:bg-surface-container-low"
+                ? "bg-surface-bright text-primary"
+                : "text-secondary hover:bg-surface-container-low hover:text-primary hover:translate-x-1"
             }`}
           >
             {item.name}
@@ -51,7 +50,7 @@ export default function Header() {
       </nav>
 
       <div className="flex items-center gap-4">
-        <button className="font-display text-sm font-bold uppercase tracking-tight text-primary-container hover:bg-surface-container-low px-2 py-1 transition-colors">
+        <button className="font-headline text-sm font-semibold uppercase tracking-tight text-primary bg-surface-container-low hover:bg-surface-container px-3 py-1.5 rounded-md transition-colors">
           FR/HT
         </button>
       </div>

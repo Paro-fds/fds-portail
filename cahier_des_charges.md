@@ -64,12 +64,13 @@ Déduit des interviews, voici le parcours d'un candidat sans la plateforme :
   - Notification de validation d'un document par l'administration.
   - Notification de rejet d'un document (avec lien pour le remplacer).
 - Possibilité pour le candidat de **remplacer un document rejeté** depuis la page de suivi.
+- **Simulation du paiement des frais** (MonCash / NatCash) avec génération d'une référence transactionnelle pour préparer l'interconnexion future avec le module FDS Pay.
 
 ### 🟡 Should Have (Important)
 - Notifications push (SMS) en complément de l'email.
 
 ### 🔴 Won't Have (Hors Scope Phase 1)
-- Paiement en ligne (délégué au Module FDS Pay).
+- Transactions monétaires réelles (L'argent réel est délégué au Module FDS Pay, seule l'UX et la persistance de simulation sont dans ce MVP).
 - Plateforme de cours (déléguée à FDS Akademi).
 
 ---
@@ -119,6 +120,7 @@ usecaseDiagram
 - **US4 :** En tant que candidat, je veux recevoir un email de confirmation après soumission afin d'avoir une trace officielle de mon dossier.
 - **US5 :** En tant que candidat, je veux être notifié par email lorsqu'un document est validé ou rejeté afin de réagir rapidement.
 - **US6 :** En tant que candidat, je veux pouvoir remplacer un document rejeté depuis la page de suivi afin de corriger mon dossier sans me déplacer.
+- **US7 :** En tant que candidat, je veux simuler le paiement de mes frais via MonCash ou NatCash afin de finaliser mon inscription avant de téléverser mes documents.
 
 ---
 
@@ -241,6 +243,7 @@ classDiagram
 - La taille maximale d'un fichier est fixée à 5 Mo.
 - Le backend vérifie le type MIME réel avant enregistrement.
 - Un document rejeté peut être remplacé par le candidat.
+- L'admission nécessite la validation préalable d'une étape de paiement (statut et référence enregistrés en BDD).
 
 ---
 

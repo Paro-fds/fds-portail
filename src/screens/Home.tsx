@@ -5,7 +5,6 @@
 
 import { Link } from "react-router-dom";
 import { PROGRAMS } from "../constants";
-import { ArrowRight, Building2, Beaker, Info, Calendar, School, Clock, Newspaper, ChevronDown, ChevronUp, HelpCircle } from "lucide-react";
 import { useState } from "react";
 
 export default function Home() {
@@ -21,53 +20,54 @@ export default function Home() {
     <div className="max-w-7xl mx-auto px-4 py-8">
       {/* Hero Section */}
       <section className="mb-12">
-        <div className="bg-surface-container rounded-none p-8 border border-outline-variant flex flex-col md:flex-row items-center gap-8 justify-between relative overflow-hidden">
+        <div className="relative overflow-hidden rounded-xl bg-gradient-to-br from-primary to-primary-container p-12 text-on-primary shadow-lg flex flex-col md:flex-row items-center gap-8 justify-between">
+          <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-[-10%] right-[10%] w-64 h-64 bg-tertiary/20 rounded-full blur-2xl"></div>
           <div className="relative z-10 max-w-2xl">
-            <span className="fds-label-caps text-primary-container mb-2 block">Faculté des Sciences — UEH</span>
-            <h1 className="font-display text-4xl font-black text-primary-container mb-4">
+            <span className="font-label text-[10px] font-bold uppercase tracking-widest text-primary-fixed block mb-3">Faculté des Sciences — UEH</span>
+            <h1 className="font-headline text-5xl font-extrabold text-white mb-4 tracking-tight">
               Portail d'Admission & d'Information
             </h1>
-            <p className="text-lg text-on-surface-variant mb-6 leading-relaxed">
+            <p className="font-body text-lg text-white/90 mb-8 leading-relaxed">
               Bienvenue sur la porte d'entrée numérique de la FDS. Explorez nos cycles de formation, suivez les actualités, consultez les dates clés et soumettez votre candidature en ligne.
             </p>
             <Link 
               to="/candidature" 
-              className="fds-button-primary inline-flex items-center gap-2 group"
+              className="px-6 py-4 bg-white text-primary font-headline font-bold rounded-md hover:bg-surface-container-low active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-max"
             >
               Démarrer une candidature
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              <span className="material-symbols-outlined text-lg">arrow_forward</span>
             </Link>
           </div>
-          <div className="hidden md:block absolute right-[-5%] top-[-10%] w-64 h-64 bg-primary-container/5 rounded-full blur-3xl" />
         </div>
       </section>
 
       {/* Présentation de la Faculté */}
-      <section className="mb-12">
-        <div className="bg-surface border border-outline-variant p-8 rounded-3xl shadow-sm">
-          <div className="flex flex-col md:flex-row gap-8 items-start">
+      <section className="mb-16">
+        <div className="bg-surface-container-lowest p-8 rounded-xl shadow-[0_8px_24px_rgba(17,28,45,0.06)] border border-outline-variant/15">
+          <div className="flex flex-col md:flex-row gap-12 items-start">
             <div className="flex-1">
-              <span className="fds-label-caps text-primary-container mb-3 inline-block">À propos de la FDS</span>
-              <h2 className="font-display text-3xl font-bold text-on-surface mb-4">La Faculté des Sciences de l’UEH</h2>
-              <p className="text-on-surface-variant leading-relaxed text-lg mb-6">
+              <span className="font-label text-[10px] font-bold uppercase tracking-widest text-primary mb-3 inline-block">À propos de la FDS</span>
+              <h2 className="font-headline text-3xl font-bold text-on-surface mb-6">La Faculté des Sciences de l’UEH</h2>
+              <p className="font-body text-on-surface-variant leading-relaxed text-lg mb-8">
                 La FDS est le pôle scientifique de l’Université d’État d’Haïti, formant des ingénieurs, des chercheurs et des techniciens capables de répondre aux enjeux du développement national. Elle associe rigueur académique, innovation et ancrage local pour permettre aux étudiants de réussir dans les domaines des sciences fondamentales et appliquées.
               </p>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                 {[
                   { title: "Rigueur scientifique", text: "Programmes solides et encadrement académique" },
                   { title: "Ouverture métier", text: "Parcours orientés vers l’ingénierie, la recherche et le secteur technique" },
                   { title: "Accès national", text: "Un portail pensé pour les candidats en province et en ville" }
                 ].map((item) => (
-                  <div key={item.title} className="bg-surface-container-low border border-outline-variant p-4 rounded-3xl">
-                    <h3 className="font-display text-sm font-bold text-primary-container mb-2">{item.title}</h3>
-                    <p className="text-sm text-on-surface-variant leading-relaxed">{item.text}</p>
+                  <div key={item.title} className="bg-surface-container-low p-6 rounded-xl border border-outline-variant/15">
+                    <h3 className="font-headline text-sm font-bold text-primary mb-3">{item.title}</h3>
+                    <p className="font-body text-sm text-on-surface-variant leading-relaxed">{item.text}</p>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="flex-1 bg-primary-container/5 border border-primary-container/20 rounded-3xl p-6">
-              <div className="text-primary-container font-display font-bold uppercase tracking-wide mb-4">Mission</div>
-              <p className="text-on-surface-variant leading-relaxed">
+            <div className="w-full md:w-1/3 bg-primary-container/5 rounded-xl p-8 border-l-4 border-primary">
+              <div className="text-primary font-headline font-bold uppercase tracking-wide mb-4">Mission</div>
+              <p className="font-body text-on-surface-variant leading-relaxed">
                 Offrir une visibilité claire et accessible aux programmes de formation, simplifier l’accès à l’information et réduire la dépendance aux contacts physiques pour les futurs candidats.
               </p>
             </div>
@@ -76,34 +76,40 @@ export default function Home() {
       </section>
 
       {/* Dates Clés - Important institutional block */}
-      <section className="mb-12">
-        <div className="bg-surface-container-high border-2 border-primary-container/10 p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Calendar className="text-primary-container w-6 h-6" />
-            <h2 className="font-display font-bold uppercase tracking-widest text-primary-container">
+      <section className="mb-16">
+        <div className="bg-surface-container-low rounded-xl p-8 border-l-4 border-primary">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="material-symbols-outlined text-primary text-2xl">calendar_today</span>
+            <h2 className="font-headline font-bold text-xl text-primary">
               Dates Clés — Admission 2026
             </h2>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-white p-4 border border-outline-variant flex items-start gap-4">
-              <div className="bg-primary-container/10 p-2 text-primary-container"><Calendar className="w-5 h-5" /></div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 flex items-start gap-4">
+              <div className="bg-primary-container/10 p-3 rounded-md text-primary">
+                <span className="material-symbols-outlined">event</span>
+              </div>
               <div>
-                <span className="fds-label-caps block mb-1">Ouverture</span>
-                <span className="font-display font-bold text-lg">15 Juillet 2026</span>
+                <span className="font-label text-xs font-semibold uppercase tracking-wider text-secondary block mb-1">Ouverture</span>
+                <span className="font-headline font-bold text-lg text-on-surface">15 Juillet 2026</span>
               </div>
             </div>
-            <div className="bg-white p-4 border border-outline-variant flex items-start gap-4">
-              <div className="bg-error-container/20 p-2 text-error"><Clock className="w-5 h-5" /></div>
+            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 flex items-start gap-4">
+              <div className="bg-error-container/50 p-3 rounded-md text-error">
+                <span className="material-symbols-outlined">schedule</span>
+              </div>
               <div>
-                <span className="fds-label-caps block mb-1">Clôture</span>
-                <span className="font-display font-bold text-lg">30 Août 2026</span>
+                <span className="font-label text-xs font-semibold uppercase tracking-wider text-secondary block mb-1">Clôture</span>
+                <span className="font-headline font-bold text-lg text-on-surface">30 Août 2026</span>
               </div>
             </div>
-            <div className="bg-primary-container text-on-primary p-4 shadow-md flex items-start gap-4">
-              <div className="bg-white/20 p-2"><School className="w-5 h-5" /></div>
+            <div className="bg-primary text-on-primary p-6 rounded-xl shadow-lg flex items-start gap-4">
+              <div className="bg-white/20 p-3 rounded-md">
+                <span className="material-symbols-outlined text-white">school</span>
+              </div>
               <div>
-                <span className="text-xs font-bold uppercase text-white/70 block mb-1">Concours</span>
-                <span className="font-display font-bold text-lg">15 Septembre 2026</span>
+                <span className="font-label text-xs font-semibold uppercase tracking-wider text-primary-fixed block mb-1">Concours</span>
+                <span className="font-headline font-bold text-lg text-white">15 Septembre 2026</span>
               </div>
             </div>
           </div>
@@ -111,31 +117,31 @@ export default function Home() {
       </section>
 
       {/* Actualités & Blog */}
-      <section className="mb-12">
-        <div className="flex items-center justify-between mb-6">
+      <section className="mb-16">
+        <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <Newspaper className="text-primary-container w-6 h-6" />
-            <h2 className="font-display text-2xl font-bold">Actualités & Annonces</h2>
+            <span className="material-symbols-outlined text-primary text-2xl">newspaper</span>
+            <h2 className="font-headline text-2xl font-bold text-on-surface">Actualités & Annonces</h2>
           </div>
-          <button className="text-sm font-bold text-primary-container hover:underline hidden sm:block">Voir tout</button>
+          <button className="text-sm font-bold text-primary hover:underline hidden sm:block">Voir tout</button>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {[
             { tag: "Concours", title: "Ouverture des inscriptions 2026", date: "10 Mai 2026", desc: "Les inscriptions pour le nouveau cycle propédeutique débuteront officiellement en juillet." },
             { tag: "Infrastructures", title: "Nouveau laboratoire de génie civil", date: "2 Mai 2026", desc: "La FDS inaugure son nouveau laboratoire de résistance des matériaux financé par nos partenaires." },
             { tag: "Recherche", title: "Conférence sur l'IA appliquée", date: "28 Avril 2026", desc: "Venez assister à notre séminaire sur les applications de l'intelligence artificielle en Haïti." }
           ].map((news, idx) => (
-            <div key={idx} className="bg-surface border border-outline-variant hover:border-primary-container/50 transition-colors flex flex-col h-full">
-              <div className="h-32 bg-surface-container-high relative overflow-hidden flex items-center justify-center border-b border-outline-variant">
-                 <Newspaper className="w-10 h-10 text-outline opacity-20" />
-                 <span className="absolute top-2 right-2 bg-surface text-xs font-bold px-2 py-1 uppercase">{news.tag}</span>
+            <div key={idx} className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 hover:shadow-[0_8px_24px_rgba(17,28,45,0.06)] transition-all flex flex-col h-full overflow-hidden">
+              <div className="h-32 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+                 <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-20">newspaper</span>
+                 <span className="absolute top-4 right-4 bg-surface text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded-md">{news.tag}</span>
               </div>
-              <div className="p-4 flex flex-col flex-1">
-                <span className="text-[10px] font-mono text-outline mb-2">{news.date}</span>
-                <h3 className="font-display font-bold text-lg mb-2 line-clamp-2">{news.title}</h3>
-                <p className="text-sm text-on-surface-variant line-clamp-3 mb-4 flex-1">{news.desc}</p>
-                <button className="text-primary-container text-sm font-bold inline-flex items-center gap-1 group w-max">
-                  Lire l'article <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+              <div className="p-6 flex flex-col flex-1">
+                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-3">{news.date}</span>
+                <h3 className="font-headline font-bold text-lg text-on-surface mb-3 line-clamp-2">{news.title}</h3>
+                <p className="font-body text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-6 flex-1">{news.desc}</p>
+                <button className="text-primary text-sm font-bold inline-flex items-center gap-1 group w-max">
+                  Lire l'article <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
                 </button>
               </div>
             </div>
@@ -144,35 +150,35 @@ export default function Home() {
       </section>
 
       {/* Catalog Grid */}
-      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-12 gap-6 scroll-mt-20">
+      <div id="catalogue" className="grid grid-cols-1 md:grid-cols-12 gap-8 scroll-mt-24 mb-16">
         {/* Cycle Propédeutique */}
         {(() => {
           const propProgram = PROGRAMS.find(p => p.category === "Propédeutique");
           return propProgram ? (
-            <section className="md:col-span-12 bg-surface border border-outline-variant p-6 hover:border-primary-container transition-colors group">
+            <section className="md:col-span-12 bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 hover:shadow-[0_8px_24px_rgba(17,28,45,0.06)] transition-all group">
               <Link to={`/programme/${propProgram.id}`} className="block">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="w-12 h-12 bg-surface-container-highest flex items-center justify-center text-primary-container shrink-0">
-                    <span className="text-2xl font-bold">Σ</span>
+                <div className="flex items-start gap-6 mb-6">
+                  <div className="w-16 h-16 bg-primary-container/10 rounded-xl flex items-center justify-center text-primary shrink-0 group-hover:bg-primary group-hover:text-white transition-colors">
+                    <span className="text-3xl font-headline font-bold">Σ</span>
                   </div>
                   <div>
-                    <h2 className="font-display text-2xl font-bold text-on-surface mb-1 group-hover:text-primary-container">
+                    <h2 className="font-headline text-3xl font-bold text-on-surface mb-2 group-hover:text-primary transition-colors">
                       {propProgram.name}
                     </h2>
-                    <div className="flex items-center gap-3 mb-2">
-                      <span className="bg-secondary-container text-on-secondary-container px-2 py-0.5 text-[10px] font-bold uppercase">Tronc Commun</span>
-                      <span className="text-on-surface-variant text-sm flex items-center gap-1 font-mono">
-                        <Clock className="w-4 h-4" /> {propProgram.duration.toLowerCase()}
+                    <div className="flex items-center gap-4 mb-4">
+                      <span className="bg-primary-fixed text-on-primary-fixed-variant px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded">Tronc Commun</span>
+                      <span className="text-secondary text-sm flex items-center gap-1 font-body font-medium">
+                        <span className="material-symbols-outlined text-sm">schedule</span> {propProgram.duration.toLowerCase()}
                       </span>
                     </div>
-                    <p className="text-sm text-on-surface-variant max-w-3xl leading-relaxed">
+                    <p className="font-body text-base text-on-surface-variant max-w-4xl leading-relaxed">
                       {propProgram.description}
                     </p>
                   </div>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-6 border-t border-outline-variant/30 pt-6">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mt-8 pt-8 border-t border-outline-variant/15">
                   {["Maths", "Physique", "Chimie"].map(sub => (
-                    <div key={sub} className="bg-surface-container-low border border-outline-variant/50 p-3 text-center font-display font-bold text-primary-container">
+                    <div key={sub} className="bg-surface-container-low p-4 rounded-xl text-center font-headline font-bold text-primary">
                       {sub}
                     </div>
                   ))}
@@ -183,22 +189,22 @@ export default function Home() {
         })()}
 
         {/* Spécialisations en Génie */}
-        <section className="md:col-span-8 bg-surface border border-outline-variant p-6">
-          <div className="flex items-center gap-3 mb-6 border-b border-outline-variant/30 pb-4">
-            <Building2 className="text-on-surface-variant w-5 h-5" />
-            <h2 className="font-display text-xl font-bold">Spécialisations en Génie</h2>
+        <section className="md:col-span-8 bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="material-symbols-outlined text-secondary text-xl">domain</span>
+            <h2 className="font-headline text-xl font-bold text-on-surface">Spécialisations en Génie</h2>
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             {PROGRAMS.filter(p => p.category === "Génie").map(prog => (
               <Link 
                 key={prog.id} 
                 to={`/programme/${prog.id}`}
-                className="border border-outline-variant/50 p-4 hover:bg-surface-container-low transition-colors group"
+                className="bg-surface-container-low p-6 rounded-xl hover:bg-surface-container transition-colors group"
               >
-                <h3 className="font-display font-bold text-primary-container mb-2 group-hover:underline">
+                <h3 className="font-headline font-bold text-primary mb-3 group-hover:underline">
                   {prog.name}
                 </h3>
-                <p className="text-xs text-on-surface-variant line-clamp-2">
+                <p className="font-body text-sm text-on-surface-variant leading-relaxed line-clamp-2">
                   {prog.description}
                 </p>
               </Link>
@@ -207,22 +213,22 @@ export default function Home() {
         </section>
 
         {/* Filières Scientifiques & Techniques */}
-        <section className="md:col-span-4 bg-surface-container-low border border-outline-variant p-6 flex flex-col">
-          <div className="flex items-center gap-3 mb-6 border-b border-outline-variant/30 pb-4">
-            <Beaker className="text-on-surface-variant w-5 h-5" />
-            <h2 className="font-display text-lg font-bold">Filières Scientifiques</h2>
+        <section className="md:col-span-4 bg-surface-container-low rounded-xl p-8 flex flex-col">
+          <div className="flex items-center gap-3 mb-8">
+            <span className="material-symbols-outlined text-secondary text-xl">science</span>
+            <h2 className="font-headline text-lg font-bold text-on-surface">Filières Scientifiques</h2>
           </div>
-          <div className="space-y-3 flex-grow">
+          <div className="space-y-4 flex-grow">
             {["Licence en Chimie", "Topographie", "Tech. Analyste Programmeur"].map(item => (
-              <div key={item} className="bg-surface border border-outline-variant/50 p-3 flex justify-between items-center group cursor-pointer hover:border-primary-container">
-                <span className="text-sm font-medium text-on-surface">{item}</span>
-                <ArrowRight className="w-4 h-4 text-outline transition-transform group-hover:translate-x-1" />
+              <div key={item} className="bg-surface-container-lowest p-4 rounded-xl flex justify-between items-center group cursor-pointer hover:shadow-[0_4px_12px_rgba(17,28,45,0.04)] transition-all">
+                <span className="font-body text-sm font-semibold text-on-surface">{item}</span>
+                <span className="material-symbols-outlined text-secondary text-sm transition-transform group-hover:translate-x-1">arrow_forward</span>
               </div>
             ))}
           </div>
-          <div className="mt-6 bg-surface-container-highest p-4 border border-outline-variant/30 text-center flex flex-col items-center gap-2">
-            <Info className="w-5 h-5 text-primary-container" />
-            <p className="text-xs text-on-surface-variant font-medium italic">
+          <div className="mt-8 bg-surface-container p-6 rounded-xl text-center flex flex-col items-center gap-3">
+            <span className="material-symbols-outlined text-primary text-xl">info</span>
+            <p className="font-body text-xs text-on-surface-variant font-medium leading-relaxed">
               Cycles courts ou licences spécialisées axées sur la pratique technique.
             </p>
           </div>
@@ -230,32 +236,30 @@ export default function Home() {
       </div>
 
       {/* FAQ Section */}
-      <section className="mb-12 mt-16 pt-12 border-t border-outline-variant">
-        <div className="max-w-3xl mx-auto">
-          <div className="text-center mb-8">
-            <div className="w-12 h-12 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-4">
-               <HelpCircle className="w-6 h-6 text-primary-container" />
+      <section className="mb-12 mt-16">
+        <div className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12">
+          <div className="text-center mb-12">
+            <div className="w-16 h-16 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-6">
+               <span className="material-symbols-outlined text-primary text-3xl">help</span>
             </div>
-            <h2 className="font-display text-3xl font-bold mb-2">Foire Aux Questions</h2>
-            <p className="text-on-surface-variant">Les réponses aux questions les plus fréquentes posées par nos candidats.</p>
+            <h2 className="font-headline text-3xl font-bold text-on-surface mb-4">Foire Aux Questions</h2>
+            <p className="font-body text-lg text-on-surface-variant">Les réponses aux questions les plus fréquentes posées par nos candidats.</p>
           </div>
           
-          <div className="flex flex-col gap-3">
+          <div className="flex flex-col gap-4 max-w-3xl mx-auto">
             {faqs.map((faq, idx) => (
-              <div key={idx} className="bg-surface border border-outline-variant overflow-hidden">
+              <div key={idx} className="bg-surface-container-low rounded-xl overflow-hidden">
                 <button 
                   onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
-                  className="w-full p-4 flex items-center justify-between text-left hover:bg-surface-container-low transition-colors"
+                  className="w-full p-6 flex items-center justify-between text-left hover:bg-surface-container transition-colors"
                 >
-                  <span className="font-display font-bold pr-4">{faq.q}</span>
-                  {openFaq === idx ? (
-                    <ChevronUp className="w-5 h-5 text-primary-container shrink-0" />
-                  ) : (
-                    <ChevronDown className="w-5 h-5 text-outline shrink-0" />
-                  )}
+                  <span className="font-headline font-bold text-on-surface pr-6">{faq.q}</span>
+                  <span className="material-symbols-outlined text-primary shrink-0">
+                    {openFaq === idx ? "expand_less" : "expand_more"}
+                  </span>
                 </button>
                 {openFaq === idx && (
-                  <div className="p-4 pt-0 text-on-surface-variant text-sm bg-surface-container-low border-t border-outline-variant/30">
+                  <div className="px-6 pb-6 pt-0 font-body text-sm text-on-surface-variant leading-relaxed">
                     {faq.a}
                   </div>
                 )}
@@ -263,9 +267,9 @@ export default function Home() {
             ))}
           </div>
           
-          <div className="mt-8 text-center bg-surface-container-low p-6 border border-outline-variant/50">
-            <p className="text-sm text-on-surface-variant mb-4">Vous n'avez pas trouvé la réponse à votre question ?</p>
-            <Link to="/aide" className="fds-button-secondary inline-flex items-center gap-2">
+          <div className="mt-12 text-center">
+            <p className="font-body text-sm text-on-surface-variant mb-6">Vous n'avez pas trouvé la réponse à votre question ?</p>
+            <Link to="/aide" className="px-6 py-3 bg-surface-container-high text-primary font-headline font-bold rounded-md hover:bg-surface-container transition-colors inline-flex items-center justify-center">
                Contacter l'administration
             </Link>
           </div>

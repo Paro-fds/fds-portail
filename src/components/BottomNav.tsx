@@ -3,17 +3,16 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { GraduationCap, ClipboardList, LifeBuoy, Search } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function BottomNav() {
   const location = useLocation();
 
   const navItems = [
-    { name: "Candidature", path: "/candidature", icon: ClipboardList },
-    { name: "Accueil", path: "/", icon: GraduationCap },
-    { name: "Suivi", path: "/suivi", icon: Search },
-    { name: "Aide", path: "/aide", icon: LifeBuoy },
+    { name: "Candidat", path: "/candidature", icon: "assignment" },
+    { name: "Accueil", path: "/", icon: "school" },
+    { name: "Suivi", path: "/suivi", icon: "search" },
+    { name: "Aide", path: "/aide", icon: "help" },
   ];
 
   const isActive = (path: string) => {
@@ -24,22 +23,23 @@ export default function BottomNav() {
   };
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex items-center justify-around bg-surface border-t border-outline-variant">
+    <nav className="md:hidden fixed bottom-0 left-0 w-full z-50 h-16 flex items-center justify-around bg-surface-container-lowest/90 backdrop-blur-md shadow-[0_-8px_24px_rgba(17,28,45,0.06)] pb-safe">
       {navItems.map((item) => {
-        const Icon = item.icon;
         const active = isActive(item.path);
         return (
           <Link
             key={item.path}
             to={item.path}
-            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all ${
+            className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all rounded-t-xl ${
               active 
-                ? "text-primary-container bg-surface-container-low border-t-2 border-primary-container" 
-                : "text-on-surface-variant hover:text-primary-container"
+                ? "text-primary bg-surface-container-low" 
+                : "text-secondary hover:text-primary hover:bg-surface-container-low/50"
             }`}
           >
-            <Icon className={`w-5 h-5 ${active ? "fill-current" : ""}`} />
-            <span className="font-display text-[10px] font-bold uppercase tracking-widest">
+            <span className={`material-symbols-outlined text-[20px] ${active ? "font-bold" : ""}`}>
+              {item.icon}
+            </span>
+            <span className="font-headline text-[10px] font-bold uppercase tracking-widest">
               {item.name}
             </span>
           </Link>

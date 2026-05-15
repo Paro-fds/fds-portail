@@ -1,20 +1,8 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
-import { useState, useEffect, useRef } from "react";
-import { 
-  Mail, Phone, MapPin, 
-  ArrowRight, Upload, 
-  FileCheck, AlertCircle, BadgeCheck, 
-  Home, RefreshCw, FileText, Lock,
-  School, Image, User, Loader2, CheckCircle2
-} from "lucide-react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
 
-type Step = "prerequis" | "info" | "upload" | "success";
+type Step = "prerequis" | "info" | "payment" | "upload" | "success";
 
 interface DocumentRequis {
   id: string;
@@ -26,27 +14,29 @@ interface DocumentRequis {
 
 const getIconForDoc = (nom: string) => {
   const lowerNom = nom.toLowerCase();
-  if (lowerNom.includes("naissance")) return <User className="w-6 h-6" />;
-  if (lowerNom.includes("bac")) return <School className="w-6 h-6" />;
-  if (lowerNom.includes("notes")) return <FileCheck className="w-6 h-6" />;
-  if (lowerNom.includes("photo")) return <Image className="w-6 h-6" />;
-  return <FileText className="w-6 h-6" />;
+  if (lowerNom.includes("naissance")) return "person";
+  if (lowerNom.includes("bac")) return "school";
+  if (lowerNom.includes("notes")) return "task";
+  if (lowerNom.includes("photo")) return "image";
+  return "description";
 };
 
 export default function Application() {
   const [step, setStep] = useState<Step>("prerequis");
   const [formData, setFormData] = useState({
-    nom: "", prenom: "", email: "", telephone: "", ville: "Port-au-Prince"
+    nom: "", prenom: "", email: "", telephone: "", ville: "Port-au-Prince",
+    methodePaiement: "MonCash" as "MonCash" | "NatCash",
+    telephonePaiement: ""
   });
   
-  // Nouveaux états dynamiques
   const [documentsRequis, setDocumentsRequis] = useState<DocumentRequis[]>([]);
   const [files, setFiles] = useState<Record<string, File>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSimulatingPayment, setIsSimulatingPayment] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [referenceDossier, setReferenceDossier] = useState<string | null>(null);
+  const [referencePaiement, setReferencePaiement] = useState<string | null>(null);
 
-  // Appel API pour récupérer les règles de la BDD (Phase 4)
   useEffect(() => {
     fetch('/api/documents-requis')
       .then(res => res.json())
@@ -58,12 +48,28 @@ export default function Application() {
     setError(null);
     if (step === "info") {
       if (!formData.nom.trim() || !formData.prenom.trim() || !formData.email.trim() || !formData.telephone.trim()) {
-        setError("Veuillez remplir tous les champs (Nom, Prénom, Email, Téléphone) avant de continuer.");
+        setError("Veuillez remplir tous les champs obligatoires avant de continuer.");
         return;
       }
-      setStep("upload");
+      setStep("payment");
     }
     else if (step === "upload") setStep("success");
+  };
+
+  const handlePaymentSubmit = () => {
+    setError(null);
+    if (!formData.telephonePaiement.trim()) {
+      setError("Veuillez entrer le numéro de téléphone lié à votre compte.");
+      return;
+    }
+    setIsSimulatingPayment(true);
+    
+    // Simulation of payment processing delay (2s)
+    setTimeout(() => {
+      setIsSimulatingPayment(false);
+      setReferencePaiement(`SIM-${Math.random().toString(36).substring(2, 9).toUpperCase()}`);
+      setStep("upload");
+    }, 2000);
   };
 
   const handleFileChange = (docId: string, file: File | null) => {
@@ -72,7 +78,6 @@ export default function Application() {
   };
 
   const handleFinalSubmit = async () => {
-    // Vérification : tous les documents sont-ils présents ?
     if (Object.keys(files).length < documentsRequis.length) {
       setError("Veuillez téléverser tous les documents requis avant de soumettre.");
       return;
@@ -82,11 +87,17 @@ export default function Application() {
     setError(null);
 
     try {
-      // 1. Création du candidat
       const candRes = await fetch('/api/candidature', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...formData, notifications_actives: true })
+        body: JSON.stringify({ 
+          nom: formData.nom,
+          prenom: formData.prenom,
+          email: formData.email,
+          notifications_actives: true,
+          methode_paiement: formData.methodePaiement,
+          reference_paiement: referencePaiement
+        })
       });
       if (!candRes.ok) throw new Error("Erreur lors de la création du candidat.");
       
@@ -94,7 +105,6 @@ export default function Application() {
       const candidatId = candData.id;
       setReferenceDossier(candData.reference_dossier);
 
-      // 2. Upload des fichiers vers Cloudinary via FastAPI
       const uploadPromises = Object.entries(files).map(async ([docId, file]) => {
         const payload = new FormData();
         payload.append('candidat_id', candidatId);
@@ -110,8 +120,6 @@ export default function Application() {
       });
 
       await Promise.all(uploadPromises);
-      
-      // 3. Succès
       setStep("success");
     } catch (e: any) {
       setError(e.message || "Une erreur inconnue est survenue.");
@@ -121,7 +129,7 @@ export default function Application() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
+    <div className="max-w-3xl mx-auto px-4 py-8 md:py-16">
       <AnimatePresence mode="wait">
         {step === "prerequis" && (
           <motion.div
@@ -129,52 +137,53 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface border border-outline-variant p-6 md:p-10"
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
-             <div className="mb-10">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="font-display text-2xl font-bold text-primary-container uppercase">Prérequis</h1>
-                <span className="font-mono text-sm text-outline">Avant de commencer</span>
+             <div className="mb-12">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
+                <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Prérequis</span>
               </div>
-              <div className="h-1.5 w-full bg-surface-container-highest">
-                <div className="h-full w-1/4 bg-primary-container" />
+              <div className="flex gap-2">
+                <div className="h-1.5 w-1/4 bg-primary rounded-full" />
+                <div className="h-1.5 w-3/4 bg-surface-container-high rounded-full" />
               </div>
             </div>
 
-            <div className="mb-10 border-b border-outline-variant pb-6">
-              <h2 className="font-display text-3xl font-bold mb-2">Documents Requis</h2>
-              <p className="text-on-surface-variant">Pour soumettre votre candidature, vous aurez besoin de numériser les documents suivants. Ces exigences proviennent de la base de données officielle.</p>
-              <div className="mt-4 flex items-start gap-3 bg-error-container/10 text-error p-4 border border-error/20">
-                <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
-                <p className="text-sm">Votre candidature ne pourra pas être finalisée sans ces documents.</p>
+            <div className="mb-10">
+              <h2 className="font-headline text-2xl font-bold mb-3 text-on-surface">Documents Requis</h2>
+              <p className="font-body text-on-surface-variant leading-relaxed">Pour soumettre votre candidature, vous aurez besoin de numériser les documents suivants.</p>
+              <div className="mt-6 flex items-start gap-4 bg-error-container/10 p-5 rounded-md border-l-4 border-error">
+                <span className="material-symbols-outlined text-error shrink-0">error</span>
+                <p className="font-body text-sm text-error font-medium">Votre candidature ne pourra pas être finalisée sans ces documents et sans le paiement des frais.</p>
               </div>
             </div>
 
             <div className="grid gap-4 mb-10">
               {documentsRequis.map((doc) => (
-                <div key={doc.id} className="flex items-start gap-4 p-4 border border-outline-variant bg-surface-container-low">
-                  <div className="bg-primary-container/10 p-2 text-primary-container shrink-0">
-                    {getIconForDoc(doc.nom)}
+                <div key={doc.id} className="flex items-start gap-4 p-5 rounded-xl border border-outline-variant/15 bg-surface-container-low hover:border-primary-container/30 transition-colors">
+                  <div className="bg-primary-container/10 p-3 rounded-md text-primary shrink-0">
+                    <span className="material-symbols-outlined text-xl">{getIconForDoc(doc.nom)}</span>
                   </div>
                   <div>
-                    <h3 className="font-display font-bold">{doc.nom}</h3>
-                    <p className="text-sm text-on-surface-variant">Format {doc.format_accepte} uniquement</p>
+                    <h3 className="font-headline font-bold text-on-surface">{doc.nom}</h3>
+                    <p className="font-body text-xs text-secondary mt-1 uppercase tracking-widest">Format {doc.format_accepte} uniquement</p>
                   </div>
                 </div>
               ))}
               {documentsRequis.length === 0 && (
-                <div className="p-8 text-center text-outline animate-pulse">Chargement des documents depuis la BDD...</div>
+                <div className="p-8 text-center text-outline animate-pulse font-body text-sm">Chargement des documents depuis la BDD...</div>
               )}
             </div>
 
-            <div className="pt-8 border-t border-outline-variant flex justify-end">
+            <div className="pt-6 flex justify-end">
               <button 
                 type="button" onClick={() => setStep("info")}
-                className="fds-button-primary flex items-center gap-2 group"
+                className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group"
                 disabled={documentsRequis.length === 0}
               >
                 J'ai préparé ces documents
-                <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
               </button>
             </div>
           </motion.div>
@@ -186,78 +195,75 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface border border-outline-variant p-6 md:p-10"
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
-            <div className="mb-10">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="font-display text-2xl font-bold text-primary-container uppercase">Candidature</h1>
-                <span className="font-mono text-sm text-outline">Étape 1/2</span>
+            <div className="mb-12">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
+                <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 1/3</span>
               </div>
-              <div className="h-1.5 w-full bg-surface-container-highest">
-                <div className="h-full w-1/2 bg-primary-container" />
+              <div className="flex gap-2">
+                <div className="h-1.5 w-2/4 bg-primary rounded-full" />
+                <div className="h-1.5 w-2/4 bg-surface-container-high rounded-full" />
               </div>
             </div>
 
-            <div className="mb-10 border-b border-outline-variant pb-6">
-              <h2 className="font-display text-3xl font-bold mb-2">Informations Personnelles</h2>
-              <p className="text-on-surface-variant">Veuillez remplir vos informations de base pour commencer votre candidature.</p>
+            <div className="mb-10">
+              <h2 className="font-headline text-2xl font-bold mb-3 text-on-surface">Informations Personnelles</h2>
+              <p className="font-body text-on-surface-variant leading-relaxed">Veuillez remplir vos informations de base pour commencer votre candidature.</p>
               {error && (
-                <div className="mt-4 flex items-center gap-2 text-error bg-error/10 p-4 border border-error/20">
-                  <AlertCircle className="w-5 h-5 shrink-0" />
-                  <span className="text-sm font-medium">{error}</span>
+                <div className="mt-6 flex items-start gap-4 bg-error-container/10 p-5 rounded-md border-l-4 border-error">
+                  <span className="material-symbols-outlined text-error shrink-0">error</span>
+                  <span className="font-body text-sm font-medium text-error">{error}</span>
                 </div>
               )}
             </div>
 
-            <form className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="flex flex-col gap-2">
-                  <label className="fds-label-caps" htmlFor="nom">Nom</label>
+            <form className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="nom">Nom de famille</label>
                   <input 
                     type="text" id="nom" 
-                    placeholder="Votre nom de famille"
-                    className="h-11 border border-outline-variant px-4 focus:outline-none focus:border-primary-container hover:border-outline transition-colors"
+                    placeholder="Votre nom"
+                    className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
                     value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})}
                   />
                 </div>
-                <div className="flex flex-col gap-2">
-                  <label className="fds-label-caps" htmlFor="prenom">Prénom</label>
+                <div className="space-y-2">
+                  <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="prenom">Prénom</label>
                   <input 
                     type="text" id="prenom" 
                     placeholder="Votre prénom"
-                    className="h-11 border border-outline-variant px-4 focus:outline-none focus:border-primary-container"
+                    className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
                     value={formData.prenom} onChange={e => setFormData({...formData, prenom: e.target.value})}
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="fds-label-caps" htmlFor="email">Email</label>
-                <div className="relative">
-                  <input 
-                    type="email" id="email" 
-                    placeholder="votre.email@exemple.com"
-                    className="w-full h-11 border border-outline-variant px-4 pr-12 focus:outline-none focus:border-primary-container transition-colors"
-                    value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="email">Email</label>
+                <input 
+                  type="email" id="email" 
+                  placeholder="votre.email@exemple.com"
+                  className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
+                  value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="fds-label-caps" htmlFor="tel">Téléphone</label>
-                <div className="relative">
-                  <input 
-                    type="tel" id="tel" 
-                    placeholder="+509 XX XX XX XX"
-                    className="w-full h-11 border border-outline-variant px-4 pr-12 focus:outline-none focus:border-primary-container transition-colors"
-                    value={formData.telephone} onChange={e => setFormData({...formData, telephone: e.target.value})}
-                  />
-                </div>
+              <div className="space-y-2">
+                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="tel">Téléphone</label>
+                <input 
+                  type="tel" id="tel" 
+                  placeholder="+509 XX XX XX XX"
+                  className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
+                  value={formData.telephone} onChange={e => setFormData({...formData, telephone: e.target.value})}
+                />
               </div>
 
-              <div className="flex flex-col gap-2">
-                <label className="fds-label-caps" htmlFor="ville">Ville</label>
-                <select id="ville" className="h-11 border border-outline-variant px-2 bg-surface focus:outline-none"
+              <div className="space-y-2">
+                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="ville">Ville de résidence</label>
+                <select id="ville" className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface"
                   value={formData.ville} onChange={e => setFormData({...formData, ville: e.target.value})}
                 >
                   <option>Port-au-Prince</option>
@@ -271,16 +277,125 @@ export default function Application() {
                 </select>
               </div>
 
-              <div className="pt-8 border-t border-outline-variant mt-10 flex justify-end">
+              <div className="pt-8 flex justify-between items-center gap-4">
+                <button 
+                  type="button" onClick={() => setStep("prerequis")}
+                  className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
+                >
+                  Précédent
+                </button>
                 <button 
                   type="button" onClick={handleNext}
-                  className="fds-button-primary inline-flex items-center gap-2 group"
+                  className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group"
                 >
-                  Suivant
-                  <ArrowRight className="w-5 h-5 transition-transform group-hover:translate-x-1" />
+                  Payer les frais
+                  <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">payment</span>
                 </button>
               </div>
             </form>
+          </motion.div>
+        )}
+
+        {step === "payment" && (
+          <motion.div
+            key="payment"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
+          >
+            <div className="mb-12">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
+                <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 2/3</span>
+              </div>
+              <div className="flex gap-2">
+                <div className="h-1.5 w-3/4 bg-primary rounded-full" />
+                <div className="h-1.5 w-1/4 bg-surface-container-high rounded-full" />
+              </div>
+            </div>
+
+            <div className="mb-10 text-center">
+              <span className="material-symbols-outlined text-5xl text-primary opacity-80 mb-4">payments</span>
+              <h2 className="font-headline text-2xl font-bold mb-3 text-on-surface">Paiement des Frais d'Admission</h2>
+              <p className="font-body text-on-surface-variant leading-relaxed">Le paiement s'effectue via le module FDS Pay. Pour le MVP, cette étape est simulée.</p>
+              
+              <div className="mt-6 flex flex-col items-center justify-center p-6 bg-surface-container-low rounded-xl border border-outline-variant/15">
+                <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary mb-2">Montant à payer</span>
+                <span className="font-headline text-4xl font-extrabold text-on-surface">1,000 HTG</span>
+              </div>
+            </div>
+
+            {error && (
+              <div className="mb-8 flex items-start gap-4 bg-error-container/10 p-5 rounded-md border-l-4 border-error">
+                <span className="material-symbols-outlined text-error shrink-0">error</span>
+                <span className="font-body text-sm font-medium text-error">{error}</span>
+              </div>
+            )}
+
+            <div className="space-y-8">
+              <div>
+                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary block mb-4">Méthode de Paiement</label>
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({...formData, methodePaiement: "MonCash"})}
+                    className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${formData.methodePaiement === 'MonCash' ? 'border-[#DA291C] bg-[#DA291C]/5' : 'border-outline-variant/20 hover:border-outline-variant/50'}`}
+                  >
+                    <span className="font-headline font-bold text-lg" style={{color: formData.methodePaiement === 'MonCash' ? '#DA291C' : 'inherit'}}>MonCash</span>
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setFormData({...formData, methodePaiement: "NatCash"})}
+                    className={`p-4 rounded-xl border-2 flex flex-col items-center gap-2 transition-all ${formData.methodePaiement === 'NatCash' ? 'border-[#004B87] bg-[#004B87]/5' : 'border-outline-variant/20 hover:border-outline-variant/50'}`}
+                  >
+                    <span className="font-headline font-bold text-lg" style={{color: formData.methodePaiement === 'NatCash' ? '#004B87' : 'inherit'}}>NatCash</span>
+                  </button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="telPaiement">Numéro de téléphone ({formData.methodePaiement})</label>
+                <div className="relative group">
+                  <span className="absolute left-0 bottom-2 text-secondary group-focus-within:text-primary transition-colors flex items-center">
+                    <span className="material-symbols-outlined text-lg">smartphone</span>
+                  </span>
+                  <input 
+                    type="tel" id="telPaiement" 
+                    placeholder="XX XX XX XX"
+                    className="w-full pl-8 pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
+                    value={formData.telephonePaiement} onChange={e => setFormData({...formData, telephonePaiement: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-8 flex justify-between items-center gap-4">
+                <button 
+                  type="button" onClick={() => setStep("info")}
+                  className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
+                  disabled={isSimulatingPayment}
+                >
+                  Précédent
+                </button>
+                <button 
+                  type="button" onClick={handlePaymentSubmit}
+                  disabled={isSimulatingPayment}
+                  className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group disabled:opacity-70 disabled:cursor-not-allowed"
+                >
+                  {isSimulatingPayment ? (
+                    <>
+                      <span className="material-symbols-outlined animate-spin text-lg">sync</span>
+                      Traitement FDS Pay...
+                    </>
+                  ) : (
+                    <>
+                      Confirmer le paiement
+                      <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">check_circle</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
           </motion.div>
         )}
 
@@ -290,49 +405,54 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface border border-outline-variant p-6 md:p-10"
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
-             <div className="mb-10">
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="font-display text-2xl font-bold text-primary-container uppercase">Candidature</h1>
-                <span className="font-mono text-sm text-outline">Étape 2/2</span>
+             <div className="mb-12">
+              <div className="flex justify-between items-center mb-6">
+                <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
+                <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 3/3</span>
               </div>
-              <div className="h-1.5 w-full bg-surface-container-highest">
-                <div className="h-full w-full bg-primary-container" />
+              <div className="flex gap-2">
+                <div className="h-1.5 w-full bg-primary rounded-full" />
               </div>
             </div>
 
-            <div className="mb-10 border-b border-outline-variant pb-6">
-              <h2 className="font-display text-3xl font-bold mb-2">Dossier Académique</h2>
-              <p className="text-on-surface-variant">Veuillez fournir les documents requis ci-dessous pour l'analyse de votre dossier.</p>
+            <div className="mb-10">
+              <div className="flex items-center gap-3 mb-6 bg-tertiary-container/20 text-tertiary p-4 rounded-xl border border-tertiary/20">
+                <span className="material-symbols-outlined">verified</span>
+                <span className="font-body text-sm font-medium">Paiement confirmé (Réf: {referencePaiement})</span>
+              </div>
+              
+              <h2 className="font-headline text-2xl font-bold mb-3 text-on-surface">Dossier Académique</h2>
+              <p className="font-body text-on-surface-variant leading-relaxed">Veuillez fournir les documents requis ci-dessous pour l'analyse de votre dossier.</p>
               {error && (
-                <div className="mt-4 flex items-center gap-2 text-error bg-error/10 p-4 border border-error/20">
-                  <AlertCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">{error}</span>
+                <div className="mt-6 flex items-start gap-4 bg-error-container/10 p-5 rounded-md border-l-4 border-error">
+                  <span className="material-symbols-outlined text-error shrink-0">error</span>
+                  <span className="font-body text-sm font-medium text-error">{error}</span>
                 </div>
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
               {documentsRequis.map((doc, index) => {
                 const hasFile = !!files[doc.id];
                 const fileObj = files[doc.id];
                 
                 return (
-                  <div key={doc.id} className={`bg-surface-container-low border p-6 flex flex-col gap-6 ${hasFile ? 'border-primary-container/50' : 'border-outline-variant'} ${index === documentsRequis.length - 1 && index % 2 === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
+                  <div key={doc.id} className={`bg-surface-container-low rounded-xl p-6 flex flex-col gap-6 border transition-colors ${hasFile ? 'border-primary/50' : 'border-outline-variant/15'} ${index === documentsRequis.length - 1 && index % 2 === 0 ? 'md:col-span-2 lg:col-span-1' : ''}`}>
                     <div className="flex justify-between items-start">
                       <div>
-                        <h3 className="font-display font-bold flex items-center gap-2">
-                           {getIconForDoc(doc.nom)} {doc.nom}
+                        <h3 className="font-headline font-bold flex items-center gap-2 text-on-surface">
+                           <span className="material-symbols-outlined text-xl text-primary">{getIconForDoc(doc.nom)}</span> {doc.nom}
                         </h3>
-                        <span className="text-[10px] font-mono text-outline mt-1 block">Format: {doc.format_accepte}</span>
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-secondary mt-2 block">Format: {doc.format_accepte}</span>
                       </div>
-                      <span className="bg-primary-container/10 px-2 py-0.5 text-[8px] font-black uppercase text-primary-container ring-1 ring-primary-container/20 tracking-tighter">
+                      <span className="bg-primary-container/10 px-2 py-1 text-[10px] font-bold uppercase tracking-widest text-primary rounded-md">
                         {doc.est_obligatoire ? "Requis" : "Optionnel"}
                       </span>
                     </div>
 
-                    <label className={`border-2 border-dashed bg-white min-h-[160px] flex flex-col items-center justify-center p-4 text-center cursor-pointer transition-all group relative overflow-hidden ${hasFile ? 'border-primary-container bg-primary-container/5' : 'border-outline-variant hover:border-primary-container hover:bg-primary-container/5'}`}>
+                    <label className={`border-2 border-dashed rounded-xl bg-surface-container-lowest min-h-[160px] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all group relative overflow-hidden ${hasFile ? 'border-primary bg-primary/5' : 'border-outline-variant/30 hover:border-primary hover:bg-primary/5'}`}>
                        <input 
                          type="file" className="hidden" 
                          accept={doc.format_accepte.includes('PDF') ? '.pdf' : 'image/*'}
@@ -340,16 +460,16 @@ export default function Application() {
                        />
                        
                        {hasFile ? (
-                         <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-2 text-primary">
-                           <CheckCircle2 className="w-8 h-8 text-primary-container" />
+                         <motion.div initial={{ scale: 0.8 }} animate={{ scale: 1 }} className="flex flex-col items-center gap-3 text-primary">
+                           <span className="material-symbols-outlined text-3xl">check_circle</span>
                            <span className="text-xs font-bold truncate max-w-[200px]">{fileObj.name}</span>
-                           <span className="text-[10px] text-outline">{(fileObj.size / 1024 / 1024).toFixed(2)} MB</span>
+                           <span className="text-[10px] uppercase tracking-widest text-secondary">{(fileObj.size / 1024 / 1024).toFixed(2)} MB</span>
                          </motion.div>
                        ) : (
                          <>
-                           <Upload className="w-8 h-8 text-outline mb-2 group-hover:scale-110 transition-transform" />
-                           <span className="fds-label-caps text-primary text-[10px]">Cliquer pour téléverser</span>
-                           <span className="text-[10px] text-outline mt-1">Glissez-déposez le fichier ici</span>
+                           <span className="material-symbols-outlined text-3xl text-secondary mb-3 group-hover:text-primary transition-colors group-hover:scale-110">upload</span>
+                           <span className="font-label text-xs font-bold uppercase tracking-widest text-primary mb-1">Cliquer pour téléverser</span>
+                           <span className="text-[10px] text-secondary uppercase tracking-widest">Ou glissez-déposez ici</span>
                          </>
                        )}
                     </label>
@@ -358,10 +478,10 @@ export default function Application() {
               })}
             </div>
 
-            <div className="pt-8 border-t border-outline-variant flex justify-between">
+            <div className="pt-6 flex flex-col sm:flex-row justify-between gap-4">
               <button 
-                type="button" onClick={() => setStep("info")}
-                className="fds-button-secondary text-sm"
+                type="button" onClick={() => setStep("payment")}
+                className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
                 disabled={isSubmitting}
               >
                 Précédent
@@ -369,17 +489,17 @@ export default function Application() {
               <button 
                 type="button" onClick={handleFinalSubmit}
                 disabled={isSubmitting}
-                className="fds-button-primary flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed group"
               >
                 {isSubmitting ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="material-symbols-outlined animate-spin text-lg">hourglass_empty</span>
                     Téléversement en cours...
                   </>
                 ) : (
                   <>
                     Soumettre le dossier
-                    <BadgeCheck className="w-5 h-5 transition-transform group-hover:scale-110" />
+                    <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">verified</span>
                   </>
                 )}
               </button>
@@ -392,36 +512,36 @@ export default function Application() {
             key="success"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-surface border border-outline-variant p-8 md:p-16 flex flex-col items-center text-center gap-8 shadow-2xl"
+            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-16 flex flex-col items-center text-center gap-8 shadow-[0_16px_48px_rgba(17,28,45,0.08)]"
           >
-            <div className="flex flex-col items-center gap-4">
-               <div className="bg-success/10 p-6 rounded-full border border-success/20">
-                <BadgeCheck className="w-16 h-16 text-success fill-current" />
+            <div className="flex flex-col items-center gap-6">
+               <div className="bg-tertiary-container/10 p-6 rounded-full">
+                <span className="material-symbols-outlined text-6xl text-tertiary">verified</span>
                </div>
-               <h1 className="font-display text-4xl font-black text-on-surface tracking-tighter uppercase">Candidature Enregistrée</h1>
+               <h1 className="font-headline text-4xl font-extrabold text-on-surface tracking-tight uppercase">Candidature Enregistrée</h1>
             </div>
 
-            <div className="w-full max-w-sm bg-surface-container-low border border-outline-variant p-6 flex flex-col gap-2">
-               <span className="fds-label-caps text-on-surface-variant text-[10px]">Référence Officielle du Dossier</span>
-               <span className="font-mono text-2xl font-black text-primary-container tracking-[.25em] select-all">{referenceDossier || "EN-ATTENTE"}</span>
+            <div className="w-full max-w-sm bg-surface-container-low rounded-xl p-8 flex flex-col gap-3">
+               <span className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary">Référence Officielle du Dossier</span>
+               <span className="font-mono text-3xl font-black text-primary tracking-[.15em] select-all">{referenceDossier || "EN-ATTENTE"}</span>
             </div>
 
-            <p className="text-on-surface-variant leading-relaxed max-w-md">
-              Un email de confirmation sécurisé a été envoyé. Vos {documentsRequis.length} documents ont été téléversés avec succès sur notre plateforme Cloudinary et liés à votre base de données PostgreSQL.
+            <p className="font-body text-on-surface-variant leading-relaxed max-w-md">
+              Un email de confirmation sécurisé a été envoyé. Vos {documentsRequis.length} documents et votre paiement ({referencePaiement}) ont été validés avec succès.
             </p>
 
-            <div className="w-full flex flex-col sm:flex-row gap-4 mt-4">
-               <Link to="/suivi" className="flex-1 fds-button-primary flex items-center justify-center gap-2">
-                 <RefreshCw className="w-4 h-4" /> Suivi du dossier
+            <div className="w-full max-w-md flex flex-col sm:flex-row gap-4 mt-6">
+               <Link to="/suivi" className="flex-1 px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container transition-all flex items-center justify-center gap-2 shadow-sm">
+                 <span className="material-symbols-outlined text-lg">search</span> Suivi du dossier
                </Link>
-               <Link to="/" className="flex-1 fds-button-secondary flex items-center justify-center gap-2">
-                 <Home className="w-4 h-4" /> Retour à l'accueil
+               <Link to="/" className="flex-1 px-6 py-4 bg-transparent text-primary border border-primary/20 font-headline font-bold rounded-md hover:bg-primary/5 transition-all flex items-center justify-center gap-2">
+                 <span className="material-symbols-outlined text-lg">home</span> Accueil
                </Link>
             </div>
 
-            <div className="pt-8 border-t border-outline-variant w-full mt-4 flex items-center justify-center gap-2 opacity-50 grayscale">
-               <Lock className="w-4 h-4" />
-               <span className="fds-label-caps text-[10px]">Portail Sécurisé — Faculté des Sciences (UEH)</span>
+            <div className="pt-8 w-full mt-4 flex items-center justify-center gap-2 opacity-50">
+               <span className="material-symbols-outlined text-sm">lock</span>
+               <span className="font-label text-[10px] font-bold uppercase tracking-widest">Portail Sécurisé — Faculté des Sciences (UEH)</span>
             </div>
           </motion.div>
         )}

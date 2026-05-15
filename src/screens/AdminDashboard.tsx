@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
-import { LogOut, CheckCircle2, XCircle, Clock, Eye, ExternalLink, FileText, Image as ImageIcon, Loader2 } from "lucide-react";
 
 interface DocumentSoumis {
   id: string;
@@ -16,6 +15,9 @@ interface Candidature {
   prenom: string;
   nom: string;
   email: string;
+  statut_paiement?: string;
+  methode_paiement?: string;
+  reference_paiement?: string;
   created_at: string;
   documents: DocumentSoumis[];
 }
@@ -39,7 +41,6 @@ export default function AdminDashboard() {
 
   /**
    * Fetch le PDF via le proxy authentifié → crée une Blob URL → ouvre dans un nouvel onglet.
-   * C'est la seule méthode fiable pour envoyer le token et afficher le PDF inline.
    */
   const openPdf = async (cloudinaryUrl: string) => {
     setOpeningPdf(cloudinaryUrl);
@@ -51,7 +52,6 @@ export default function AdminDashboard() {
       const blob = await res.blob();
       const blobUrl = URL.createObjectURL(blob);
       window.open(blobUrl, "_blank");
-      // Libérer la mémoire après 60s
       setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
     } catch (e) {
       alert("Impossible d'ouvrir le document. Vérifiez votre connexion.");
@@ -101,58 +101,70 @@ export default function AdminDashboard() {
 
   const getStatusBadge = (status: string) => {
     switch (status) {
-      case "valide": return <span className="bg-success/10 text-success px-2 py-0.5 text-[10px] font-bold uppercase rounded-sm border border-success/20">Validé</span>;
-      case "rejete": return <span className="bg-error/10 text-error px-2 py-0.5 text-[10px] font-bold uppercase rounded-sm border border-error/20">Rejeté</span>;
-      default: return <span className="bg-warning/10 text-warning px-2 py-0.5 text-[10px] font-bold uppercase rounded-sm border border-warning/20">En Attente</span>;
+      case "valide": return <span className="bg-tertiary/10 text-tertiary px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max"><span className="material-symbols-outlined text-xs">check_circle</span> Validé</span>;
+      case "rejete": return <span className="bg-error/10 text-error px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max"><span className="material-symbols-outlined text-xs">cancel</span> Rejeté</span>;
+      default: return <span className="bg-secondary/10 text-secondary px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max"><span className="material-symbols-outlined text-xs">schedule</span> En Attente</span>;
     }
   };
 
+  const getPaymentBadge = (status?: string, methode?: string, reference?: string) => {
+    if (status === "paye") {
+      const isMonCash = methode === "MonCash";
+      return (
+        <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max ${isMonCash ? 'bg-[#DA291C]/10 text-[#DA291C]' : 'bg-[#004B87]/10 text-[#004B87]'}`} title={`Réf: ${reference}`}>
+          <span className="material-symbols-outlined text-xs">payments</span> Payé via {methode}
+        </span>
+      );
+    }
+    return <span className="bg-error/10 text-error px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max"><span className="material-symbols-outlined text-xs">money_off</span> Non payé</span>;
+  };
+
   return (
-    <div className="max-w-6xl mx-auto px-4 py-8">
-      <div className="flex justify-between items-end border-b border-outline-variant pb-6 mb-8">
+    <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-outline-variant/30 pb-6 mb-10 gap-4">
         <div>
-          <h1 className="font-display text-3xl font-black uppercase tracking-tight text-primary-container">Tableau de Bord</h1>
-          <p className="text-on-surface-variant mt-1">Gestion des admissions FDS</p>
+          <h1 className="font-headline text-3xl font-extrabold uppercase tracking-tight text-primary">Tableau de Bord</h1>
+          <p className="font-body text-secondary mt-1">Gestion des admissions FDS</p>
         </div>
-        <button onClick={logout} className="fds-button-secondary text-sm flex items-center gap-2 h-9">
-          <LogOut className="w-4 h-4" /> Déconnexion
+        <button onClick={logout} className="px-4 py-2 bg-transparent text-secondary border border-outline-variant/30 font-headline text-sm font-bold rounded-md hover:bg-surface-container-low transition-colors flex items-center gap-2">
+          <span className="material-symbols-outlined text-lg">logout</span> Déconnexion
         </button>
       </div>
 
       {/* Modal de prévisualisation — Images uniquement */}
       {previewUrl && !isPdf(previewUrl) && (
         <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          className="fixed inset-0 bg-inverse-surface/90 backdrop-blur-sm z-50 flex items-center justify-center p-4"
           onClick={() => setPreviewUrl(null)}
         >
           <div
-            className="bg-surface max-w-3xl w-full rounded-lg overflow-hidden shadow-2xl"
+            className="bg-surface-container-lowest max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl border border-outline-variant/15"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center p-4 border-b border-outline-variant">
-              <span className="font-display font-bold">Prévisualisation</span>
+            <div className="flex justify-between items-center p-4 border-b border-outline-variant/15">
+              <span className="font-headline font-bold text-on-surface">Prévisualisation</span>
               <div className="flex gap-2">
                 <a
                   href={previewUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="fds-button-secondary text-xs flex items-center gap-1 h-8 px-3"
+                  className="px-4 py-2 bg-surface-container-low text-primary font-headline text-xs font-bold rounded-md hover:bg-surface-container transition-colors flex items-center gap-2"
                 >
-                  <ExternalLink className="w-3 h-3" /> Ouvrir
+                  <span className="material-symbols-outlined text-sm">open_in_new</span> Ouvrir
                 </a>
                 <button
                   onClick={() => setPreviewUrl(null)}
-                  className="w-8 h-8 flex items-center justify-center text-outline hover:text-on-surface border border-outline-variant"
+                  className="w-8 h-8 flex items-center justify-center text-secondary hover:text-on-surface hover:bg-surface-container-low rounded-md transition-colors"
                 >
-                  ✕
+                  <span className="material-symbols-outlined text-xl">close</span>
                 </button>
               </div>
             </div>
-            <div className="bg-surface-container-lowest p-4 flex items-center justify-center min-h-[300px]">
+            <div className="bg-surface-container p-6 flex items-center justify-center min-h-[400px]">
               <img
                 src={previewUrl}
                 alt="Prévisualisation"
-                className="max-w-full max-h-[70vh] object-contain"
+                className="max-w-full max-h-[70vh] object-contain rounded-lg shadow-sm"
               />
             </div>
           </div>
@@ -160,71 +172,84 @@ export default function AdminDashboard() {
       )}
 
       {isLoading ? (
-        <div className="text-center py-20 text-outline">Chargement des dossiers...</div>
+        <div className="flex flex-col items-center justify-center py-32 gap-4">
+          <span className="material-symbols-outlined animate-spin text-4xl text-primary">hourglass_empty</span>
+          <span className="font-body text-secondary">Chargement des dossiers...</span>
+        </div>
       ) : (
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-6">
           {candidatures.length === 0 ? (
-            <div className="bg-surface-container-low p-10 text-center border border-outline-variant text-on-surface-variant">
-              Aucun dossier de candidature reçu pour le moment.
+            <div className="bg-surface-container-lowest p-16 rounded-xl border border-outline-variant/15 flex flex-col items-center justify-center gap-4 shadow-[0_4px_12px_rgba(17,28,45,0.04)]">
+              <span className="material-symbols-outlined text-4xl text-outline">folder_open</span>
+              <p className="font-body text-on-surface-variant text-center">Aucun dossier de candidature reçu pour le moment.</p>
             </div>
           ) : (
             candidatures.map((c) => (
-              <div key={c.id} className="bg-surface border border-outline-variant">
+              <div key={c.id} className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 overflow-hidden shadow-[0_4px_12px_rgba(17,28,45,0.04)] hover:shadow-[0_8px_24px_rgba(17,28,45,0.08)] transition-shadow">
                 {/* Ligne Résumé */}
                 <div 
-                  className="p-4 flex items-center justify-between cursor-pointer hover:bg-surface-container-low transition-colors"
+                  className={`p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between cursor-pointer transition-colors ${expandedId === c.id ? "bg-surface-container-low" : "hover:bg-surface-container-low"}`}
                   onClick={() => setExpandedId(expandedId === c.id ? null : c.id)}
                 >
-                  <div className="flex items-center gap-6">
-                    <div className="font-mono text-sm font-black bg-primary-container/10 px-2 py-1 text-primary-container">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-4 sm:mb-0">
+                    <div className="font-mono text-xs font-black tracking-widest bg-primary-container/10 px-3 py-1.5 rounded-md text-primary inline-flex items-center gap-2 w-max">
+                      <span className="material-symbols-outlined text-sm">badge</span>
                       {c.reference_dossier}
                     </div>
                     <div>
-                      <h3 className="font-display font-bold text-lg">{c.prenom} {c.nom}</h3>
-                      <p className="text-xs text-outline">{c.email}</p>
+                      <h3 className="font-headline font-extrabold text-xl text-on-surface">{c.prenom} {c.nom}</h3>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1">
+                        <p className="font-body text-sm text-secondary">{c.email}</p>
+                        {getPaymentBadge(c.statut_paiement, c.methode_paiement, c.reference_paiement)}
+                      </div>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <div className="text-xs text-on-surface-variant flex gap-2">
-                      <span className="font-bold text-success">{c.documents.filter(d => d.statut_validation === "valide").length} Validés</span>
+                  <div className="flex items-center gap-6 self-end sm:self-auto">
+                    <div className="font-body text-sm text-secondary flex items-center gap-2">
+                      <span className={`font-bold ${c.documents.filter(d => d.statut_validation === "valide").length === c.documents.length ? "text-tertiary" : "text-primary"}`}>
+                        {c.documents.filter(d => d.statut_validation === "valide").length} Validés
+                      </span>
                       <span>/</span>
                       <span className="font-bold">{c.documents.length} Docs</span>
                     </div>
-                    <Eye className={`w-5 h-5 text-outline transition-transform ${expandedId === c.id ? "rotate-180" : ""}`} />
+                    <span className={`material-symbols-outlined text-secondary transition-transform duration-300 ${expandedId === c.id ? "rotate-180" : ""}`}>
+                      expand_more
+                    </span>
                   </div>
                 </div>
 
                 {/* Détails étendus (Documents) */}
                 {expandedId === c.id && (
-                  <div className="p-4 bg-surface-container-lowest border-t border-outline-variant grid gap-4">
-                    <h4 className="fds-label-caps">Documents soumis</h4>
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                  <div className="p-6 bg-surface-container-lowest border-t border-outline-variant/15">
+                    <h4 className="font-label text-xs font-bold uppercase tracking-widest text-secondary mb-6 flex items-center gap-2">
+                      <span className="material-symbols-outlined text-lg">folder_shared</span>
+                      Documents soumis
+                    </h4>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                       {c.documents.map((doc) => (
-                        <div key={doc.id} className="border border-outline-variant bg-surface p-4 flex flex-col gap-4">
-                          <div className="flex justify-between items-start">
-                            <span className="font-medium text-sm">{doc.nom_document}</span>
+                        <div key={doc.id} className="bg-surface-container-low rounded-xl p-5 flex flex-col gap-5">
+                          <div className="flex justify-between items-start gap-4">
+                            <span className="font-headline font-bold text-on-surface">{doc.nom_document}</span>
                             {getStatusBadge(doc.statut_validation)}
                           </div>
 
                           {/* Miniature ou icône PDF */}
                           {isPdf(doc.fichier_url) ? (
-                            // PDF → fetch authentifié → Blob URL → nouvel onglet
                             <button
                               onClick={() => openPdf(doc.fichier_url)}
                               disabled={openingPdf === doc.fichier_url}
-                              className="w-full bg-surface-container-low border border-outline-variant h-24 flex flex-col items-center justify-center gap-1 hover:bg-primary-container/10 hover:border-primary-container/30 transition-colors group disabled:opacity-60"
+                              className="w-full bg-surface-container-lowest rounded-lg h-32 flex flex-col items-center justify-center gap-2 hover:bg-primary-container/5 hover:text-primary transition-colors group disabled:opacity-60 border border-outline-variant/15"
                               title="Cliquer pour ouvrir le PDF"
                             >
                               {openingPdf === doc.fichier_url ? (
-                                <><Loader2 className="w-6 h-6 animate-spin text-primary-container" /><span className="text-[10px] font-mono text-outline">Chargement...</span></>
+                                <><span className="material-symbols-outlined animate-spin text-3xl text-primary">hourglass_empty</span><span className="text-[10px] font-bold uppercase tracking-widest text-secondary">Chargement...</span></>
                               ) : (
-                                <><FileText className="w-8 h-8 text-outline group-hover:text-primary-container transition-colors" /><span className="text-[10px] font-mono uppercase text-outline group-hover:text-primary-container">Ouvrir PDF</span></>
+                                <><span className="material-symbols-outlined text-4xl text-secondary group-hover:text-primary transition-colors">description</span><span className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary group-hover:text-primary">Ouvrir PDF</span></>
                               )}
                             </button>
                           ) : (
-                            // Image → ouvre le modal de prévisualisation
                             <div
-                              className="bg-surface-container-low border border-outline-variant h-24 flex items-center justify-center cursor-pointer hover:bg-surface-container transition-colors overflow-hidden"
+                              className="bg-surface-container-lowest rounded-lg border border-outline-variant/15 h-32 flex items-center justify-center cursor-pointer hover:opacity-80 transition-opacity overflow-hidden relative group"
                               onClick={() => setPreviewUrl(doc.fichier_url)}
                               title="Cliquer pour prévisualiser"
                             >
@@ -233,51 +258,54 @@ export default function AdminDashboard() {
                                 alt={doc.nom_document}
                                 className="h-full w-full object-cover"
                               />
+                              <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <span className="material-symbols-outlined text-white text-3xl">visibility</span>
+                              </div>
                             </div>
                           )}
                           
-                          <div className="flex items-center justify-between mt-auto pt-2">
+                          <div className="flex items-center justify-between mt-auto pt-4 border-t border-outline-variant/15">
                             {isPdf(doc.fichier_url) ? (
                               <button
                                 onClick={() => openPdf(doc.fichier_url)}
                                 disabled={openingPdf === doc.fichier_url}
-                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline disabled:opacity-50"
+                                className="font-headline text-xs text-primary font-bold flex items-center gap-1.5 hover:underline disabled:opacity-50"
                               >
-                                <ExternalLink className="w-3 h-3" />
+                                <span className="material-symbols-outlined text-sm">open_in_new</span>
                                 {openingPdf === doc.fichier_url ? "Chargement..." : "Ouvrir le PDF"}
                               </button>
                             ) : (
                               <button
                                 onClick={() => setPreviewUrl(doc.fichier_url)}
-                                className="text-xs text-primary font-bold flex items-center gap-1 hover:underline"
+                                className="font-headline text-xs text-primary font-bold flex items-center gap-1.5 hover:underline"
                               >
-                                <Eye className="w-3 h-3" /> Prévisualiser
+                                <span className="material-symbols-outlined text-sm">visibility</span> Prévisualiser
                               </button>
                             )}
-                            <div className="flex gap-2">
+                            <div className="flex gap-2 bg-surface-container p-1 rounded-md">
                               <button 
                                 onClick={() => updateDocumentStatus(doc.id, "valide")}
                                 disabled={doc.statut_validation === "valide"}
-                                className="w-8 h-8 flex items-center justify-center bg-success/10 text-success border border-success/20 hover:bg-success hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${doc.statut_validation === 'valide' ? 'bg-tertiary text-white' : 'text-secondary hover:bg-tertiary/20 hover:text-tertiary'}`}
                                 title="Valider"
                               >
-                                <CheckCircle2 className="w-4 h-4" />
+                                <span className="material-symbols-outlined text-[20px]">check_circle</span>
                               </button>
                               <button 
                                 onClick={() => updateDocumentStatus(doc.id, "rejete")}
                                 disabled={doc.statut_validation === "rejete"}
-                                className="w-8 h-8 flex items-center justify-center bg-error/10 text-error border border-error/20 hover:bg-error hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${doc.statut_validation === 'rejete' ? 'bg-error text-white' : 'text-secondary hover:bg-error/20 hover:text-error'}`}
                                 title="Rejeter"
                               >
-                                <XCircle className="w-4 h-4" />
+                                <span className="material-symbols-outlined text-[20px]">cancel</span>
                               </button>
                               <button 
                                 onClick={() => updateDocumentStatus(doc.id, "en_attente")}
                                 disabled={doc.statut_validation === "en_attente"}
-                                className="w-8 h-8 flex items-center justify-center bg-warning/10 text-warning border border-warning/20 hover:bg-warning hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`w-8 h-8 rounded-md flex items-center justify-center transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${doc.statut_validation === 'en_attente' ? 'bg-secondary text-white' : 'text-secondary hover:bg-secondary/20 hover:text-secondary'}`}
                                 title="Remettre en attente"
                               >
-                                <Clock className="w-4 h-4" />
+                                <span className="material-symbols-outlined text-[20px]">schedule</span>
                               </button>
                             </div>
                           </div>

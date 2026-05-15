@@ -55,6 +55,8 @@ class CandidatCreate(BaseModel):
     prenom: str
     email: str
     notifications_actives: bool = True
+    methode_paiement: Optional[str] = None
+    reference_paiement: Optional[str] = None
 
 class DocumentRequisResponse(BaseModel):
     id: uuid.UUID
@@ -102,7 +104,10 @@ def create_candidature(candidat: CandidatCreate, db: Session = Depends(get_db)):
         prenom=candidat.prenom,
         email=candidat.email,
         reference_dossier=ref,
-        notifications_actives=candidat.notifications_actives
+        notifications_actives=candidat.notifications_actives,
+        statut_paiement="paye" if candidat.reference_paiement else "non_paye",
+        methode_paiement=candidat.methode_paiement,
+        reference_paiement=candidat.reference_paiement
     )
     db.add(new_candidat)
     db.commit()
@@ -238,6 +243,9 @@ def get_all_candidatures(db: Session = Depends(get_db), admin: Utilisateur = Dep
             "prenom": c.prenom,
             "nom": c.nom,
             "email": c.email,
+            "statut_paiement": c.statut_paiement,
+            "methode_paiement": c.methode_paiement,
+            "reference_paiement": c.reference_paiement,
             "created_at": c.created_at,
             "documents": docs_soumis
         })

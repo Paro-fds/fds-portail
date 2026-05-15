@@ -3,70 +3,69 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { MapPin, Phone, Mail, Clock, ExternalLink } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
-    <footer className="bg-primary text-white/90 border-t border-outline-variant">
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+    <footer className="bg-primary text-white mt-12">
+      <div className="max-w-[1200px] mx-auto px-8 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Identité */}
-          <div>
-            <h3 className="font-display text-lg font-black uppercase tracking-tight text-white mb-4">
+          <div className="md:col-span-5">
+            <h3 className="font-headline text-2xl font-bold text-white mb-6">
               Faculté des Sciences
             </h3>
-            <p className="text-sm text-white/60 leading-relaxed mb-4">
+            <p className="font-body text-base text-white/80 leading-relaxed mb-6 max-w-md">
               Université d'État d'Haïti (UEH). Fondée en 1902, la FDS forme les ingénieurs et scientifiques qui bâtissent l'avenir d'Haïti.
             </p>
-            <p className="text-xs text-white/40 font-mono">
+            <p className="font-body text-sm text-white/50">
               © {new Date().getFullYear()} FDS — UEH
             </p>
           </div>
 
           {/* Contact */}
-          <div>
-            <h4 className="font-display text-sm font-bold uppercase tracking-widest text-white/70 mb-4">
+          <div className="md:col-span-4">
+            <h4 className="font-label text-xs font-semibold uppercase tracking-wider text-white/60 mb-6">
               Contact
             </h4>
-            <ul className="space-y-3 text-sm">
-              <li className="flex items-start gap-3">
-                <MapPin className="w-4 h-4 text-white/50 mt-0.5 shrink-0" />
-                <span className="text-white/70">Delmas 33, Port-au-Prince, Haïti</span>
+            <ul className="space-y-4 font-body text-sm text-white/80">
+              <li className="flex items-start gap-3 hover:text-white transition-colors cursor-default">
+                <span className="material-symbols-outlined text-white/50 text-lg">location_on</span>
+                <span>Delmas 33, Port-au-Prince, Haïti</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Phone className="w-4 h-4 text-white/50 shrink-0" />
-                <span className="text-white/70">+509 XX XX XXXX</span>
+              <li className="flex items-center gap-3 hover:text-white transition-colors cursor-default">
+                <span className="material-symbols-outlined text-white/50 text-lg">call</span>
+                <span>+509 XX XX XXXX</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Mail className="w-4 h-4 text-white/50 shrink-0" />
-                <span className="text-white/70">contact@fds.edu.ht</span>
+              <li className="flex items-center gap-3 hover:text-white transition-colors cursor-default">
+                <span className="material-symbols-outlined text-white/50 text-lg">mail</span>
+                <span>contact@fds.edu.ht</span>
               </li>
-              <li className="flex items-center gap-3">
-                <Clock className="w-4 h-4 text-white/50 shrink-0" />
-                <span className="text-white/70">Lun — Ven : 9h00 — 15h00</span>
+              <li className="flex items-center gap-3 hover:text-white transition-colors cursor-default">
+                <span className="material-symbols-outlined text-white/50 text-lg">schedule</span>
+                <span>Lun — Ven : 9h00 — 15h00</span>
               </li>
             </ul>
           </div>
 
           {/* Liens rapides */}
-          <div>
-            <h4 className="font-display text-sm font-bold uppercase tracking-widest text-white/70 mb-4">
+          <div className="md:col-span-3">
+            <h4 className="font-label text-xs font-semibold uppercase tracking-wider text-white/60 mb-6">
               Liens rapides
             </h4>
-            <ul className="space-y-2 text-sm">
+            <ul className="space-y-4 font-body text-sm">
               <li>
-                <a href="/#catalogue" className="text-white/60 hover:text-white transition-colors">
+                <a href="/#catalogue" className="text-white/80 hover:text-white hover:translate-x-1 inline-block transition-transform">
                   Catalogue des programmes
                 </a>
               </li>
               <li>
-                <Link to="/candidature" className="text-white/60 hover:text-white transition-colors">
+                <Link to="/candidature" className="text-white/80 hover:text-white hover:translate-x-1 inline-block transition-transform">
                   Déposer une candidature
                 </Link>
               </li>
               <li>
-                <Link to="/aide" className="text-white/60 hover:text-white transition-colors">
+                <Link to="/aide" className="text-white/80 hover:text-white hover:translate-x-1 inline-block transition-transform">
                   Contact & Aide
                 </Link>
               </li>
@@ -76,8 +75,8 @@ export default function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div className="border-t border-white/10 px-4 py-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-[10px] text-white/30 font-mono uppercase tracking-widest">
+      <div className="px-8 pb-8 pt-4">
+        <div className="max-w-[1200px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-[10px] font-bold uppercase tracking-widest text-white/40">
           <span>Portail Institutionnel — Faculté des Sciences, UEH</span>
           <span>Projet GL-EN3-2026</span>
         </div>
