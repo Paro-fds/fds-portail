@@ -23,14 +23,13 @@ export default function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 h-16 w-full bg-surface/80 backdrop-blur-md px-8 flex items-center justify-between">
+    <header className="sticky top-0 z-50 h-24 w-full bg-surface/80 backdrop-blur-md px-8 flex items-center justify-between border-b border-outline-variant/20">
       <Link to="/" className="flex items-center gap-3 group">
-        <div className="bg-primary p-1.5 rounded-md transition-transform group-hover:scale-105 flex items-center justify-center">
-          <span className="material-symbols-outlined text-white text-sm">lock</span>
-        </div>
-        <span className="font-headline text-lg font-extrabold uppercase tracking-tight text-primary">
-          FDS Portail
-        </span>
+        <img
+          src="/logo.jpg"
+          alt="Faculté des Sciences"
+          className="h-20 w-auto object-contain transition-transform group-hover:scale-105 mix-blend-multiply scale-110 origin-left"
+        />
       </Link>
 
       <nav className="hidden md:flex h-full items-center gap-6">
@@ -38,11 +37,10 @@ export default function Header() {
           <Link
             key={item.path}
             to={item.path}
-            className={`h-full flex items-center px-4 font-headline text-sm font-semibold transition-all rounded-md my-2 ${
-              isActive(item.path)
+            className={`h-full flex items-center px-4 font-headline text-sm font-semibold transition-all rounded-md my-2 ${isActive(item.path)
                 ? "bg-surface-bright text-primary"
                 : "text-secondary hover:bg-surface-container-low hover:text-primary hover:translate-x-1"
-            }`}
+              }`}
           >
             {item.name}
           </Link>

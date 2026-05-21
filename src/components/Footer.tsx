@@ -12,9 +12,9 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Identité */}
           <div className="md:col-span-5">
-            <h3 className="font-headline text-2xl font-bold text-white mb-6">
-              Faculté des Sciences
-            </h3>
+            <div className="bg-white inline-block p-4 rounded-xl mb-6 shadow-md">
+              <img src="/logo.jpg" alt="Faculté des Sciences" className="h-20 w-auto object-contain" />
+            </div>
             <p className="font-body text-base text-white/80 leading-relaxed mb-6 max-w-md">
               Université d'État d'Haïti (UEH). Fondée en 1902, la FDS forme les ingénieurs et scientifiques qui bâtissent l'avenir d'Haïti.
             </p>
