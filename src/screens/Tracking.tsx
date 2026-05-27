@@ -15,7 +15,16 @@ interface TrackingData {
   candidat_id: string;
   prenom: string;
   nom: string;
+  statut_paiement?: "paye" | "non_paye" | string;
   documents: DocumentSoumis[];
+}
+
+type ProgressTone = "complete" | "current" | "blocked" | "pending";
+
+interface ProgressStep {
+  label: string;
+  icon: string;
+  tone: ProgressTone;
 }
 
 export default function Tracking() {
@@ -108,8 +117,96 @@ export default function Tracking() {
     }
   };
 
+  const buildProgressSteps = (tracking: TrackingData): ProgressStep[] => {
+    const hasDocuments = tracking.documents.length > 0;
+    const hasRejectedDocument = tracking.documents.some((doc) => doc.statut_validation === "rejete");
+    const allDocumentsValid = hasDocuments && tracking.documents.every((doc) => doc.statut_validation === "valide");
+    const hasPendingDocument = tracking.documents.some((doc) => doc.statut_validation === "en_attente");
+    const paymentComplete = tracking.statut_paiement === "paye";
+
+    return [
+      {
+        label: "Dossier reçu",
+        icon: "inventory",
+        tone: "complete",
+      },
+      {
+        label: "Paiement confirmé",
+        icon: "payments",
+        tone: paymentComplete ? "complete" : "current",
+      },
+      {
+        label: "Documents reçus",
+        icon: "folder_copy",
+        tone: hasDocuments ? "complete" : "pending",
+      },
+      {
+        label: hasRejectedDocument ? "Correction requise" : "Vérification",
+        icon: hasRejectedDocument ? "priority_high" : "fact_check",
+        tone: hasRejectedDocument
+          ? "blocked"
+          : allDocumentsValid
+            ? "complete"
+            : hasPendingDocument
+              ? "current"
+              : "pending",
+      },
+      {
+        label: "Dossier validé",
+        icon: "verified",
+        tone: allDocumentsValid ? "complete" : "pending",
+      },
+    ];
+  };
+
+  const getProgressSummary = (tracking: TrackingData) => {
+    const totalDocuments = tracking.documents.length;
+    const validDocuments = tracking.documents.filter((doc) => doc.statut_validation === "valide").length;
+    const rejectedDocuments = tracking.documents.filter((doc) => doc.statut_validation === "rejete").length;
+
+    if (rejectedDocuments > 0) {
+      return `${rejectedDocuments} document${rejectedDocuments > 1 ? "s" : ""} à corriger avant la validation finale.`;
+    }
+
+    if (totalDocuments > 0 && validDocuments === totalDocuments) {
+      return "Tous les documents ont été validés par l'administration.";
+    }
+
+    if (totalDocuments === 0) {
+      return "Aucun document n'a encore été associé à ce dossier.";
+    }
+
+    return `${validDocuments}/${totalDocuments} document${totalDocuments > 1 ? "s" : ""} validé${validDocuments > 1 ? "s" : ""}. Le dossier est en cours de vérification.`;
+  };
+
+  const getStepClasses = (tone: ProgressTone) => {
+    switch (tone) {
+      case "complete":
+        return "border-tertiary bg-tertiary text-on-tertiary";
+      case "current":
+        return "border-primary bg-primary text-on-primary";
+      case "blocked":
+        return "border-error bg-error text-on-error";
+      default:
+        return "border-outline-variant bg-surface-container-lowest text-secondary";
+    }
+  };
+
+  const getLabelClasses = (tone: ProgressTone) => {
+    switch (tone) {
+      case "complete":
+        return "text-tertiary";
+      case "current":
+        return "text-primary";
+      case "blocked":
+        return "text-error";
+      default:
+        return "text-secondary";
+    }
+  };
+
   return (
-    <div className="max-w-2xl mx-auto px-4 py-8 md:py-16">
+    <div className="max-w-4xl mx-auto px-4 py-8 md:py-16">
       <AnimatePresence mode="wait">
         {!data ? (
           <motion.div
@@ -174,6 +271,46 @@ export default function Tracking() {
                 <span className="font-mono text-xl font-black text-primary bg-primary-container/10 px-4 py-2 rounded-md">
                   {data.reference_dossier}
                 </span>
+              </div>
+            </div>
+
+            <div className="mb-10 p-6 bg-surface-container-low rounded-xl border border-outline-variant/15">
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3 mb-6">
+                <div>
+                  <span className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary mb-2 block">Progression du dossier</span>
+                  <p className="font-body text-sm text-on-surface-variant">{getProgressSummary(data)}</p>
+                </div>
+                <span className={`font-label text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-md w-max ${
+                  data.documents.some((doc) => doc.statut_validation === "rejete")
+                    ? "bg-error/10 text-error"
+                    : data.documents.length > 0 && data.documents.every((doc) => doc.statut_validation === "valide")
+                      ? "bg-tertiary/10 text-tertiary"
+                      : "bg-primary/10 text-primary"
+                }`}>
+                  {data.documents.some((doc) => doc.statut_validation === "rejete")
+                    ? "Correction requise"
+                    : data.documents.length > 0 && data.documents.every((doc) => doc.statut_validation === "valide")
+                      ? "Dossier validé"
+                      : "En vérification"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+                {buildProgressSteps(data).map((step, index) => (
+                  <div key={step.label} className="relative flex sm:flex-col items-center sm:items-start gap-4">
+                    {index < 4 && (
+                      <div className="hidden sm:block absolute left-11 top-5 h-0.5 w-[calc(100%-1.75rem)] bg-outline-variant/35" />
+                    )}
+                    <div className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 shadow-sm ${getStepClasses(step.tone)}`}>
+                      <span className="material-symbols-outlined text-xl">{step.icon}</span>
+                    </div>
+                    <div className="min-w-0">
+                      <span className={`font-label text-[10px] font-bold uppercase tracking-widest leading-tight block ${getLabelClasses(step.tone)}`}>
+                        {step.label}
+                      </span>
+                    </div>
+                  </div>
+                ))}
               </div>
             </div>
 

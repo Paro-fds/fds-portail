@@ -14,6 +14,7 @@ import Tracking from "./screens/Tracking";
 import Login from "./screens/Login";
 import AdminDashboard from "./screens/AdminDashboard";
 import ProtectedRoute from "./components/ProtectedRoute";
+import MotionGraphics from "./screens/MotionGraphics";
 import { AuthProvider } from "./contexts/AuthContext";
 
 function ScrollToTop() {
@@ -45,6 +46,9 @@ export default function App() {
               <Route path="admin" element={<AdminDashboard />} />
             </Route>
           </Route>
+          
+          {/* Page Standalone Motion Graphics (hors Layout pour capture vidéo propre) */}
+          <Route path="motion" element={<MotionGraphics />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

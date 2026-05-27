@@ -1,5 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from fastapi.responses import Response
 from sqlalchemy.orm import Session
@@ -16,6 +17,8 @@ from models import Candidat, DocumentRequis, DocumentSoumis, Utilisateur
 from services.upload import upload_file_to_cloudinary
 from services.email import send_confirmation_email, send_document_validated_email, send_document_rejected_email
 from core.security import verify_password, create_access_token, SECRET_KEY, ALGORITHM
+from core.rate_limiter import check_rate_limit, record_failed_attempt, reset_attempts
+from core.logging_middleware import AccessLoggingMiddleware
 from jose import JWTError, jwt
 
 # Dépendance d'authentification
@@ -41,6 +44,12 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="API FDS Portail", version="1.0.0")
 
+# ─────────────────────────────────────────────────────────────────────────────
+# MIDDLEWARES DE SÉCURITÉ
+# L'ordre est important : les middlewares s'appliquent de bas en haut (LIFO).
+# ─────────────────────────────────────────────────────────────────────────────
+
+# 1. CORS — doit rester en premier pour gérer les preflight OPTIONS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -48,6 +57,39 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# 2. Security Headers Middleware — OWASP A02:2025 (Security Misconfiguration)
+# Ajoute les en-têtes HTTP de sécurité sur toutes les réponses.
+class SecurityHeadersMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next) -> Response:
+        response = await call_next(request)
+        # Empêche le clickjacking
+        response.headers["X-Frame-Options"] = "DENY"
+        # Empêche le MIME-type sniffing
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        # Force HTTPS pour les 1 an à venir (incluSubDomains)
+        response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+        # Contrôle des sources de contenu (CSP restrictive)
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self'; "
+            "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; "
+            "font-src 'self' https://fonts.gstatic.com; "
+            "img-src 'self' data: https://res.cloudinary.com; "
+            "connect-src 'self'; "
+            "frame-ancestors 'none'"
+        )
+        # Limite les informations exposées dans le header Referer
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        # Contrôle les fonctionnalités browser (désactiver caméra, micro, géoloc)
+        response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
+        return response
+
+app.add_middleware(SecurityHeadersMiddleware)
+
+# 3. Access Logging Middleware — OWASP A09:2025 (Security Logging & Alerting)
+# Log chaque requête en JSON structuré avec alerte sur 401/403/429.
+app.add_middleware(AccessLoggingMiddleware)
 
 # --- SCHEMAS (Pydantic) ---
 class CandidatCreate(BaseModel):
@@ -209,17 +251,49 @@ def get_candidature_tracking(reference_dossier: str, db: Session = Depends(get_d
         "candidat_id": candidat.id,
         "prenom": candidat.prenom,
         "nom": candidat.nom,
+        "statut_paiement": candidat.statut_paiement,
         "documents": docs_soumis
     }
 
 # --- ROUTES ADMIN SECURISEES ---
 
 @app.post("/api/auth/token")
-def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+def login_for_access_token(
+    request: Request,
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db)
+):
+    """
+    Authentification administrateur avec protection contre le brute-force.
+    - OWASP A07:2025 : Rate limiting (5 tentatives / 60s, blocage 5 min)
+    - OWASP A04:2025 : Mots de passe hashés bcrypt
+    - OWASP A01:2025 : Vérification du rôle 'admin' obligatoire
+    """
+    # 1. Vérifier le rate limit AVANT toute vérification de credentials
+    # (pour ne pas révéler si l'email existe via le timing)
+    check_rate_limit(request)
+
     user = db.query(Utilisateur).filter(Utilisateur.email == form_data.username).first()
+
+    # 2. Authentification — message générique pour éviter l'énumération d'utilisateurs
     if not user or not verify_password(form_data.password, user.mot_de_passe_hash):
-        raise HTTPException(status_code=400, detail="Email ou mot de passe incorrect")
-    
+        record_failed_attempt(request)  # Comptabiliser l'échec
+        raise HTTPException(
+            status_code=401,
+            detail="Email ou mot de passe incorrect.",
+            headers={"WWW-Authenticate": "Bearer"}
+        )
+
+    # 3. Vérification du rôle (Least Privilege — A01)
+    if user.role != "admin":
+        record_failed_attempt(request)
+        raise HTTPException(
+            status_code=403,
+            detail="Accès réservé aux administrateurs."
+        )
+
+    # 4. Succès — réinitialiser le compteur de l'IP
+    reset_attempts(request)
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
@@ -314,4 +388,3 @@ def proxy_document(url: str, admin: Utilisateur = Depends(get_current_admin)):
         media_type=content_type,
         headers={"Content-Disposition": "inline; filename=document.pdf" if is_pdf else "inline"}
     )
-
