@@ -5,11 +5,23 @@
 
 import { Link } from "react-router-dom";
 import { PROGRAMS } from "../constants";
+import { useActualites } from "../hooks/useActualites";
+import { useDatesCles } from "../hooks/useDatesCles";
 import { useState } from "react";
 
 export default function Home() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
-  
+  const { news, loading: newsLoading } = useActualites();
+  const { dates } = useDatesCles();
+
+  // Configuration visuelle par type de date
+  const dateStyles: Record<string, { bg: string; iconBg: string; icon: string; labelClass: string; dateClass: string }> = {
+    ouverture: { bg: "bg-surface-container-lowest border border-outline-variant/15", iconBg: "bg-primary-container/10 text-primary", icon: "event",         labelClass: "text-secondary", dateClass: "text-on-surface" },
+    cloture:   { bg: "bg-surface-container-lowest border border-outline-variant/15", iconBg: "bg-error-container/50 text-error",     icon: "schedule",      labelClass: "text-secondary", dateClass: "text-on-surface" },
+    concours:  { bg: "bg-primary shadow-lg",                                         iconBg: "bg-white/20 text-white",              icon: "school",         labelClass: "text-primary-fixed", dateClass: "text-white" },
+    autre:     { bg: "bg-surface-container-lowest border border-outline-variant/15", iconBg: "bg-surface-container text-secondary", icon: "calendar_today", labelClass: "text-secondary", dateClass: "text-on-surface" },
+  };
+
   const faqs = [
     { q: "Quelles sont les conditions d'admission au cycle propédeutique ?", a: "Vous devez être titulaire d'un baccalauréat (NS4) et réussir le concours d'admission organisé chaque année par la faculté." },
     { q: "Quels sont les frais de scolarité ?", a: "La FDS étant une entité de l'Université d'État d'Haïti, la scolarité est subventionnée. Seuls des frais annuels d'inscription sont requis." },
@@ -85,33 +97,20 @@ export default function Home() {
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 flex items-start gap-4">
-              <div className="bg-primary-container/10 p-3 rounded-md text-primary">
-                <span className="material-symbols-outlined">event</span>
-              </div>
-              <div>
-                <span className="font-label text-xs font-semibold uppercase tracking-wider text-secondary block mb-1">Ouverture</span>
-                <span className="font-headline font-bold text-lg text-on-surface">15 Juillet 2026</span>
-              </div>
-            </div>
-            <div className="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/15 flex items-start gap-4">
-              <div className="bg-error-container/50 p-3 rounded-md text-error">
-                <span className="material-symbols-outlined">schedule</span>
-              </div>
-              <div>
-                <span className="font-label text-xs font-semibold uppercase tracking-wider text-secondary block mb-1">Clôture</span>
-                <span className="font-headline font-bold text-lg text-on-surface">30 Août 2026</span>
-              </div>
-            </div>
-            <div className="bg-primary text-on-primary p-6 rounded-xl shadow-lg flex items-start gap-4">
-              <div className="bg-white/20 p-3 rounded-md">
-                <span className="material-symbols-outlined text-white">school</span>
-              </div>
-              <div>
-                <span className="font-label text-xs font-semibold uppercase tracking-wider text-primary-fixed block mb-1">Concours</span>
-                <span className="font-headline font-bold text-lg text-white">15 Septembre 2026</span>
-              </div>
-            </div>
+            {dates.map((d) => {
+              const s = dateStyles[d.type] ?? dateStyles.autre;
+              return (
+                <div key={d.id} className={`${s.bg} p-6 rounded-xl flex items-start gap-4`}>
+                  <div className={`${s.iconBg} p-3 rounded-md`}>
+                    <span className="material-symbols-outlined">{s.icon}</span>
+                  </div>
+                  <div>
+                    <span className={`font-label text-xs font-semibold uppercase tracking-wider ${s.labelClass} block mb-1`}>{d.label}</span>
+                    <span className={`font-headline font-bold text-lg ${s.dateClass}`}>{d.date}</span>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -126,26 +125,97 @@ export default function Home() {
           <button className="text-sm font-bold text-primary hover:underline hidden sm:block">Voir tout</button>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          {[
-            { tag: "Concours", title: "Ouverture des inscriptions 2026", date: "10 Mai 2026", desc: "Les inscriptions pour le nouveau cycle propédeutique débuteront officiellement en juillet." },
-            { tag: "Infrastructures", title: "Nouveau laboratoire de génie civil", date: "2 Mai 2026", desc: "La FDS inaugure son nouveau laboratoire de résistance des matériaux financé par nos partenaires." },
-            { tag: "Recherche", title: "Conférence sur l'IA appliquée", date: "28 Avril 2026", desc: "Venez assister à notre séminaire sur les applications de l'intelligence artificielle en Haïti." }
-          ].map((news, idx) => (
-            <div key={idx} className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 hover:shadow-[0_8px_24px_rgba(17,28,45,0.06)] transition-all flex flex-col h-full overflow-hidden">
-              <div className="h-32 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
-                 <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-20">newspaper</span>
-                 <span className="absolute top-4 right-4 bg-surface text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded-md">{news.tag}</span>
+          {newsLoading ? (
+            // Squelette de chargement — 3 cartes placeholder
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 flex flex-col h-full overflow-hidden animate-pulse">
+                <div className="h-32 bg-surface-container-high" />
+                <div className="p-6 flex flex-col gap-3">
+                  <div className="h-3 w-20 bg-surface-container-high rounded" />
+                  <div className="h-5 w-full bg-surface-container-high rounded" />
+                  <div className="h-5 w-3/4 bg-surface-container-high rounded" />
+                  <div className="h-3 w-full bg-surface-container rounded mt-2" />
+                  <div className="h-3 w-5/6 bg-surface-container rounded" />
+                </div>
               </div>
-              <div className="p-6 flex flex-col flex-1">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-3">{news.date}</span>
-                <h3 className="font-headline font-bold text-lg text-on-surface mb-3 line-clamp-2">{news.title}</h3>
-                <p className="font-body text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-6 flex-1">{news.desc}</p>
-                <button className="text-primary text-sm font-bold inline-flex items-center gap-1 group w-max">
-                  Lire l'article <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-                </button>
-              </div>
-            </div>
-          ))}
+            ))
+          ) : (
+            // Articles réels (Sanity ou statiques selon configuration)
+            [...news]
+              .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0))
+              .slice(0, 3)
+              .map((item) => {
+                // Résolution de l'URL finale :
+                // fichierPdfUrl (PDF uploadé dans Sanity) est prioritaire sur actionUrl
+                const resolvedUrl = item.fichierPdfUrl ?? item.actionUrl;
+                // Si un PDF est uploadé, forcer le type "telecharger"
+                const resolvedType = item.fichierPdfUrl ? "telecharger" : (item.actionType ?? "lire");
+
+                const ACTION_CONFIG: Record<string, { label: string; icon: string; isExternal?: boolean; isDownload?: boolean }> = {
+                  lire:       { label: "Lire l'article",  icon: "arrow_forward", isExternal: true },
+                  telecharger:{ label: "Télécharger",     icon: "download",      isDownload: true },
+                  voir:       { label: "Voir",            icon: "open_in_new",   isExternal: true },
+                  inscrire:   { label: "S'inscrire",      icon: "how_to_reg" },
+                };
+                const action = ACTION_CONFIG[resolvedType] ?? ACTION_CONFIG.lire;
+                const hasUrl = !!resolvedUrl;
+
+                // Rendu du bouton d'action
+                const ActionBtn = () => {
+                  const btnClass = `text-sm font-bold inline-flex items-center gap-1.5 group w-max mt-auto ${
+                    hasUrl
+                      ? "text-primary hover:underline cursor-pointer"
+                      : "text-on-surface-variant/40 cursor-not-allowed"
+                  }`;
+                  const iconClass = `material-symbols-outlined text-[18px] ${hasUrl ? "group-hover:translate-x-0.5 transition-transform" : ""}`;
+                  const inner = <><span>{action.label}</span><span className={iconClass}>{action.icon}</span></>;
+
+                  if (!hasUrl) return <span className={btnClass}>{inner}</span>;
+
+                  // Lien externe ou téléchargement
+                  if (action.isExternal || action.isDownload) {
+                    return (
+                      <a
+                        href={resolvedUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        download={action.isDownload || undefined}
+                        className={btnClass}
+                      >
+                        {inner}
+                      </a>
+                    );
+                  }
+
+                  // Lien interne (React Router)
+                  return <Link to={resolvedUrl!} className={btnClass}>{inner}</Link>;
+                };
+
+                return (
+                  <div key={item.id} className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 hover:shadow-[0_8px_24px_rgba(17,28,45,0.06)] transition-all flex flex-col h-full overflow-hidden">
+                    <div className="h-32 bg-surface-container-high relative overflow-hidden flex items-center justify-center">
+                      <span className="material-symbols-outlined text-4xl text-on-surface-variant opacity-20">newspaper</span>
+                      <div className="absolute top-4 right-4 flex items-center gap-2">
+                        {item.pinned && (
+                          <span className="bg-primary text-on-primary text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded-md flex items-center gap-1">
+                            <span className="material-symbols-outlined" style={{fontSize:"12px"}}>push_pin</span>
+                            À la une
+                          </span>
+                        )}
+                        <span className="bg-surface text-[10px] font-bold px-2 py-1 uppercase tracking-widest rounded-md">{item.tag}</span>
+                      </div>
+                    </div>
+                    <div className="p-6 flex flex-col flex-1">
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-secondary mb-3">{item.date}</span>
+                      <h3 className="font-headline font-bold text-lg text-on-surface mb-3 line-clamp-2">{item.title}</h3>
+                      <p className="font-body text-sm text-on-surface-variant leading-relaxed line-clamp-3 mb-6 flex-1">{item.desc}</p>
+                      <ActionBtn />
+                    </div>
+                  </div>
+                );
+              })
+
+          )}
         </div>
       </section>
 

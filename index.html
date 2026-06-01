@@ -11,9 +11,71 @@
   <meta property="og:description"
     content="Portail institutionnel de la Faculté des Sciences. Programmes, candidatures et informations d'admission." />
   <meta property="og:type" content="website" />
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
-  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!--
+    PERFORMANCE — Préconnexion DNS (réduit la latence de ~100-300ms)
+    Le navigateur ouvre la connexion TCP/TLS vers Google Fonts AVANT
+    de télécharger les fichiers CSS, en parallèle du parsing HTML.
+  -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!--
+    PERFORMANCE — Chargement non-bloquant des fonts (§4.1 cahier des charges)
+    Pattern media="print" + onload : le navigateur traite ces feuilles de style
+    comme non-critiques et ne bloque pas le rendu pour les télécharger.
+    Sans cela, la page reste blanche jusqu'à réception complète des fonts (~300–800ms en 3G).
+  -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap"
+    rel="stylesheet"
+    media="print"
+    onload="this.media='all'"
+  />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet"
+    media="print"
+    onload="this.media='all'"
+  />
+  <!-- Fallback pour les navigateurs sans JS -->
+  <noscript>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+  </noscript>
+
   <title>FDS Portail — Faculté des Sciences | Université d'État d'Haïti</title>
+
+  <!--
+    PERFORMANCE — CSS CRITIQUE INLINE (Anti-FOUC §4.1)
+    Ces styles s'appliquent IMMÉDIATEMENT, avant que React ou Tailwind ne se chargent.
+    Sans eux, le navigateur affiche l'ossature HTML nue (texte non stylisé, fond blanc)
+    pendant ~200–500ms — ce que vous observiez comme "je vois les codes HTML".
+    Les valeurs correspondent exactement au @theme Tailwind défini dans index.css.
+  -->
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { font-size: 16px; }
+
+    body {
+      background-color: #f9f9ff;   /* --color-surface / --color-background */
+      color: #111c2d;              /* --color-on-surface */
+      font-family: Inter, system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+    }
+
+    /* Masque le contenu le temps que React monte le DOM — évite le flash non stylisé */
+    #root:empty {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background-color: #f9f9ff;
+    }
+  </style>
 </head>
 
 <body>

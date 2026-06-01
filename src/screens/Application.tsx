@@ -36,6 +36,7 @@ export default function Application() {
   const [error, setError] = useState<string | null>(null);
   const [referenceDossier, setReferenceDossier] = useState<string | null>(null);
   const [referencePaiement, setReferencePaiement] = useState<string | null>(null);
+  const [deplacementPhysique, setDeplacementPhysique] = useState<boolean | null>(null);
 
   useEffect(() => {
     fetch('/api/documents-requis')
@@ -77,9 +78,20 @@ export default function Application() {
     setFiles(prev => ({ ...prev, [docId]: file }));
   };
 
+  const getAcceptForDoc = (formatAccepte: string) => {
+    const upper = formatAccepte.toUpperCase();
+    if (upper.includes("PDF") && !upper.includes("JPG")) return ".pdf";
+    if (upper.includes("JPG") || upper.includes("JPEG")) return ".jpg,.jpeg";
+    return ".pdf,.jpg,.jpeg";
+  };
+
   const handleFinalSubmit = async () => {
     if (Object.keys(files).length < documentsRequis.length) {
       setError("Veuillez téléverser tous les documents requis avant de soumettre.");
+      return;
+    }
+    if (deplacementPhysique === null) {
+      setError("Veuillez répondre à la question sur le déplacement physique (obligatoire).");
       return;
     }
     
@@ -96,7 +108,8 @@ export default function Application() {
           email: formData.email,
           notifications_actives: true,
           methode_paiement: formData.methodePaiement,
-          reference_paiement: referencePaiement
+          reference_paiement: referencePaiement,
+          deplacement_physique: deplacementPhysique,
         })
       });
       if (!candRes.ok) throw new Error("Erreur lors de la création du candidat.");
@@ -455,7 +468,7 @@ export default function Application() {
                     <label className={`border-2 border-dashed rounded-xl bg-surface-container-lowest min-h-[160px] flex flex-col items-center justify-center p-6 text-center cursor-pointer transition-all group relative overflow-hidden ${hasFile ? 'border-primary bg-primary/5' : 'border-outline-variant/30 hover:border-primary hover:bg-primary/5'}`}>
                        <input 
                          type="file" className="hidden" 
-                         accept={doc.format_accepte.includes('PDF') ? '.pdf' : 'image/*'}
+                         accept={getAcceptForDoc(doc.format_accepte)}
                          onChange={(e) => handleFileChange(doc.id, e.target.files?.[0] || null)}
                        />
                        
@@ -477,6 +490,37 @@ export default function Application() {
                 );
               })}
             </div>
+
+            <fieldset className="mb-10 p-6 rounded-xl border border-outline-variant/15 bg-surface-container-low">
+              <legend className="font-headline font-bold text-on-surface px-2 mb-4">
+                Avez-vous dû vous déplacer pour compléter cette candidature ? <span className="text-error">*</span>
+              </legend>
+              <p className="font-body text-sm text-on-surface-variant mb-4 px-2">
+                Cette information nous aide à mesurer l&apos;impact du portail en ligne.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 px-2">
+                <label className="flex items-center gap-3 cursor-pointer font-body text-on-surface">
+                  <input
+                    type="radio"
+                    name="deplacement"
+                    checked={deplacementPhysique === false}
+                    onChange={() => setDeplacementPhysique(false)}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  Non, tout a été fait en ligne
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer font-body text-on-surface">
+                  <input
+                    type="radio"
+                    name="deplacement"
+                    checked={deplacementPhysique === true}
+                    onChange={() => setDeplacementPhysique(true)}
+                    className="w-4 h-4 accent-primary"
+                  />
+                  Oui, j&apos;ai dû me déplacer
+                </label>
+              </div>
+            </fieldset>
 
             <div className="pt-6 flex flex-col sm:flex-row justify-between gap-4">
               <button 

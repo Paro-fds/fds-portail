@@ -1,14 +1,15 @@
-from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request
+from fastapi import FastAPI, Depends, HTTPException, UploadFile, File, Form, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from fastapi.responses import Response
+from fastapi.responses import Response as StarletteResponse
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
 import uuid
 import random
 import filetype
+import logging
 from datetime import datetime, timezone
 import requests as http_requests
 
@@ -17,7 +18,13 @@ from models import Candidat, DocumentRequis, DocumentSoumis, Utilisateur
 from services.upload import upload_file_to_cloudinary
 from services.email import send_confirmation_email, send_document_validated_email, send_document_rejected_email
 from core.security import verify_password, create_access_token, SECRET_KEY, ALGORITHM
-from core.rate_limiter import check_rate_limit, record_failed_attempt, reset_attempts
+from core.rate_limiter import (
+    check_rate_limit,
+    record_failed_attempt,
+    reset_attempts,
+    check_candidature_rate_limit,
+    record_candidature_attempt,
+)
 from core.logging_middleware import AccessLoggingMiddleware
 from jose import JWTError, jwt
 
@@ -41,6 +48,8 @@ def get_current_admin(token: str = Depends(oauth2_scheme), db: Session = Depends
 
 # Création des tables dans la BDD
 Base.metadata.create_all(bind=engine)
+
+logger = logging.getLogger(__name__)
 
 app = FastAPI(title="API FDS Portail", version="1.0.0")
 
@@ -99,6 +108,7 @@ class CandidatCreate(BaseModel):
     notifications_actives: bool = True
     methode_paiement: Optional[str] = None
     reference_paiement: Optional[str] = None
+    deplacement_physique: bool
 
 class DocumentRequisResponse(BaseModel):
     id: uuid.UUID
@@ -117,7 +127,7 @@ def read_root():
     return {"message": "Bienvenue sur l'API FDS Portail"}
 
 @app.get("/api/documents-requis", response_model=List[DocumentRequisResponse])
-def get_documents_requis(db: Session = Depends(get_db)):
+def get_documents_requis(response: Response, db: Session = Depends(get_db)):
     docs = db.query(DocumentRequis).all()
     if not docs:
         docs_init = [
@@ -125,17 +135,31 @@ def get_documents_requis(db: Session = Depends(get_db)):
             DocumentRequis(nom="Certificat Baccalauréat", format_accepte="PDF", est_obligatoire=True),
             DocumentRequis(nom="Relevés de Notes (NS4)", format_accepte="PDF", est_obligatoire=True),
             DocumentRequis(nom="Pièce d'identité (CIN/NIF)", format_accepte="PDF", est_obligatoire=True),
-            DocumentRequis(nom="Photo d'Identité", format_accepte="JPG/PNG", est_obligatoire=True),
+            DocumentRequis(nom="Photo d'Identité", format_accepte="JPG/JPEG", est_obligatoire=True),
         ]
         db.add_all(docs_init)
         db.commit()
         docs = db.query(DocumentRequis).all()
+    else:
+        for doc in docs:
+            if "Photo" in doc.nom and "PNG" in (doc.format_accepte or ""):
+                doc.format_accepte = "JPG/JPEG"
+        db.commit()
+
+    response.headers["Cache-Control"] = "public, max-age=300"
     return docs
 
 @app.post("/api/candidature")
-def create_candidature(candidat: CandidatCreate, db: Session = Depends(get_db)):
+def create_candidature(
+    request: Request,
+    candidat: CandidatCreate,
+    db: Session = Depends(get_db),
+):
+    check_candidature_rate_limit(request)
+
     db_candidat = db.query(Candidat).filter(Candidat.email == candidat.email).first()
     if db_candidat:
+        record_candidature_attempt(request)
         return {"id": db_candidat.id, "reference_dossier": db_candidat.reference_dossier, "message": "Candidat existant"}
     
     # Génération d'une référence unique
@@ -149,11 +173,13 @@ def create_candidature(candidat: CandidatCreate, db: Session = Depends(get_db)):
         notifications_actives=candidat.notifications_actives,
         statut_paiement="paye" if candidat.reference_paiement else "non_paye",
         methode_paiement=candidat.methode_paiement,
-        reference_paiement=candidat.reference_paiement
+        reference_paiement=candidat.reference_paiement,
+        deplacement_physique=candidat.deplacement_physique,
     )
     db.add(new_candidat)
     db.commit()
     db.refresh(new_candidat)
+    record_candidature_attempt(request)
 
     # Envoi de l'email de confirmation (non bloquant)
     if new_candidat.notifications_actives:
@@ -201,8 +227,12 @@ async def upload_document(
 
     try:
         secure_url = upload_file_to_cloudinary(file_bytes, file.filename)
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erreur Cloudinary: {str(e)}")
+    except Exception:
+        logger.exception("Échec upload Cloudinary")
+        raise HTTPException(
+            status_code=500,
+            detail="Impossible de téléverser le fichier. Veuillez réessayer.",
+        )
 
     # Upsert : si ce type de document existe déjà pour ce candidat, on le remplace
     existing_doc = db.query(DocumentSoumis).filter(
@@ -297,33 +327,51 @@ def login_for_access_token(
     access_token = create_access_token(data={"sub": user.email})
     return {"access_token": access_token, "token_type": "bearer"}
 
-@app.get("/api/admin/candidatures")
-def get_all_candidatures(db: Session = Depends(get_db), admin: Utilisateur = Depends(get_current_admin)):
-    candidats = db.query(Candidat).order_by(Candidat.created_at.desc()).all()
-    result = []
-    for c in candidats:
-        docs_soumis = []
-        for doc in c.documents_soumis:
-            docs_soumis.append({
-                "id": doc.id,
-                "nom_document": doc.document_requis.nom,
-                "fichier_url": doc.fichier_url,
-                "statut_validation": doc.statut_validation,
-                "soumis_le": doc.soumis_le
-            })
-        result.append({
-            "id": c.id,
-            "reference_dossier": c.reference_dossier,
-            "prenom": c.prenom,
-            "nom": c.nom,
-            "email": c.email,
-            "statut_paiement": c.statut_paiement,
-            "methode_paiement": c.methode_paiement,
-            "reference_paiement": c.reference_paiement,
-            "created_at": c.created_at,
-            "documents": docs_soumis
+def _serialize_candidature(c: Candidat) -> dict:
+    docs_soumis = []
+    for doc in c.documents_soumis:
+        docs_soumis.append({
+            "id": doc.id,
+            "nom_document": doc.document_requis.nom,
+            "fichier_url": doc.fichier_url,
+            "statut_validation": doc.statut_validation,
+            "soumis_le": doc.soumis_le,
         })
-    return result
+    return {
+        "id": c.id,
+        "reference_dossier": c.reference_dossier,
+        "prenom": c.prenom,
+        "nom": c.nom,
+        "email": c.email,
+        "statut_paiement": c.statut_paiement,
+        "methode_paiement": c.methode_paiement,
+        "reference_paiement": c.reference_paiement,
+        "deplacement_physique": c.deplacement_physique,
+        "created_at": c.created_at,
+        "documents": docs_soumis,
+    }
+
+
+@app.get("/api/admin/candidatures")
+def get_all_candidatures(
+    page: int = 1,
+    limit: int = 20,
+    db: Session = Depends(get_db),
+    admin: Utilisateur = Depends(get_current_admin),
+):
+    page = max(1, page)
+    limit = min(max(1, limit), 100)
+
+    query = db.query(Candidat).order_by(Candidat.created_at.desc())
+    total = query.count()
+    candidats = query.offset((page - 1) * limit).limit(limit).all()
+
+    return {
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "items": [_serialize_candidature(c) for c in candidats],
+    }
 
 class StatutUpdate(BaseModel):
     statut: str
@@ -377,13 +425,14 @@ def proxy_document(url: str, admin: Utilisateur = Depends(get_current_admin)):
     try:
         resp = http_requests.get(url, timeout=30)
         resp.raise_for_status()
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"Impossible de récupérer le document : {e}")
+    except Exception:
+        logger.exception("Échec proxy document")
+        raise HTTPException(status_code=502, detail="Impossible de récupérer le document.")
 
     is_pdf = url.lower().endswith(".pdf") or "/raw/" in url.lower()
     content_type = "application/pdf" if is_pdf else resp.headers.get("content-type", "image/jpeg")
 
-    return Response(
+    return StarletteResponse(
         content=resp.content,
         media_type=content_type,
         headers={"Content-Disposition": "inline; filename=document.pdf" if is_pdf else "inline"}

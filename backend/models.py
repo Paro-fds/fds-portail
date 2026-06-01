@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Text, Uuid
+from sqlalchemy import Column, String, Boolean, DateTime, ForeignKey, Text, Uuid, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from database import Base
@@ -16,6 +16,7 @@ class Candidat(Base):
     methode_paiement = Column(String(50), nullable=True)
     reference_paiement = Column(String(100), nullable=True)
     notifications_actives = Column(Boolean, default=True)
+    deplacement_physique = Column(Boolean, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     documents_soumis = relationship("DocumentSoumis", back_populates="candidat", cascade="all, delete-orphan")
@@ -37,6 +38,13 @@ class DocumentRequis(Base):
 
 class DocumentSoumis(Base):
     __tablename__ = "documents_soumis"
+    __table_args__ = (
+        UniqueConstraint(
+            "candidat_id",
+            "document_requis_id",
+            name="uq_document_soumis_candidat_requis",
+        ),
+    )
 
     id = Column(Uuid(as_uuid=True), primary_key=True, default=uuid.uuid4)
     candidat_id = Column(Uuid(as_uuid=True), ForeignKey("candidats.id", ondelete="CASCADE"), nullable=False)

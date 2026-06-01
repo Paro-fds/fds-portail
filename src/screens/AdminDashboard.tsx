@@ -18,9 +18,19 @@ interface Candidature {
   statut_paiement?: string;
   methode_paiement?: string;
   reference_paiement?: string;
+  deplacement_physique?: boolean | null;
   created_at: string;
   documents: DocumentSoumis[];
 }
+
+interface CandidaturesPage {
+  total: number;
+  page: number;
+  limit: number;
+  items: Candidature[];
+}
+
+const PAGE_SIZE = 20;
 
 /** Retourne l'URL du proxy backend pour afficher un document avec le bon Content-Type */
 function getProxyUrl(url: string, token: string): string {
@@ -34,6 +44,8 @@ function isPdf(url: string): boolean {
 export default function AdminDashboard() {
   const { token, logout } = useAuth();
   const [candidatures, setCandidatures] = useState<Candidature[]>([]);
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -61,14 +73,18 @@ export default function AdminDashboard() {
   };
 
 
-  const fetchCandidatures = async () => {
+  const fetchCandidatures = async (pageNum: number = page) => {
+    setIsLoading(true);
     try {
-      const res = await fetch("/api/admin/candidatures", {
-        headers: { "Authorization": `Bearer ${token}` }
-      });
+      const res = await fetch(
+        `/api/admin/candidatures?page=${pageNum}&limit=${PAGE_SIZE}`,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
       if (res.ok) {
-        const data = await res.json();
-        setCandidatures(data);
+        const data: CandidaturesPage = await res.json();
+        setCandidatures(data.items);
+        setTotal(data.total);
+        setPage(data.page);
       }
     } catch (e) {
       console.error(e);
@@ -78,8 +94,10 @@ export default function AdminDashboard() {
   };
 
   useEffect(() => {
-    fetchCandidatures();
-  }, []);
+    fetchCandidatures(page);
+  }, [page, token]);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const updateDocumentStatus = async (docId: string, newStatus: string) => {
     try {
@@ -92,7 +110,7 @@ export default function AdminDashboard() {
         body: JSON.stringify({ statut: newStatus })
       });
       if (res.ok) {
-        fetchCandidatures();
+        fetchCandidatures(page);
       }
     } catch (e) {
       console.error(e);
@@ -117,6 +135,28 @@ export default function AdminDashboard() {
       );
     }
     return <span className="bg-error/10 text-error px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max"><span className="material-symbols-outlined text-xs">money_off</span> Non payé</span>;
+  };
+
+  const getDeplacementBadge = (value?: boolean | null) => {
+    if (value === null || value === undefined) {
+      return (
+        <span className="bg-surface-container text-secondary px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md w-max">
+          Déplacement non renseigné
+        </span>
+      );
+    }
+    if (value) {
+      return (
+        <span className="bg-error-container/30 text-error px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max">
+          <span className="material-symbols-outlined text-xs">directions_walk</span> Déplacement requis
+        </span>
+      );
+    }
+    return (
+      <span className="bg-tertiary/10 text-tertiary px-2 py-1 text-[10px] font-bold uppercase tracking-widest rounded-md flex items-center gap-1 w-max">
+        <span className="material-symbols-outlined text-xs">cloud_done</span> 100 % en ligne
+      </span>
+    );
   };
 
   return (
@@ -198,9 +238,10 @@ export default function AdminDashboard() {
                     </div>
                     <div>
                       <h3 className="font-headline font-extrabold text-xl text-on-surface">{c.prenom} {c.nom}</h3>
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 mt-1">
+                      <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 sm:gap-4 mt-1">
                         <p className="font-body text-sm text-secondary">{c.email}</p>
                         {getPaymentBadge(c.statut_paiement, c.methode_paiement, c.reference_paiement)}
+                        {getDeplacementBadge(c.deplacement_physique)}
                       </div>
                     </div>
                   </div>
@@ -317,6 +358,32 @@ export default function AdminDashboard() {
               </div>
             ))
           )}
+        </div>
+      )}
+
+      {!isLoading && total > PAGE_SIZE && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-8 pt-6 border-t border-outline-variant/30">
+          <p className="font-body text-sm text-secondary">
+            {total} dossier{total > 1 ? "s" : ""} — page {page} / {totalPages}
+          </p>
+          <div className="flex gap-2">
+            <button
+              type="button"
+              disabled={page <= 1}
+              onClick={() => setPage((p) => Math.max(1, p - 1))}
+              className="px-4 py-2 text-sm font-headline font-bold rounded-md border border-outline-variant/30 text-secondary hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Précédent
+            </button>
+            <button
+              type="button"
+              disabled={page >= totalPages}
+              onClick={() => setPage((p) => p + 1)}
+              className="px-4 py-2 text-sm font-headline font-bold rounded-md border border-outline-variant/30 text-secondary hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+            >
+              Suivant
+            </button>
+          </div>
         </div>
       )}
     </div>

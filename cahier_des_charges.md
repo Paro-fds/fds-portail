@@ -92,7 +92,7 @@ L'hypothèse sera évaluée à partir d'indicateurs simples, observables et reli
 | Indicateur | Méthode de collecte | Seuil de validation |
 |---|---|---|
 | Nombre de candidatures soumises | Comptage des dossiers créés en base (`candidats.reference_dossier`) | ≥ 20 dossiers en 14 jours |
-| Taux de complétion sans déplacement | Question obligatoire à la fin du formulaire : "Avez-vous dû vous déplacer pour compléter cette candidature ?" | ≥ 70 % répondent "Non" |
+| Taux de complétion sans déplacement | Question obligatoire en fin de formulaire, persistée en base : `candidats.deplacement_physique` (`false` = Non, `true` = Oui). Calcul : `COUNT(*) WHERE deplacement_physique = false / COUNT(*) WHERE deplacement_physique IS NOT NULL` | ≥ 70 % répondent "Non" (`deplacement_physique = false`) |
 | Taux d'abandon du formulaire | Comparaison entre candidats ayant commencé le formulaire et dossiers soumis | ≤ 30 % d'abandon |
 | Temps moyen de soumission | Horodatage début/fin du parcours de candidature | ≤ 20 minutes sur mobile |
 | Taux de documents rejetés puis remplacés | Suivi des documents passés de `rejete` à `en_attente` après remplacement | ≥ 80 % des rejets corrigés en ligne |
@@ -115,6 +115,7 @@ Ces métriques permettent d'éviter une validation subjective du MVP : le succè
   - Notification de rejet d'un document (avec lien pour le remplacer).
 - Possibilité pour le candidat de **remplacer un document rejeté** depuis la page de suivi.
 - **Simulation du paiement des frais** (MonCash / NatCash) avec génération d'une référence transactionnelle pour préparer l'interconnexion future avec le module FDS Pay.
+- **Mesure de l'hypothèse §3.4 :** question obligatoire « Avez-vous dû vous déplacer pour compléter cette candidature ? », enregistrée en `candidats.deplacement_physique` et consultable côté admin.
 
 ### 🟡 Should Have (Important)
 - Notifications push (SMS) en complément de l'email.
@@ -205,6 +206,7 @@ flowchart LR
 - **US6 :** En tant que candidat, je veux pouvoir remplacer un document rejeté depuis la page de suivi afin de corriger mon dossier sans me déplacer.
 - **US7 :** En tant que candidat, je veux simuler le paiement de mes frais via MonCash ou NatCash afin de finaliser mon inscription avant de téléverser mes documents.
 - **US8 :** En tant que candidat, je veux visualiser l'avancement de mon dossier sous forme de barre de progression afin de comprendre rapidement les étapes complétées et les actions restantes.
+- **US9 :** En tant qu'équipe produit, je veux enregistrer si le candidat s'est déplacé physiquement lors de sa candidature afin de mesurer le taux de complétion sans déplacement (indicateur §3.5).
 
 ### 6.3 User Stories Sécurité
 
@@ -230,6 +232,7 @@ Ces stories traduisent les exigences de sécurité en besoins compréhensibles p
 | **US6** | Depuis la page de suivi, seuls les documents rejetés proposent l'action de remplacement ; après remplacement, le statut repasse à `en_attente`. |
 | **US7** | Le paiement simulé permet de choisir MonCash ou NatCash ; une référence transactionnelle est générée ; cette référence est visible dans le tableau de bord admin. |
 | **US8** | La page de suivi affiche une barre de progression basée sur le paiement et les statuts des documents ; si tous les documents sont validés, le dossier apparaît comme validé ; si au moins un document est rejeté, l'étape "Correction requise" est mise en évidence. |
+| **US9** | Question obligatoire en fin d'étape upload (« Avez-vous dû vous déplacer… ? ») ; le champ `deplacement_physique` est requis dans `POST /api/candidature` ; la valeur est persistée en `candidats.deplacement_physique` ; le tableau admin affiche l'indicateur par dossier. |
 | **US-S1** | Toute route admin nécessite un JWT valide ; un utilisateur non authentifié reçoit 401/403 ; aucun dossier candidat n'est retourné sans authentification. |
 | **US-S2** | Chaque changement de statut renseigne `valide_par` et `date_validation` ; ces informations restent conservées en base pour audit. |
 | **US-S3** | Les URLs ou contenus des documents ne sont jamais exposés dans une page publique ; l'accès aux documents passe par une route protégée admin. |
@@ -243,6 +246,7 @@ Ces stories traduisent les exigences de sécurité en besoins compréhensibles p
 | Besoin métier | Fonctionnalité | Donnée/API concernée | Preuve attendue |
 |---|---|---|---|
 | Réduire le déplacement physique | Candidature en ligne + upload | `POST /api/candidature`, `POST /api/upload` | Dossier complet créé sans dépôt papier |
+| Mesurer l'impact du portail | Question déplacement + persistance | `candidats.deplacement_physique`, `POST /api/candidature` | ≥ 70 % avec `deplacement_physique = false` (requête SQL ou export admin) |
 | Donner une source officielle | Pages cursus + documents requis | `GET /api/documents-requis` + catalogue cursus | Informations visibles avant candidature |
 | Rassurer le candidat | Référence dossier + email | `reference_dossier`, service email | Référence affichée et envoyée |
 | Rendre le suivi compréhensible | Barre de progression du dossier | `statut_paiement`, `statut_validation` | Étapes affichées selon l'état réel du dossier |
@@ -309,9 +313,9 @@ sequenceDiagram
     participant Mail as Resend (Email)
     participant A as Admin FDS
 
-    C->>API: POST /api/candidature (infos + paiement simulé)
+    C->>API: POST /api/candidature (infos + paiement simulé + deplacement_physique)
     activate API
-    API->>DB: INSERT candidat + référence dossier
+    API->>DB: INSERT candidat + référence dossier + deplacement_physique
     DB-->>API: Dossier créé
     API-->>C: 201 Created + reference_dossier
     deactivate API
@@ -384,6 +388,7 @@ classDiagram
         +String methode_paiement
         +String reference_paiement
         +Boolean notifications_actives
+        +Boolean deplacement_physique
         +DateTime created_at
     }
     
@@ -424,6 +429,8 @@ classDiagram
 - Un document remplacé conserve le même couple logique `(candidat_id, document_requis_id)` afin d'éviter les doublons dans le dossier.
 - Le statut d'un document remplacé repasse automatiquement à `en_attente`.
 - Les décisions administratives doivent toujours être auditables (`valide_par`, `date_validation`).
+- À chaque soumission, `deplacement_physique` est obligatoire : `false` si le candidat n'a pas eu besoin de se déplacer, `true` sinon. Ce champ alimente l'indicateur « taux de complétion sans déplacement » (§3.5). Les dossiers antérieurs à l'introduction du champ peuvent avoir `NULL` (non renseigné).
+- La contrainte `UNIQUE (candidat_id, document_requis_id)` sur `documents_soumis` garantit l'upsert sans doublon lors d'un remplacement.
 
 ---
 
@@ -538,11 +545,22 @@ La sécurité est conçue dès l'architecture, selon les **3 principes fondateur
 | **A03** | Supply Chain Failures | `pip check` / `npm audit` à chaque sprint. Dépendances documentées en §10. |
 | **A04** | Cryptographic Failures | Mots de passe hashés bcrypt (`passlib`). HTTPS obligatoire. Secrets hors du code source. |
 | **A05** | Injection | SQLAlchemy ORM (requêtes paramétrées — zéro concaténation SQL). Validation Pydantic. |
-| **A06** | Insecure Design | Threat Modeling STRIDE appliqué lors de la conception. Rate limiting planifié. |
+| **A06** | Insecure Design | Threat Modeling STRIDE appliqué (voir tableau ci-dessous). Rate limiting sur `/api/auth/token` et `/api/candidature`. |
 | **A07** | Authentication Failures | JWT à durée de vie courte. Sessions invalidées à la déconnexion. Lib éprouvée (`python-jose`). |
 | **A08** | Integrity Failures | JWT signé avec secret fort (256 bits min.). Pas d'état côté client sans signature. |
 | **A09** | Logging Failures | Middleware de logging : chaque requête HTTP loggée avec code de réponse + userId (hors données sensibles). |
 | **A10** | Exceptional Conditions | `try/catch` global sur chaque endpoint → retourne 400/403/500 sans exposer les détails internes. |
+
+#### Threat Modeling STRIDE — Scénarios d'abus identifiés
+
+| Menace STRIDE | Scénario d'abus | Surface d'attaque | Mitigation appliquée |
+|---|---|---|---|
+| **Spoofing** | Un acteur se fait passer pour un admin en forgeant un JWT | `Authorization: Bearer` header | Signature HS256 validée à chaque requête via `get_current_admin()` |
+| **Tampering** | Un candidat modifie la référence dossier pour accéder à un autre dossier | `GET /api/candidature/{ref}` | Aucune donnée sensible exposée par référence seule ; seul le statut public est retourné |
+| **Repudiation** | Un admin nie avoir rejeté un document | `PUT /api/admin/documents/{id}/statut` | `valide_par` + `date_validation` enregistrés et immuables en BDD |
+| **Information Disclosure** | Stack trace exposée en cas d'erreur serveur | Tous les endpoints | Messages d'erreur génériques côté client, détails dans les logs serveur uniquement |
+| **Denial of Service** | Soumission massive de candidatures ou d'uploads pour épuiser les ressources | `POST /api/candidature`, `POST /api/upload` | Rate limiting `rate_limiter.py` : 5 requêtes / 60s sur `/api/auth/token` ; 10 requêtes / 60s par IP sur `/api/candidature` ; pagination sur les listes admin |
+| **Elevation of Privilege** | Un utilisateur non-admin tente d'accéder aux routes `/api/admin/` | Toutes les routes admin | `get_current_admin()` + `deny by default` — 403 si rôle insuffisant |
 
 #### Mécanismes de sécurité spécifiques aux fichiers
 - **Validation des fichiers uploadés :** seuls les formats PDF, JPG et JPEG sont acceptés.
@@ -556,6 +574,7 @@ La sécurité est conçue dès l'architecture, selon les **3 principes fondateur
 - **AuthN (« Qui es-tu ? »)** : email + mot de passe hashé bcrypt → JWT signé (`HS256`, durée 60 min).
 - **AuthO (« Qu'as-tu le droit de faire ? »)** : RBAC — table `Utilisateur.role` (`admin` / `agent`). Le rôle est vérifié à **chaque endpoint** via `get_current_admin()`, pas seulement à la connexion.
 - **JWT Best Practices** : `exp` et `sub` validés à chaque requête. Secret ≥ 256 bits. Jamais de données sensibles dans le payload (base64 lisible).
+- **Refresh tokens** : non implémentés dans le MVP — l'admin devra se reconnecter après 60 min d'inactivité. Un endpoint `POST /api/auth/refresh` est prévu en post-MVP (voir §11.5).
 
 ### 9.6 Système de notification par email
 
@@ -642,10 +661,40 @@ OpenAPI est auto-généré par FastAPI — Contract-First sans effort supplémen
 
 La performance est conçue dès l'architecture selon la règle 80/20 : **mesurer avant d'optimiser**.
 
-#### Caching (Niveau Applicatif)
-- **Stratégie Cache-Aside** : les résultats fréquemment lus et rarement modifiés (liste des `DocumentRequis`, cursus) sont candidats au cache Redis.
-- **Cache HTTP** : les réponses `GET` statiques retournent des headers `Cache-Control` appropriés.
-- **Invalidation** : par TTL (Time To Live) ou événement (ex: mise à jour d'un document requis par l'admin).
+#### Performance Frontend (MVP 3G)
+Pour répondre à l'exigence d'un chargement en moins de 3 secondes sur connexion lente (cf. §4.1), les optimisations suivantes sont intégrées nativement :
+- **CSS Critique Inline (Anti-FOUC) :** L'ossature stylistique de base (couleurs de fond et de police) est injectée directement dans le `<head>` pour éviter l'effet d'écran blanc ou de texte nu pendant le chargement de React.
+- **Fonts non-bloquantes :** Utilisation du pattern `media="print" + onload` et préconnexion DNS pour télécharger les Google Fonts sans bloquer le rendu initial (First Contentful Paint).
+- **Code Splitting (Lazy Loading) :** Le bundle JavaScript est découpé par page via `React.lazy()`. L'utilisateur ne télécharge que le code de la page qu'il visite, réduisant la charge initiale de plus de 60%.
+- **CDN Global :** Les actualités et dates clés sont servies via le cache CDN de Sanity (`useCdn: true`), rapprochant la donnée de l'utilisateur haïtien.
+
+#### Caching Backend (Niveau Applicatif)
+- **Cache HTTP** : les réponses `GET` statiques retournent des headers `Cache-Control` appropriés. Implémenté sur `GET /api/documents-requis` : `Cache-Control: public, max-age=300`.
+- **Stratégie Cache-Aside (post-MVP)** : les résultats fréquemment lus et rarement modifiés (liste des `DocumentRequis`, cursus) seront mis en cache via Redis avec invalidation par TTL ou événement admin. Redis n'est pas dans la stack MVP — cette évolution est documentée en §11.5.
+
+#### Pagination des listes
+Toutes les listes retournées par l'API admin supportent la pagination pour éviter les Full Table Scans à volume croissant :
+
+| Endpoint | Paramètres | Valeur par défaut |
+|---|---|---|
+| `GET /api/admin/candidatures` | `?page=1&limit=20` | 20 dossiers par page |
+| `GET /api/admin/documents` | `?page=1&limit=50` | 50 documents par page *(post-MVP si liste dédiée)* |
+
+La réponse de `GET /api/admin/candidatures` inclut `total`, `page`, `limit` et `items` (chaque item expose notamment `deplacement_physique`) pour permettre la navigation côté frontend.
+
+#### Connection Pooling (PostgreSQL)
+SQLAlchemy est configuré avec un pool de connexions pour éviter la saturation de Railway en production :
+
+```python
+# backend/database.py
+engine = create_engine(
+    DATABASE_URL,
+    pool_size=5,        # connexions permanentes maintenues
+    max_overflow=10,    # connexions supplémentaires autorisées en pic
+    pool_timeout=30,    # délai d'attente avant erreur (secondes)
+    pool_pre_ping=True  # vérifie la connexion avant usage (évite les connexions mortes)
+)
+```
 
 #### Indexation Base de Données (PostgreSQL)
 
@@ -717,7 +766,7 @@ Cette section transforme le cahier des charges en outil de pilotage : elle préc
 
 Le MVP est considéré comme terminé lorsque les conditions suivantes sont satisfaites :
 
-- Un candidat peut consulter les cursus, ouvrir le formulaire, simuler un paiement, soumettre ses informations et téléverser tous les documents requis depuis un mobile.
+- Un candidat peut consulter les cursus, ouvrir le formulaire, simuler un paiement, répondre à la question sur le déplacement physique, soumettre ses informations et téléverser tous les documents requis depuis un mobile.
 - Le système génère une référence unique de dossier et permet de retrouver ce dossier depuis la page de suivi.
 - Un administrateur authentifié peut consulter les candidatures, ouvrir les documents et valider ou rejeter chaque document.
 - Un document rejeté peut être remplacé par le candidat sans créer un second dossier.
@@ -756,6 +805,8 @@ Le MVP est considéré comme terminé lorsque les conditions suivantes sont sati
 - Les SMS/push notifications sont hors MVP et restent en amélioration future.
 - Le portail ne gère pas les cours, les notes, les inscriptions pédagogiques ou l'espace étudiant complet.
 - L'interopérabilité avec FDS Pay, FDS Akademi et un SSO institutionnel complet est préparée architecturalement, mais non livrée dans cette phase.
+- **Refresh tokens absents** : le JWT admin expire après 60 min sans renouvellement automatique — l'administrateur devra se reconnecter manuellement. Un endpoint `POST /api/auth/refresh` est prévu en post-MVP.
+- **Cache Redis absent** : le caching applicatif repose uniquement sur les headers `Cache-Control` HTTP dans cette phase. Redis sera introduit post-MVP pour les données fréquemment lues.
 
 ### 11.5 Évolutions post-MVP
 
@@ -763,6 +814,8 @@ Le MVP est considéré comme terminé lorsque les conditions suivantes sont sati
 |---|---|---|
 | P1 | Intégration réelle avec FDS Pay | Encaisser et réconcilier automatiquement les frais |
 | P1 | Découpage backend en routeurs FastAPI par domaine | Renforcer le monolithe modulaire annoncé |
+| P1 | Refresh tokens (`POST /api/auth/refresh`) | Sessions admin continues sans reconnexion toutes les 60 min |
+| P1 | Cache Redis (Cache-Aside sur `DocumentRequis`) | Réduire la charge BDD sur les lectures fréquentes |
 | P2 | Tableau de bord statistique des candidatures | Suivre les volumes, rejets, délais et programmes demandés |
 | P2 | Notifications SMS | Atteindre les candidats qui consultent rarement leur email |
 | P3 | Création d'un espace candidat complet | Historique, profil, documents persistants et communications |
@@ -832,6 +885,7 @@ Cette section documente la structure physique réelle du projet telle qu'elle ex
     ├── create_admin.py                    <- Script utilitaire : créer un compte admin
     ├── alter_db.py                        <- Migration : colonnes paiement
     ├── alter_db_payment.py               <- Migration : méthode et référence paiement
+    ├── alter_db_cdc.py                   <- Migration : deplacement_physique + index unique documents
     ├── .env                              <- Variables sensibles (hors Git — A02/A04)
     │
     ├── core/                              <- Modules transverses sécurité
