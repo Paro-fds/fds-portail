@@ -44,7 +44,7 @@ export function useActualites(): UseActualitesResult {
   const [source, setSource] = useState<"sanity" | "static">("static");
 
   useEffect(() => {
-    const projectId = import.meta.env.VITE_SANITY_PROJECT_ID;
+    const projectId = import.meta.env.VITE_SANITY_PROJECT_ID || "q0m1l9gp";
 
     // Si Sanity n'est pas configuré → utiliser les données statiques immédiatement
     if (!projectId) {
