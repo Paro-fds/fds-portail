@@ -668,6 +668,14 @@ Pour répondre à l'exigence d'un chargement en moins de 3 secondes sur connexio
 - **Code Splitting (Lazy Loading) :** Le bundle JavaScript est découpé par page via `React.lazy()`. L'utilisateur ne télécharge que le code de la page qu'il visite, réduisant la charge initiale de plus de 60%.
 - **CDN Global :** Les actualités et dates clés sont servies via le cache CDN de Sanity (`useCdn: true`), rapprochant la donnée de l'utilisateur haïtien.
 
+### 10.4 Architecture Frontend et Design System (The Digital Curator)
+
+Afin d'assurer une cohérence visuelle parfaite et une expérience utilisateur (UX) premium, le projet implémente un Design System sur-mesure nommé **"The Digital Curator"**.
+- **Approche Atomic Design :** L'interface est construite à l'aide de composants UI purs et réutilisables (`Button`, `Card`, `Input`, `Badge`) situés dans `src/components/ui/`.
+- **Variables CSS centralisées :** Les couleurs (Primary `#004B87`, Secondary, Error, Surface) et typographies sont définies dans `index.css` et exposées via TailwindCSS.
+- **Règle du "No-Line" :** Utilisation d'espacements (gap, padding) et de variations de teintes (Surface-low, Surface-high) plutôt que des bordures dures (`border-b`), pour un rendu moderne, épuré et lisible sur mobile.
+- **Animations fluides :** Utilisation de `motion/react` pour les transitions entre les étapes du formulaire et le rendu des listes, réduisant la charge cognitive (UX).
+
 #### Caching Backend (Niveau Applicatif)
 - **Cache HTTP** : les réponses `GET` statiques retournent des headers `Cache-Control` appropriés. Implémenté sur `GET /api/documents-requis` : `Cache-Control: public, max-age=300`.
 - **Stratégie Cache-Aside (post-MVP)** : les résultats fréquemment lus et rarement modifiés (liste des `DocumentRequis`, cursus) seront mis en cache via Redis avec invalidation par TTL ou événement admin. Redis n'est pas dans la stack MVP — cette évolution est documentée en §11.5.
@@ -852,11 +860,23 @@ Cette section documente la structure physique réelle du projet telle qu'elle ex
 │   │   └── AuthContext.tsx               <- Contexte admin : token JWT, état connecté, logout
 │   │
 │   ├── components/                        <- Composants réutilisables (UI commune)
+│   │   ├── ui/                           <- Design System "The Digital Curator" (Atomic Design)
+│   │   │   ├── Button.tsx                <- Bouton standardisé (Primary, Secondary, Outline)
+│   │   │   ├── Card.tsx                  <- Conteneur de surface
+│   │   │   ├── Input.tsx                 <- Champ de formulaire avec gestion d'erreurs
+│   │   │   └── Badge.tsx                 <- Étiquette d'état (Statuts, Tags)
 │   │   ├── Layout.tsx                    <- Gabarit : Header + Outlet + Footer
 │   │   ├── Header.tsx                    <- Barre de navigation supérieure
 │   │   ├── Footer.tsx                    <- Pied de page institutionnel
 │   │   ├── BottomNav.tsx                 <- Navigation mobile bas d'écran (Mobile-First)
 │   │   └── ProtectedRoute.tsx            <- Guard de route RBAC : redirige si JWT absent (A01)
+│   │
+│   ├── hooks/                             <- Hooks React personnalisés (Logique métier UI)
+│   │   ├── useActualites.ts              <- Connexion au CMS Sanity pour les news avec fallback local
+│   │   └── useDatesCles.ts               <- Connexion au CMS Sanity pour les dates d'admission
+│   │
+│   ├── lib/                               <- Utilitaires et clients externes
+│   │   └── sanityClient.ts               <- Client d'API Sanity configuré (ID projet, dataset)
 │   │
 │   ├── screens/                           <- Pages (1 fichier = 1 route)
 │   │   ├── Home.tsx                      <- Accueil : présentation FDS, dates, cursus
