@@ -13,7 +13,7 @@
 import { createClient } from "@sanity/client";
 
 export const sanityClient = createClient({
-  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || "",
+  projectId: import.meta.env.VITE_SANITY_PROJECT_ID || "q0m1l9gp",
   dataset: import.meta.env.VITE_SANITY_DATASET || "production",
   apiVersion: "2024-01-01", // Date figée — évite les breaking changes d'API
   useCdn: true,             // CDN Sanity : lecture rapide, cache ~60s (suffisant pour des actualités)
