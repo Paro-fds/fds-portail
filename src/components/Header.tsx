@@ -37,10 +37,11 @@ export default function Header() {
           <Link
             key={item.path}
             to={item.path}
-            className={`h-full flex items-center px-4 font-headline text-sm font-semibold transition-all rounded-md my-2 ${isActive(item.path)
+            className={`h-full flex items-center px-4 font-headline text-sm font-semibold transition-all rounded-md my-2 ${
+              isActive(item.path)
                 ? "bg-surface-bright text-primary"
                 : "text-secondary hover:bg-surface-container-low hover:text-primary hover:translate-x-1"
-              }`}
+            }`}
           >
             {item.name}
           </Link>

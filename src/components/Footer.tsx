@@ -12,8 +12,8 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Identité */}
           <div className="md:col-span-5">
-            <div className="bg-white inline-block p-4 rounded-xl mb-6 shadow-md">
-              <img src="/logo.jpg" alt="Faculté des Sciences" className="h-20 w-auto object-contain" />
+            <div className="bg-white inline-block p-4 rounded-xl mb-6">
+              <img src="/logo.jpg" alt="Faculté des Sciences" className="h-16 w-auto object-contain" />
             </div>
             <p className="font-body text-base text-white/80 leading-relaxed mb-6 max-w-md">
               Université d'État d'Haïti (UEH). Fondée en 1902, la FDS forme les ingénieurs et scientifiques qui bâtissent l'avenir d'Haïti.
@@ -33,9 +33,11 @@ export default function Footer() {
                 <span className="material-symbols-outlined text-white/50 text-lg">location_on</span>
                 <span>Delmas 33, Port-au-Prince, Haïti</span>
               </li>
-              <li className="flex items-center gap-3 hover:text-white transition-colors cursor-default">
+              <li className="flex items-center gap-3">
                 <span className="material-symbols-outlined text-white/50 text-lg">call</span>
-                <span>+509 XX XX XXXX</span>
+                <Link to="/aide" className="text-white/80 hover:text-white transition-colors">
+                  Contacter le secrétariat
+                </Link>
               </li>
               <li className="flex items-center gap-3 hover:text-white transition-colors cursor-default">
                 <span className="material-symbols-outlined text-white/50 text-lg">mail</span>

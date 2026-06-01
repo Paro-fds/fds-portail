@@ -31,8 +31,8 @@ export default function BottomNav() {
             key={item.path}
             to={item.path}
             className={`flex flex-col items-center justify-center flex-1 h-full gap-1 transition-all rounded-t-xl ${
-              active 
-                ? "text-primary bg-surface-container-low" 
+              active
+                ? "text-primary bg-surface-container-low"
                 : "text-secondary hover:text-primary hover:bg-surface-container-low/50"
             }`}
           >

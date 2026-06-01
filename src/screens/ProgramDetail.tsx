@@ -6,6 +6,7 @@
 import { useParams, Link } from "react-router-dom";
 import { PROGRAMS, CursusData } from "../constants";
 import { allCursus } from "../data/cursus";
+import { Card } from "../components/ui/Card";
 
 const areaIcons: Record<string, string> = {
   bolt: "bolt",
@@ -48,7 +49,7 @@ export default function ProgramDetail() {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
         {/* Main Content */}
         <div className="md:col-span-8 flex flex-col gap-12">
-          <section className="bg-surface-container-lowest rounded-xl p-8 md:p-12 border border-outline-variant/15 shadow-[0_8px_24px_rgba(17,28,45,0.06)] flex flex-col justify-center">
+          <Card className="p-8 md:p-12 flex flex-col justify-center">
             <div className="inline-flex items-center gap-2 bg-tertiary-container/20 text-tertiary px-3 py-1.5 rounded-md w-max mb-8">
               <span className="material-symbols-outlined text-sm">check_circle</span>
               <span className="font-label text-[10px] font-bold uppercase tracking-widest">Ouvert aux candidatures</span>
@@ -70,10 +71,10 @@ export default function ProgramDetail() {
                 </div>
               ))}
             </div>
-          </section>
+          </Card>
 
           {program.areas && (
-            <section className="bg-surface-container-low rounded-xl p-8 md:p-12">
+            <Card variant="flat" className="p-8 md:p-12">
               <h2 className="font-headline text-2xl font-bold text-on-surface mb-8">Domaines d'Intégration</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 {program.areas.map(area => {
@@ -91,12 +92,12 @@ export default function ProgramDetail() {
                   );
                 })}
               </div>
-            </section>
+            </Card>
           )}
 
           {/* Cours du programme */}
           {cursus && (
-            <section className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12">
+            <Card className="p-8 md:p-12">
               <div className="flex items-center gap-3 mb-10">
                 <span className="material-symbols-outlined text-primary text-2xl">menu_book</span>
                 <h2 className="font-headline text-2xl font-bold text-on-surface">Programme d'Études</h2>
@@ -104,7 +105,7 @@ export default function ProgramDetail() {
 
               <div className="space-y-12">
                 {Object.entries(cursus.niveaux).map(([niveau, cours]) => (
-                  <div key={niveau} className="bg-surface-container-low rounded-xl p-8">
+                  <Card key={niveau} variant="flat" className="p-8">
                     <h3 className="font-headline text-xl font-bold text-primary mb-6 flex items-center gap-3">
                       <span className="bg-primary-fixed text-on-primary-fixed-variant px-3 py-1 rounded-md text-xs font-bold uppercase tracking-widest">
                         {niveau}
@@ -161,10 +162,10 @@ export default function ProgramDetail() {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </Card>
                 ))}
               </div>
-            </section>
+            </Card>
           )}
         </div>
 

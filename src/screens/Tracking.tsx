@@ -1,6 +1,8 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
 
 interface DocumentSoumis {
   id: string;
@@ -214,8 +216,8 @@ export default function Tracking() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 text-center shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
+            <Card className="p-8 md:p-12 text-center">
             <div className="w-20 h-20 bg-primary-container/10 rounded-full flex items-center justify-center mx-auto mb-8">
               <span className="material-symbols-outlined text-4xl text-primary">search</span>
             </div>
@@ -230,7 +232,7 @@ export default function Tracking() {
                 <input 
                   type="text" id="ref" 
                   placeholder="CAN-2026-..."
-                  className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-mono text-center text-xl uppercase placeholder:text-outline-variant"
+                  className="w-full h-16 bg-surface-container-low border border-outline-variant/30 rounded-md focus:ring-1 focus:ring-primary focus:border-primary transition-all font-mono text-center text-xl uppercase placeholder:text-outline-variant outline-none"
                   value={reference} onChange={e => setReference(e.target.value.toUpperCase())}
                 />
               </div>
@@ -242,27 +244,25 @@ export default function Tracking() {
                 </div>
               )}
 
-              <button 
+              <Button 
                 type="submit" 
                 disabled={isSearching || !reference.trim()}
-                className="w-full px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+                icon={isSearching ? "hourglass_empty" : "search"}
+                fullWidth
               >
-                {isSearching ? (
-                  <><span className="material-symbols-outlined animate-spin text-lg">hourglass_empty</span> Recherche...</>
-                ) : (
-                  <><span className="material-symbols-outlined text-lg">search</span> Rechercher mon dossier</>
-                )}
-              </button>
+                {isSearching ? "Recherche..." : "Rechercher mon dossier"}
+              </Button>
             </form>
+            </Card>
           </motion.div>
         ) : (
           <motion.div
             key="result"
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-8 border-b border-outline-variant/15 gap-6">
+            <Card className="p-8 md:p-12">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 pb-8 gap-6">
               <div>
                 <span className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary mb-2 block">Dossier Candidat</span>
                 <h1 className="font-headline text-3xl font-extrabold text-on-surface">{data.prenom} {data.nom}</h1>
@@ -295,20 +295,42 @@ export default function Tracking() {
                 </span>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-5 gap-4">
+              {/* ─── Mobile : timeline verticale ─── */}
+              <div className="flex flex-col gap-0 sm:hidden">
                 {buildProgressSteps(data).map((step, index) => (
-                  <div key={step.label} className="relative flex sm:flex-col items-center sm:items-start gap-4">
-                    {index < 4 && (
-                      <div className="hidden sm:block absolute left-11 top-5 h-0.5 w-[calc(100%-1.75rem)] bg-outline-variant/35" />
-                    )}
-                    <div className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 shadow-sm ${getStepClasses(step.tone)}`}>
-                      <span className="material-symbols-outlined text-xl">{step.icon}</span>
+                  <div key={step.label} className="flex items-start gap-4">
+                    {/* Colonne icône + connecteur */}
+                    <div className="flex flex-col items-center shrink-0">
+                      <div className={`w-9 h-9 rounded-full border-2 flex items-center justify-center shadow-sm ${getStepClasses(step.tone)}`}>
+                        <span className="material-symbols-outlined text-lg">{step.icon}</span>
+                      </div>
+                      {index < 4 && (
+                        <div className="w-0.5 flex-1 min-h-[1.75rem] bg-outline-variant/40 my-1" />
+                      )}
                     </div>
-                    <div className="min-w-0">
+                    {/* Label */}
+                    <div className="pt-1.5 pb-5">
                       <span className={`font-label text-[10px] font-bold uppercase tracking-widest leading-tight block ${getLabelClasses(step.tone)}`}>
                         {step.label}
                       </span>
                     </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* ─── Desktop : stepper horizontal ─── */}
+              <div className="hidden sm:grid sm:grid-cols-5 gap-4">
+                {buildProgressSteps(data).map((step, index) => (
+                  <div key={step.label} className="relative flex flex-col items-start gap-2">
+                    {index < 4 && (
+                      <div className="absolute left-11 top-[1.125rem] h-0.5 w-[calc(100%-1.75rem)] bg-outline-variant/35" />
+                    )}
+                    <div className={`relative z-10 w-10 h-10 rounded-full border-2 flex items-center justify-center shrink-0 shadow-sm ${getStepClasses(step.tone)}`}>
+                      <span className="material-symbols-outlined text-xl">{step.icon}</span>
+                    </div>
+                    <span className={`font-label text-[10px] font-bold uppercase tracking-widest leading-tight block ${getLabelClasses(step.tone)}`}>
+                      {step.label}
+                    </span>
                   </div>
                 ))}
               </div>
@@ -393,19 +415,22 @@ export default function Tracking() {
             </div>
 
             <div className="mt-12 pt-8 border-t border-outline-variant/15 flex flex-col sm:flex-row gap-4 justify-between items-center">
-              <button 
+              <Button 
                 onClick={() => { setData(null); setReference(""); setUploadError(null); setUploadSuccess(null); }}
-                className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors w-full sm:w-auto flex justify-center items-center gap-2"
+                variant="outline"
+                icon="arrow_back"
               >
-                <span className="material-symbols-outlined text-lg">arrow_back</span> Faire une autre recherche
-              </button>
-              <button
+                Faire une autre recherche
+              </Button>
+              <Button
                 onClick={() => handleSearch({ preventDefault: () => {} } as React.FormEvent)}
-                className="px-6 py-4 bg-primary-container/10 text-primary font-headline font-bold rounded-md hover:bg-primary-container/20 transition-colors w-full sm:w-auto flex justify-center items-center gap-2"
+                variant="secondary"
+                icon="refresh"
               >
-                <span className="material-symbols-outlined text-lg">refresh</span> Actualiser
-              </button>
+                Actualiser
+              </Button>
             </div>
+            </Card>
           </motion.div>
         )}
       </AnimatePresence>

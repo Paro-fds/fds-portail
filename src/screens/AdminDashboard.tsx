@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../components/ui/Button";
 
 interface DocumentSoumis {
   id: string;
@@ -161,14 +162,14 @@ export default function AdminDashboard() {
 
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-outline-variant/30 pb-6 mb-10 gap-4">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end pb-6 mb-10 gap-4">
         <div>
           <h1 className="font-headline text-3xl font-extrabold uppercase tracking-tight text-primary">Tableau de Bord</h1>
           <p className="font-body text-secondary mt-1">Gestion des admissions FDS</p>
         </div>
-        <button onClick={logout} className="px-4 py-2 bg-transparent text-secondary border border-outline-variant/30 font-headline text-sm font-bold rounded-md hover:bg-surface-container-low transition-colors flex items-center gap-2">
-          <span className="material-symbols-outlined text-lg">logout</span> Déconnexion
-        </button>
+        <Button variant="outline" onClick={logout} icon="logout">
+          Déconnexion
+        </Button>
       </div>
 
       {/* Modal de prévisualisation — Images uniquement */}
@@ -181,7 +182,7 @@ export default function AdminDashboard() {
             className="bg-surface-container-lowest max-w-4xl w-full rounded-xl overflow-hidden shadow-2xl border border-outline-variant/15"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center p-4 border-b border-outline-variant/15">
+            <div className="flex justify-between items-center p-4">
               <span className="font-headline font-bold text-on-surface">Prévisualisation</span>
               <div className="flex gap-2">
                 <a
@@ -367,22 +368,20 @@ export default function AdminDashboard() {
             {total} dossier{total > 1 ? "s" : ""} — page {page} / {totalPages}
           </p>
           <div className="flex gap-2">
-            <button
-              type="button"
-              disabled={page <= 1}
+            <Button
+              variant="outline"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
-              className="px-4 py-2 text-sm font-headline font-bold rounded-md border border-outline-variant/30 text-secondary hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={page <= 1}
             >
               Précédent
-            </button>
-            <button
-              type="button"
-              disabled={page >= totalPages}
+            </Button>
+            <Button
+              variant="outline"
               onClick={() => setPage((p) => p + 1)}
-              className="px-4 py-2 text-sm font-headline font-bold rounded-md border border-outline-variant/30 text-secondary hover:bg-surface-container-low disabled:opacity-40 disabled:cursor-not-allowed"
+              disabled={page >= totalPages}
             >
               Suivant
-            </button>
+            </Button>
           </div>
         </div>
       )}

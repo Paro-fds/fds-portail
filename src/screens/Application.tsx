@@ -1,6 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
+import { Button } from "../components/ui/Button";
+import { Input } from "../components/ui/Input";
+import { Card } from "../components/ui/Card";
+import { Badge } from "../components/ui/Badge";
 
 type Step = "prerequis" | "info" | "payment" | "upload" | "success";
 
@@ -150,16 +154,16 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
+            <Card className="p-8 md:p-12">
              <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
                 <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Prérequis</span>
               </div>
               <div className="flex gap-2">
-                <div className="h-1.5 w-1/4 bg-primary rounded-full" />
-                <div className="h-1.5 w-3/4 bg-surface-container-high rounded-full" />
+                <div className="h-1.5 w-1/4 bg-primary rounded" />
+                <div className="h-1.5 w-3/4 bg-surface-container-high rounded" />
               </div>
             </div>
 
@@ -190,15 +194,15 @@ export default function Application() {
             </div>
 
             <div className="pt-6 flex justify-end">
-              <button 
-                type="button" onClick={() => setStep("info")}
-                className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group"
+              <Button 
+                onClick={() => setStep("info")}
                 disabled={documentsRequis.length === 0}
+                icon="arrow_forward"
               >
                 J'ai préparé ces documents
-                <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">arrow_forward</span>
-              </button>
+              </Button>
             </div>
+            </Card>
           </motion.div>
         )}
 
@@ -208,16 +212,16 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
+            <Card className="p-8 md:p-12">
             <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
                 <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 1/3</span>
               </div>
               <div className="flex gap-2">
-                <div className="h-1.5 w-2/4 bg-primary rounded-full" />
-                <div className="h-1.5 w-2/4 bg-surface-container-high rounded-full" />
+                <div className="h-1.5 w-2/4 bg-primary rounded" />
+                <div className="h-1.5 w-2/4 bg-surface-container-high rounded" />
               </div>
             </div>
 
@@ -234,49 +238,29 @@ export default function Application() {
 
             <form className="space-y-8">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div className="space-y-2">
-                  <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="nom">Nom de famille</label>
-                  <input 
-                    type="text" id="nom" 
-                    placeholder="Votre nom"
-                    className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                    value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="prenom">Prénom</label>
-                  <input 
-                    type="text" id="prenom" 
-                    placeholder="Votre prénom"
-                    className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                    value={formData.prenom} onChange={e => setFormData({...formData, prenom: e.target.value})}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="email">Email</label>
-                <input 
-                  type="email" id="email" 
-                  placeholder="votre.email@exemple.com"
-                  className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                  value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+                <Input 
+                  label="Nom de famille" id="nom" placeholder="Votre nom"
+                  value={formData.nom} onChange={e => setFormData({...formData, nom: e.target.value})}
+                />
+                <Input 
+                  label="Prénom" id="prenom" placeholder="Votre prénom"
+                  value={formData.prenom} onChange={e => setFormData({...formData, prenom: e.target.value})}
                 />
               </div>
 
-              <div className="space-y-2">
-                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="tel">Téléphone</label>
-                <input 
-                  type="tel" id="tel" 
-                  placeholder="+509 XX XX XX XX"
-                  className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                  value={formData.telephone} onChange={e => setFormData({...formData, telephone: e.target.value})}
-                />
-              </div>
+              <Input 
+                label="Email" id="email" type="email" placeholder="votre.email@exemple.com" icon="alternate_email"
+                value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})}
+              />
+
+              <Input 
+                label="Téléphone" id="tel" type="tel" placeholder="+509 XX XX XX XX" icon="phone"
+                value={formData.telephone} onChange={e => setFormData({...formData, telephone: e.target.value})}
+              />
 
               <div className="space-y-2">
                 <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="ville">Ville de résidence</label>
-                <select id="ville" className="w-full pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface"
+                <select id="ville" className="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/30 rounded-md focus:ring-1 focus:ring-primary focus:border-primary transition-all font-body text-on-surface outline-none"
                   value={formData.ville} onChange={e => setFormData({...formData, ville: e.target.value})}
                 >
                   <option>Port-au-Prince</option>
@@ -291,21 +275,15 @@ export default function Application() {
               </div>
 
               <div className="pt-8 flex justify-between items-center gap-4">
-                <button 
-                  type="button" onClick={() => setStep("prerequis")}
-                  className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
-                >
+                <Button variant="outline" onClick={() => setStep("prerequis")} type="button">
                   Précédent
-                </button>
-                <button 
-                  type="button" onClick={handleNext}
-                  className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group"
-                >
+                </Button>
+                <Button onClick={handleNext} icon="payment" type="button">
                   Payer les frais
-                  <span className="material-symbols-outlined text-lg group-hover:translate-x-1 transition-transform">payment</span>
-                </button>
+                </Button>
               </div>
             </form>
+            </Card>
           </motion.div>
         )}
 
@@ -315,16 +293,16 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
+            <Card className="p-8 md:p-12">
             <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
                 <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 2/3</span>
               </div>
               <div className="flex gap-2">
-                <div className="h-1.5 w-3/4 bg-primary rounded-full" />
-                <div className="h-1.5 w-1/4 bg-surface-container-high rounded-full" />
+                <div className="h-1.5 w-3/4 bg-primary rounded" />
+                <div className="h-1.5 w-1/4 bg-surface-container-high rounded" />
               </div>
             </div>
 
@@ -367,48 +345,27 @@ export default function Application() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="telPaiement">Numéro de téléphone ({formData.methodePaiement})</label>
-                <div className="relative group">
-                  <span className="absolute left-0 bottom-2 text-secondary group-focus-within:text-primary transition-colors flex items-center">
-                    <span className="material-symbols-outlined text-lg">smartphone</span>
-                  </span>
-                  <input 
-                    type="tel" id="telPaiement" 
-                    placeholder="XX XX XX XX"
-                    className="w-full pl-8 pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                    value={formData.telephonePaiement} onChange={e => setFormData({...formData, telephonePaiement: e.target.value})}
-                  />
-                </div>
-              </div>
+              <Input 
+                label={`Numéro de téléphone (${formData.methodePaiement})`} 
+                id="telPaiement" type="tel" placeholder="XX XX XX XX" icon="smartphone"
+                value={formData.telephonePaiement} onChange={e => setFormData({...formData, telephonePaiement: e.target.value})}
+              />
 
               <div className="pt-8 flex justify-between items-center gap-4">
-                <button 
-                  type="button" onClick={() => setStep("info")}
-                  className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
-                  disabled={isSimulatingPayment}
-                >
+                <Button variant="outline" onClick={() => setStep("info")} disabled={isSimulatingPayment} type="button">
                   Précédent
-                </button>
-                <button 
-                  type="button" onClick={handlePaymentSubmit}
-                  disabled={isSimulatingPayment}
-                  className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm w-full sm:w-auto group disabled:opacity-70 disabled:cursor-not-allowed"
+                </Button>
+                <Button 
+                  onClick={handlePaymentSubmit} 
+                  disabled={isSimulatingPayment} 
+                  icon={isSimulatingPayment ? "sync" : "check_circle"} 
+                  type="button"
                 >
-                  {isSimulatingPayment ? (
-                    <>
-                      <span className="material-symbols-outlined animate-spin text-lg">sync</span>
-                      Traitement FDS Pay...
-                    </>
-                  ) : (
-                    <>
-                      Confirmer le paiement
-                      <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">check_circle</span>
-                    </>
-                  )}
-                </button>
+                  {isSimulatingPayment ? "Traitement FDS Pay..." : "Confirmer le paiement"}
+                </Button>
               </div>
             </div>
+            </Card>
           </motion.div>
         )}
 
@@ -418,15 +375,15 @@ export default function Application() {
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
-            className="bg-surface-container-lowest rounded-xl border border-outline-variant/15 p-8 md:p-12 shadow-[0_8px_24px_rgba(17,28,45,0.06)]"
           >
+            <Card className="p-8 md:p-12">
              <div className="mb-12">
               <div className="flex justify-between items-center mb-6">
                 <h1 className="font-headline text-3xl font-extrabold text-primary tracking-tight">Candidature</h1>
                 <span className="font-label text-xs font-bold uppercase tracking-widest text-secondary">Étape 3/3</span>
               </div>
               <div className="flex gap-2">
-                <div className="h-1.5 w-full bg-primary rounded-full" />
+                <div className="h-1.5 w-full bg-primary rounded" />
               </div>
             </div>
 
@@ -523,31 +480,19 @@ export default function Application() {
             </fieldset>
 
             <div className="pt-6 flex flex-col sm:flex-row justify-between gap-4">
-              <button 
-                type="button" onClick={() => setStep("payment")}
-                className="px-6 py-4 bg-transparent text-secondary border border-outline-variant/30 font-headline font-bold rounded-md hover:bg-surface-container-low transition-colors text-center"
-                disabled={isSubmitting}
-              >
+              <Button variant="outline" onClick={() => setStep("payment")} disabled={isSubmitting} type="button">
                 Précédent
-              </button>
-              <button 
-                type="button" onClick={handleFinalSubmit}
-                disabled={isSubmitting}
-                className="px-6 py-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed group"
+              </Button>
+              <Button 
+                onClick={handleFinalSubmit} 
+                disabled={isSubmitting} 
+                icon={isSubmitting ? "hourglass_empty" : "verified"} 
+                type="button"
               >
-                {isSubmitting ? (
-                  <>
-                    <span className="material-symbols-outlined animate-spin text-lg">hourglass_empty</span>
-                    Téléversement en cours...
-                  </>
-                ) : (
-                  <>
-                    Soumettre le dossier
-                    <span className="material-symbols-outlined text-lg group-hover:scale-110 transition-transform">verified</span>
-                  </>
-                )}
-              </button>
+                {isSubmitting ? "Téléversement en cours..." : "Soumettre le dossier"}
+              </Button>
             </div>
+            </Card>
           </motion.div>
         )}
 

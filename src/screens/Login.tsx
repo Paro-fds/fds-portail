@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
+import { Input } from "../components/ui/Input";
+import { Button } from "../components/ui/Button";
+import { Card } from "../components/ui/Card";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -45,7 +48,7 @@ export default function Login() {
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-primary-container/5 via-surface to-primary/5 -z-10" />
-      <div className="w-full max-w-md bg-surface-container-lowest rounded-xl p-8 md:p-12 shadow-[0_16px_48px_rgba(17,28,45,0.08)] border border-outline-variant/15 relative z-10">
+      <Card className="w-full max-w-md p-8 md:p-12 relative z-10">
         <div className="flex flex-col items-center mb-10">
           <div className="bg-primary/10 p-4 mb-6 rounded-full">
             <span className="material-symbols-outlined text-4xl text-primary">lock</span>
@@ -62,47 +65,24 @@ export default function Login() {
             </div>
           )}
 
-          <div className="space-y-2">
-            <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="email">Email</label>
-            <div className="relative group">
-              <span className="absolute left-0 bottom-3 text-secondary group-focus-within:text-primary transition-colors">
-                <span className="material-symbols-outlined text-lg">mail</span>
-              </span>
-              <input
-                type="email" id="email" required
-                className="w-full pl-8 pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface placeholder:text-outline-variant"
-                value={email} onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin@fds.edu.ht"
-              />
-            </div>
-          </div>
+          <Input 
+            label="Email" id="email" type="email" required placeholder="admin@fds.edu.ht" icon="mail"
+            value={email} onChange={(e) => setEmail(e.target.value)}
+          />
 
-          <div className="space-y-2">
-            <label className="font-label text-[10px] font-bold uppercase tracking-widest text-secondary" htmlFor="password">Mot de passe</label>
-            <div className="relative group">
-              <span className="absolute left-0 bottom-3 text-secondary group-focus-within:text-primary transition-colors">
-                <span className="material-symbols-outlined text-lg">key</span>
-              </span>
-              <input
-                type="password" id="password" required
-                className="w-full pl-8 pb-2 bg-transparent border-0 border-b-2 border-outline-variant/30 focus:ring-0 focus:border-primary transition-colors font-body text-on-surface"
-                value={password} onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
+          <Input 
+            label="Mot de passe" id="password" type="password" required icon="key"
+            value={password} onChange={(e) => setPassword(e.target.value)}
+          />
 
-          <button 
-            type="submit" disabled={isLoading}
-            className="w-full px-6 py-4 mt-4 bg-primary text-on-primary font-headline font-bold rounded-md hover:bg-primary-container active:scale-[0.98] transition-all flex items-center justify-center gap-2 shadow-sm disabled:opacity-70 disabled:cursor-not-allowed"
+          <Button 
+            type="submit" disabled={isLoading} fullWidth className="mt-4"
+            icon={isLoading ? "hourglass_empty" : "login"}
           >
-            {isLoading ? (
-              <><span className="material-symbols-outlined animate-spin text-lg">hourglass_empty</span> Vérification...</>
-            ) : (
-              <><span className="material-symbols-outlined text-lg">login</span> Connexion</>
-            )}
-          </button>
+            {isLoading ? "Vérification..." : "Connexion"}
+          </Button>
         </form>
-      </div>
+      </Card>
     </div>
   );
 }
