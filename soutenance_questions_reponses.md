@@ -48,3 +48,25 @@ Ce document parcourt chaque chapitre de votre cahier des charges et anticipe une
 ## §11. Validation, Risques et Limites
 **Q : Quelle est la principale limite de sécurité de cette version 1.0 (MVP) et comment comptez-vous la régler ?**
 > **R :** "Comme documenté dans le paragraphe 11.4, notre sécurité par JWT est robuste, mais il manque le mécanisme de renouvellement automatique (Refresh Tokens). Actuellement, l'administrateur devra se reconnecter manuellement toutes les 60 minutes. C'est une limite assumée pour le MVP, dont la résolution (un endpoint `POST /api/auth/refresh`) est classée en priorité P1 post-soutenance."
+
+---
+
+## 🔥 Questions Techniques Avancées & Pièges Fréquents du Jury
+
+**Q : Vous avez choisi une API REST. Pourquoi pas GraphQL qui est pourtant la nouvelle norme ?**
+> **R :** "(Référence ADR-002). GraphQL est très puissant pour éviter l'over-fetching lorsque les clients ont des besoins de données très hétérogènes. Or, notre portail est une application CRUD classique où les besoins du frontend sont très uniformes. REST nous a permis de bénéficier du cache HTTP natif (GET) et surtout d'auto-générer notre documentation OpenAPI via FastAPI sans effort supplémentaire (Contract-First)."
+
+**Q : Vous dites avoir limité la taille des fichiers à 5 Mo. Que se passe-t-il si un attaquant envoie un fichier de 50 Go pour saturer la RAM de votre serveur avant même la vérification ?**
+> **R :** "Excellente question. La limitation des 5 Mo ne se fait pas qu'au niveau du code métier. Au niveau du serveur web (comme Nginx ou Gunicorn qui fera tourner FastAPI), nous configurons une limite stricte sur la taille du 'Request Body' (`client_max_body_size` ou middleware FastAPI). La requête de 50 Go est rejetée par le serveur HTTP avant même d'atteindre la mémoire de notre code Python."
+
+**Q : Concurrence : Que se passe-t-il si deux administrateurs cliquent exactement à la même milliseconde sur "Valider" et "Rejeter" pour le même document ?**
+> **R :** "C'est un scénario de concurrence typique. PostgreSQL gère cela grâce à son niveau d'isolation transactionnelle par défaut (Read Committed). La première transaction qui arrive pose un verrou (lock) sur la ligne en modification (`UPDATE document_soumis`). La deuxième transaction doit attendre. Le statut final sera celui de la deuxième transaction, et grâce à notre champ d'audit (`valide_par` et `date_validation`), nous saurons exactement quel administrateur a eu le dernier mot en base."
+
+**Q : Du côté administrateur, où stockez-vous le token JWT sur le navigateur (React) ? Dans le LocalStorage ? N'est-ce pas dangereux (faille XSS) ?**
+> **R :** "Le LocalStorage est effectivement vulnérable aux attaques XSS si le site exécute du Javascript malveillant. Pour le MVP, comme l'application Admin n'affiche aucun texte ou commentaire généré par les utilisateurs (pas de forum, pas de chat), la surface d'attaque XSS est quasi-nulle, ce qui justifie son usage temporaire. L'évolution post-MVP serait de stocker ce token dans un Cookie `HttpOnly` et `Secure` pour bloquer totalement sa lecture par Javascript."
+
+**Q : Et la gestion de vos mots de passe et clés secrètes ? Est-ce que la clé API de Cloudinary ou votre JWT Secret se balade sur votre GitHub public ?**
+> **R :** "Absolument pas (OWASP A02). Toutes les clés (Base de données, Cloudinary, Resend, JWT Secret) sont lues depuis les variables d'environnement (`import.meta.env` côté React et `os.getenv()` côté Python). Le fichier `.env` est strictement ignoré par Git (via le `.gitignore`). Sur le dépôt de code, nous n'avons poussé qu'un fichier `.env.example` avec des valeurs factices."
+
+**Q : Pourquoi avoir choisi TypeScript plutôt que JavaScript classique pour le Frontend ?**
+> **R :** "TypeScript ajoute un typage statique qui nous a permis de définir des contrats stricts (Interfaces) pour nos données. Par exemple, l'interface `DocumentSoumis` nous garantit que nous ne pourrons jamais assigner un statut farfelu comme 'en_cours' au lieu de 'en_attente'. Cela attrape 80% des erreurs au moment de la compilation dans notre éditeur, avant même que le code ne tourne dans le navigateur."
