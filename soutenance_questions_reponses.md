@@ -12,7 +12,10 @@ Ce document parcourt chaque chapitre de votre cahier des charges et anticipe une
 **Q : Pourquoi votre solution se limite-t-elle à un portail de candidature (MVP) et non à un système de gestion universitaire complet ?**
 > **R :** "Par souci de pragmatisme et de rapidité de déploiement (Time-to-Market). Résoudre le chaos informationnel de l'admission est la porte d'entrée du cycle étudiant. Essayer de tout informatiser d'un coup (intranet, notes, etc.) est la première cause d'échec des projets informatiques. Notre MVP vise un succès ciblé et mesurable."
 
-## §3. Argumentation (Customer Journey & Hypothèse)
+## §3. Argumentation (Customer Journey, Hypothèse & JTBD)
+**Q : Pouvez-vous nous définir le "Job to be Done" (JTBD) de votre persona principal ?**
+> **R :** "Absolument. Contrairement à une User Story qui décrit une fonctionnalité, le JTBD décrit la *motivation* profonde : *« Quand je dois m'inscrire à l'université depuis ma province sans information claire, je veux pouvoir m'informer, soumettre mon dossier et payer virtuellement les frais entièrement en ligne afin de sécuriser ma candidature à la FDS sans perdre de temps ni risquer ma sécurité dans un déplacement physique. »* C'est ce changement de situation qui justifie toute notre architecture."
+
 **Q : Comment comptez-vous prouver scientifiquement que votre plateforme est réellement utile ?**
 > **R :** "Nous avons intégré une métrique de succès chiffrable en base de données : la question obligatoire 'Avez-vous dû vous déplacer ?' enregistrée en `deplacement_physique`. Si à l'issue de la première campagne, plus de 70% des dossiers répondent 'Non', nous aurons prouvé par la donnée réelle que nous avons éliminé la friction géographique."
 

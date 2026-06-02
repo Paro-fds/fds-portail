@@ -132,6 +132,12 @@ L'hypothèse sera évaluée à partir d'indicateurs simples, observables et reli
 
 Ces métriques permettent d'éviter une validation subjective du MVP : le succès n'est pas seulement "le site fonctionne", mais "le site réduit effectivement la dépendance au déplacement physique".
 
+### 3.7 Job to be Done (JTBD)
+
+Le "Job to be Done" résume la motivation profonde du persona lorsqu'il interagit avec le système :
+
+> **« Quand je** dois m'inscrire à l'université depuis ma province sans information claire, **je veux** pouvoir m'informer, soumettre mon dossier et payer virtuellement les frais entièrement en ligne **afin de** sécuriser ma candidature à la FDS sans perdre de temps ni risquer ma sécurité dans un déplacement physique. **»**
+
 ---
 
 ## §4. Priorisation MoSCoW
