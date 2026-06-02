@@ -13,79 +13,108 @@ La Faculté des Sciences (FDS) de l'UEH forme l'élite de l'ingénierie en Haït
 
 ## §2. Solution Proposée
 
-Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralement en ligne depuis son smartphone.
+Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralem## §3. Argumentation (Customer Journey & Hypothèse)
+
+### 3.1 Persona principal
+
+**Louismy, 17 ans**, élève en Terminale à Pétion-Ville. Il possède un smartphone Android avec une connexion 3G intermittente. Il souhaite s’inscrire en génie informatique à la FDS, mais ne trouve pas facilement d’informations officielles sur les dates, les modalités d’admission et les prérequis.
 
 ---
 
-## §3. Argumentation (Customer Journey & Hypothèse)
+### 3.2 Interviews et verbatims
 
-### 3.1 Persona Principal
-**Louismy, 17 ans**, élève en Terminale à Pétion-Ville. Il possède un smartphone Android avec une connexion 3G intermittente. Il souhaite s'inscrire en génie informatique mais ne trouve aucune information officielle sur les dates et les modalités d'admission.
+Afin de valider la réalité du terrain, une interview a été menée auprès d’un profil correspondant au persona principal. La consigne d’ouverture était :
 
-### 3.2 Interviews et Verbatims
+*« Racontez-moi ce que vous avez fait pour trouver des informations sur la FDS et comprendre comment postuler, depuis le moment où vous avez décidé de vous y intéresser jusqu’au moment où vous avez soumis votre candidature ou abandonné l’idée. »*
 
-Afin de valider la réalité du terrain, une interview a été conduite avec un profil cible correspondant au persona. La consigne d'ouverture était : *« Racontez-moi ce que vous avez fait pour trouver les informations sur la FDS et comprendre comment postuler. Depuis le moment où vous avez décidé de vous y intéresser jusqu'au moment où vous avez soumis votre candidature ou renoncé. »*
+#### Q1. Première recherche
+
+**Question :** *« Lorsque vous avez décidé de vous renseigner sur la FDS pour vous inscrire, qu’avez-vous fait en premier ? »*
+
+> « J’ai cherché sur Google. J’ai tapé “FDS Haïti”. J’ai trouvé un ancien site web avec les cursus, mais les informations semblaient peu à jour et le site était difficile à naviguer. Le formulaire de contact ne fonctionnait pas et je n’avais pas de numéro de téléphone direct. »
+
+#### Q2. Recherche d’alternative
+
+**Question :** *« Qu’avez-vous fait ensuite ? »*
+
+> « J’ai cherché à nouveau en tapant “FDS Haïti adresse”. J’ai trouvé l’adresse de la faculté avec un numéro de téléphone. J’ai appelé, mais je n’ai obtenu aucune réponse. J’ai donc compris qu’il fallait me rendre sur place. Je m’y suis rendu deux jours plus tard. »
+
+#### Q3. Déplacement à la faculté
+
+**Question :** *« Comment s’est passé votre déplacement à la FDS ? Qu’avez-vous ressenti ? »*
+
+> « Aujourd’hui, chaque déplacement comporte une certaine appréhension à cause du contexte sécuritaire. Heureusement, la FDS étant actuellement située à Delmas 33, cela restait relativement accessible pour moi qui habite à Pétion-Ville. Mais j’imagine difficilement la situation des candidats venant de province. Je me demandais aussi comment une école d’ingénieurs aussi reconnue pouvait ne pas disposer d’un site moderne permettant de s’informer et de s’inscrire en ligne. »
+
+#### Q4. Recherche d’informations sur place
+
+**Question :** *« Une fois sur place, comment avez-vous obtenu les informations nécessaires ? »*
+
+> « Je me suis d’abord renseigné auprès d’étudiants qui m’ont orienté vers le secrétariat. On m’a remis une brochure photocopiée avec des corrections écrites à la main. J’ai enfin obtenu des informations concrètes sur les modalités d’inscription et les matières enseignées. Cependant, le calendrier n’était pas encore disponible et l’on m’a demandé de revenir dans deux semaines ou de rappeler plus tard. »
+
+#### Q5. Dépôt de candidature
+
+**Question :** *« Avez-vous finalement pu vous inscrire ? Comment cela s’est-il passé ? »*
+
+> « Oui. Je suis revenu quelques semaines plus tard pour remplir un formulaire papier. On m’a confirmé mon admissibilité, remis un numéro d’inscription et communiqué la date du concours. Il ne me restait plus qu’à attendre. »
+
+#### Q6. Suggestions d’amélioration
+
+**Question :** *« Qu’est-ce qui devrait changer pour améliorer cette expérience ? »*
+
+> « Il faudrait déjà un site web à jour avec les informations sur les cursus, les prérequis, les dates et les frais. Ensuite, la possibilité de postuler en ligne permettrait d’économiser du temps et d’éviter un déplacement. »
+
+#### Verbatims clés retenus pour justifier le MVP
+
+> *« J’ai trouvé un ancien site web avec les cursus, mais les informations semblaient peu à jour et le site était difficile à naviguer. »*
+
+> *« Je me demandais comment une école d’ingénieurs de renom pouvait ne pas disposer d’un site moderne avec la possibilité de faire des inscriptions en ligne. »*
 
 ---
 
-**Q1. Première recherche :** *« Quand vous avez décidé de vous renseigner sur la FDS pour vous y inscrire, qu'est-ce que vous avez fait en premier ? Racontez-moi. »*
+### 3.3 Customer Journey Map (État actuel – *As-Is*)
 
-> « J'ai cherché sur Google. J'ai tapé 'FDS Haïti'. J'ai trouvé une site web ancien avec les cursus, mais pas à jour de ce que je ressentais, et surtout difficilement navigable. Le formulaire de contact ne marchait pas et je n'avais pas un numéro de téléphone direct. »
+À partir des interviews réalisées, le parcours utilisateur actuel d’un candidat à la FDS peut être représenté comme suit :
 
----
+| Étape                                     | Actions du candidat                            | Ressenti / Questions                        | Difficultés rencontrées (Pain Points)               |
+| ----------------------------------------- | ---------------------------------------------- | ------------------------------------------- | --------------------------------------------------- |
+| **1. Recherche d’informations**           | Louismy recherche « FDS Haïti » sur Google     | *« Où trouver des informations fiables ? »* | Informations dispersées, ancien site non mis à jour |
+| **2. Tentative de contact**               | Il cherche un numéro et tente d’appeler        | *« Pourquoi personne ne répond ? »*         | Absence de canal de communication fiable            |
+| **3. Déplacement physique**               | Il se rend à Delmas 33                         | Stress, appréhension                        | Déplacement coûteux en temps, risques sécuritaires  |
+| **4. Recherche d’informations sur place** | Il interroge des étudiants puis le secrétariat | *« Enfin des réponses concrètes »*          | Informations papier peu professionnelles            |
+| **5. Attente administrative**             | Il doit revenir plus tard pour le calendrier   | Frustration                                 | Absence de calendrier clair et accessible           |
+| **6. Dépôt de candidature**               | Il remplit un formulaire papier                | *« Cela aurait pu être fait en ligne »*     | Procédure lente et entièrement manuelle             |
+| **7. Confirmation**                       | Il reçoit un numéro d’inscription              | Soulagement                                 | Aucun suivi numérique du dossier                    |
 
-**Q2. Alternative :** *« Qu'avez-vous fait alors ? »*
+#### Principal problème identifié
 
-> « J'ai eu le reflexe de chercher à nouveau en mettant 'FDS Haïti adresse' et c'est là que j'ai trouvé l'adresse de la faculté avec un numero de telephone. J'ai composé le numero et je n'ai pas eu de reponse. J'ai alors compris qu'il fallait me rendre sur place. Ce que j'ai fait 2 jours plus tard. »
-
----
-
-**Q3. Déplacement :** *« Comment s'est passé votre déplacement pour aller à la FDS ? Qu'avez-vous ressenti ? »*
-
-> « Comme tout déplacement de nos jours c'est toujours avec de l'apprehension à cause de l'insécurité. Mais comme la FDS est actuellement à Delmas 33 c'etait plus facile pour moi qui habite à Pétion-Ville. Je n'ose imaginer pour ceux qui habitent en province. Quand à mon ressenti, je me demandais comment une ecole d'ingenieur de renom comme la FDS pouvait ne pas avoir de site web à jour en 2026 avec la possibilité de faire des inscriptions en ligne. Est-ce que je faisais le bon choix ? »
-
----
-
-**Q4. Informations sur place :** *« Une fois sur place, comment vous avez eu les informations dont vous aviez besoin ? »*
-
-> « Une fois sur place, je me suis renseigné auprès des étudiants qui m'ont orienté vers le secrétariat. Là, on m'a donné une brochure photocopiée avec des corrections à la main. C'est là que j'ai eu quelque chose de concret. J'ai pu posé des questions sur les modalités d'inscription et les matières enseignées. Je n'ai pas eu de confirmation de la part du secrétariat car le calendrier n'etait pas encore sorti. Elle m'a dit de revenir dans 2 semaines ou d'appeler. »
+Le principal problème observé est une **forte dépendance au déplacement physique**, causée par un **déficit d’information numérique fiable et centralisée**. Cette situation crée une inégalité d’accès, particulièrement pour les candidats vivant hors de Port-au-Prince.
 
 ---
 
-**Q5. Candidature :** *« Avez-vous pu finalement vous inscrire ? Comment ça s'est passé ? Vous avez eu une confirmation ? »*
+### 3.4 Customer Journey cible (*To-Be* avec le MVP)
 
-> « En effet je suis revenue quelques semaines plus tard. J'ai rempli un formulaire papier sur place. Et on m'a confirmé que j'étais admissible en me donnant un numero d'inscription et la date du concours. N'avais plus qu'à attendre le jour du concours. »
+Le portail FDS proposé transforme ce parcours en une expérience numérique simplifiée :
+
+1. **Recherche :** Louismy accède directement au portail officiel FDS depuis son smartphone.
+2. **Information :** Il consulte les cursus, prérequis, frais et dates importantes.
+3. **Candidature :** Il remplit le formulaire en ligne et téléverse ses documents.
+4. **Confirmation :** Il reçoit immédiatement un numéro de référence (`CAN-2026-XXXX`) ainsi qu’un email de confirmation.
+5. **Suivi :** Il suit l’évolution de son dossier en ligne et peut remplacer un document rejeté sans déplacement.
+
+**Résultat attendu :** une réduction significative des déplacements physiques, une meilleure accessibilité pour les candidats de province et une amélioration de la transparence administrative.
 
 ---
 
-**Q6. Comment changer la donne :** *« Qu'est-ce qui devrait changer pour que votre expérience soit meilleure ? »*
+### 3.5 Hypothèse testable
 
-> « Je dirai déjà d'avoir un site web à jour avec les informations sur les cursus, les prérequis, les dates et les frais. Ensuite la possibilité de postuler en ligne car cela economise un déplacement et du temps. »
+| Élément                                 | Formulation                                                                                                                                                                      |
+| --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Nous croyons que**                    | les lycéens, notamment ceux vivant hors de Port-au-Prince, rencontrent des difficultés importantes pour obtenir des informations fiables et soumettre leur candidature à la FDS. |
+| **Ils ont besoin de**                   | consulter des informations officielles et postuler entièrement en ligne depuis un smartphone.                                                                                    |
+| **Afin de**                             | réduire les déplacements physiques, économiser du temps et améliorer l’accès aux études d’ingénierie.                                                                            |
+| **Nous saurons que cela fonctionne si** | au moins **20 candidatures** sont soumises en ligne durant les deux premières semaines et que **70 % des candidats** complètent le processus sans déplacement physique.          |
 
----
-
-**Verbatims clés retenus pour justifier le MVP :**
-
-> *« J'ai trouvé une site web ancien avec les cursus, mais pas à jour de ce que je ressentais, et surtout difficilement navigable. Le formulaire de contact ne marchait pas et je n'avais pas un numéro de téléphone direct. »*
-
-> *« Je me demandais comment une ecole d'ingenieur de renom comme la FDS pouvait ne pas avoir de site web à jour en 2026 avec la possibilité de faire des inscriptions en ligne. Est-ce que je faisais le bon choix ? »*
-
-### 3.3 Customer Journey (État Actuel / As-Is)
-Déduit des interviews, voici le parcours d'un candidat sans la plateforme :
-1. **Recherche :** Louismy tape "FDS Haïti" sur Google. Il ne trouve rien d'officiel.
-2. **Déplacement :** Il se rend physiquement à la FDS (ou à Delmas 33), ce qui est chronophage et anxiogène vu le contexte sécuritaire.
-3. **Au Secrétariat :** Il reçoit une feuille photocopiée et doit revenir plus tard pour déposer son dossier physique.
-*Pain Point majeur : Asymétrie d'accès à l'information et obligation de déplacement physique.*
-
-### 3.4 Hypothèse Testable
-| | |
-|---|---|
-| **Nous croyons que** | les lycéens, en particulier hors de Port-au-Prince, |
-| **ont besoin de** | trouver les informations officielles et soumettre leur candidature en ligne depuis un téléphone, |
-| **pour** | ne plus dépendre d'un déplacement physique pour s'inscrire à la FDS. |
-| **Nous saurons que c'est vrai si** | au moins **20 candidatures** sont soumises via le formulaire en ligne dans les 2 premières semaines **et** au moins **70 % des candidats complètent le processus sans déplacement physique**. |
-
-### 3.5 Plan de mesure de l'hypothèse
+### 3.6 Plan de mesure de l'hypothèse
 
 L'hypothèse sera évaluée à partir d'indicateurs simples, observables et reliés directement au parcours candidat :
 
