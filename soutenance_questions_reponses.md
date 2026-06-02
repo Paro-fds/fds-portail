@@ -22,7 +22,7 @@ Ce document parcourt chaque chapitre de votre cahier des charges et anticipe une
 
 ## §5. MVP et Walking Skeleton
 **Q : Pouvez-vous me définir techniquement ce qu'est le 'Walking Skeleton' de votre système ?**
-> **R :** "C'est le flux minimal de bout en bout qui prouve que tous nos composants communiquent. Dans notre cas : un candidat clique sur 'Postuler' sur le Frontend React, le Backend FastAPI enregistre ses infos dans PostgreSQL, stocke le PDF de son diplôme sur Cloudinary, **puis redirige le candidat vers une simulation de paiement (MonCash). Une fois validé**, le service d'emailing (Resend) s'active en asynchrone, et l'Admin peut valider ce dossier sur son tableau de bord."
+> **R :** "C'est le flux minimal de bout en bout qui prouve que tous nos composants communiquent. Dans notre cas : un candidat clique sur 'Postuler' sur le Frontend React et remplit ses infos personnelles. **Il est ensuite redirigé vers une simulation de paiement (MonCash). Une fois validé, il uploade son diplôme, que le Frontend envoie vers Cloudinary, et le Backend FastAPI enregistre tout le dossier dans PostgreSQL**. Ensuite, le service d'emailing (Resend) s'active en asynchrone, et l'Admin peut valider ce dossier sur son tableau de bord."
 
 ## §6. Use Cases et User Stories
 **Q : Vous avez prévu une fonctionnalité de 'Remplacement de document' (UC6). N'était-il pas plus simple de forcer le candidat à refaire un dossier en cas de rejet ?**
