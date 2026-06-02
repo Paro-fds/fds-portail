@@ -79,15 +79,15 @@ Afin de valider la réalité du terrain, une interview a été menée auprès d�
 
 À partir des interviews réalisées, le parcours utilisateur actuel d’un candidat à la FDS peut être représenté comme suit :
 
-| Étape                                     | Actions du candidat                            | Ressenti / Questions                        | Difficultés rencontrées (Pain Points)               |
-| ----------------------------------------- | ---------------------------------------------- | ------------------------------------------- | --------------------------------------------------- |
-| **1. Recherche d’informations**           | Louismy recherche « FDS Haïti » sur Google     | *« Où trouver des informations fiables ? »* | Informations dispersées, ancien site non mis à jour |
-| **2. Tentative de contact**               | Il cherche un numéro et tente d’appeler        | *« Pourquoi personne ne répond ? »*         | Absence de canal de communication fiable            |
-| **3. Déplacement physique**               | Il se rend à Delmas 33                         | Stress, appréhension                        | Déplacement coûteux en temps, risques sécuritaires  |
-| **4. Recherche d’informations sur place** | Il interroge des étudiants puis le secrétariat | *« Enfin des réponses concrètes »*          | Informations papier peu professionnelles            |
-| **5. Attente administrative**             | Il doit revenir plus tard pour le calendrier   | Frustration                                 | Absence de calendrier clair et accessible           |
-| **6. Dépôt de candidature**               | Il remplit un formulaire papier                | *« Cela aurait pu être fait en ligne »*     | Procédure lente et entièrement manuelle             |
-| **7. Confirmation**                       | Il reçoit un numéro d’inscription              | Soulagement                                 | Aucun suivi numérique du dossier                    |
+| Étape | Actions du candidat | Ressenti (Émotions) | Difficultés (Pain Points) | Opportunités pour le MVP | Moments de vérité |
+|---|---|---|---|---|---|
+| **1. Recherche d’informations** | Louismy recherche « FDS Haïti » sur Google | Perte de temps, doute | Informations dispersées, ancien site non mis à jour | **Créer un portail officiel centralisé** avec SEO optimisé | |
+| **2. Tentative de contact** | Il cherche un numéro et tente d’appeler | Frustration | Absence de canal de communication fiable | **Afficher clairement les contacts** et une FAQ | |
+| **3. Déplacement physique** | Il se rend à Delmas 33 | Stress, appréhension | Déplacement coûteux en temps, risques sécuritaires | **Permettre la candidature 100% en ligne** | 🚨 *Point de rupture potentiel (abandon)* |
+| **4. Sur place** | Il interroge des étudiants puis le secrétariat | Soulagement temporaire | Informations papier peu professionnelles | **Digitaliser les fiches de cursus** | |
+| **5. Attente administrative** | Il doit revenir plus tard pour le calendrier | Agacement | Absence de calendrier clair et accessible | **Publier les dates clés** gérées par CMS | |
+| **6. Dépôt de candidature** | Il remplit un formulaire papier | Résignation | Procédure lente et manuelle | **Formulaire d'upload de documents** (Mobile-First) | 🎯 *Moment de vérité décisif (conversion)* |
+| **7. Confirmation** | Il reçoit un numéro d’inscription | Soulagement | Aucun suivi numérique du dossier | **Génération de référence et suivi en ligne** | |
 
 #### Principal problème identifié
 
@@ -235,15 +235,69 @@ flowchart LR
 **Lecture du diagramme :** le candidat n'a pas besoin de compte pour postuler ; il utilise sa référence pour suivre son dossier. L'administrateur, lui, doit obligatoirement passer par l'authentification avant d'accéder aux dossiers et de prendre une décision.
 
 ### 6.2 User Stories (Backlog MVP)
-- **US1 :** En tant que candidat, je veux consulter la liste des documents requis afin de préparer mon dossier d'admission.
-- **US2 :** En tant que candidat, je veux téléverser mes fichiers (PDF/JPG) en ligne afin de ne pas avoir à les apporter physiquement au secrétariat.
-- **US3 :** En tant qu'administrateur, je veux modifier le statut d'un document (`valide`, `rejete`) afin que le candidat connaisse l'état de sa demande.
-- **US4 :** En tant que candidat, je veux recevoir un email de confirmation après soumission afin d'avoir une trace officielle de mon dossier.
-- **US5 :** En tant que candidat, je veux être notifié par email lorsqu'un document est validé ou rejeté afin de réagir rapidement.
-- **US6 :** En tant que candidat, je veux pouvoir remplacer un document rejeté depuis la page de suivi afin de corriger mon dossier sans me déplacer.
-- **US7 :** En tant que candidat, je veux simuler le paiement de mes frais via MonCash ou NatCash afin de finaliser mon inscription avant de téléverser mes documents.
-- **US8 :** En tant que candidat, je veux visualiser l'avancement de mon dossier sous forme de barre de progression afin de comprendre rapidement les étapes complétées et les actions restantes.
-- **US9 :** En tant qu'équipe produit, je veux enregistrer si le candidat s'est déplacé physiquement lors de sa candidature afin de mesurer le taux de complétion sans déplacement (indicateur §3.5).
+
+- **US1 : Consulter les cursus**
+  - *En tant que* candidat, *je veux* consulter la liste des documents requis *afin de* préparer mon dossier d'admission.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* je suis sur la page d'accueil
+    - *Quand* je clique sur le cursus "Génie Informatique"
+    - *Alors* la liste exacte des documents requis s'affiche à l'écran.
+
+- **US2 : Téléverser les fichiers**
+  - *En tant que* candidat, *je veux* téléverser mes fichiers (PDF/JPG) en ligne *afin de* ne pas avoir à les apporter physiquement au secrétariat.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* je remplis mon formulaire de candidature
+    - *Quand* j'attache un fichier PDF de moins de 5 Mo
+    - *Alors* le fichier est accepté et stocké de manière sécurisée sur Cloudinary.
+
+- **US3 : Validation par l'Admin**
+  - *En tant qu'* administrateur, *je veux* modifier le statut d'un document (`valide`, `rejete`) *afin que* le candidat connaisse l'état de sa demande.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* je suis connecté au tableau de bord
+    - *Quand* je clique sur "Rejeter" pour un document spécifique
+    - *Alors* le statut du document passe à "rejete" en base de données.
+
+- **US4 : Email de confirmation**
+  - *En tant que* candidat, *je veux* recevoir un email de confirmation après soumission *afin d'* avoir une trace officielle de mon dossier.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* ma candidature est soumise avec succès
+    - *Quand* le serveur génère la référence du dossier
+    - *Alors* je reçois un email asynchrone contenant cette référence.
+
+- **US5 : Notification de statut**
+  - *En tant que* candidat, *je veux* être notifié par email lorsqu'un document est validé ou rejeté *afin de* réagir rapidement.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* mon dossier est en cours de traitement
+    - *Quand* l'administrateur rejette un de mes documents
+    - *Alors* je reçois un email m'indiquant le motif du rejet et le lien de suivi.
+
+- **US6 : Remplacement de document**
+  - *En tant que* candidat, *je veux* pouvoir remplacer un document rejeté depuis la page de suivi *afin de* corriger mon dossier sans me déplacer.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* je suis sur la page de suivi de mon dossier et qu'un document est rejeté
+    - *Quand* j'uploade un nouveau document valide à la place
+    - *Alors* le statut de ce document repasse à "en_attente" pour révision.
+
+- **US7 : Simulation de paiement**
+  - *En tant que* candidat, *je veux* simuler le paiement de mes frais via MonCash ou NatCash *afin de* finaliser mon inscription avant de téléverser mes documents.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* j'ai validé mes informations personnelles
+    - *Quand* je confirme la simulation du paiement sur l'interface
+    - *Alors* je suis autorisé à passer à l'étape finale d'upload.
+
+- **US8 : Barre de progression**
+  - *En tant que* candidat, *je veux* visualiser l'avancement de mon dossier sous forme de barre de progression *afin de* comprendre rapidement les étapes complétées et les actions restantes.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* je consulte le suivi de mon dossier
+    - *Quand* tous mes documents sont marqués comme "valides"
+    - *Alors* la barre de progression atteint 100% et indique que le dossier est complet.
+
+- **US9 : Mesure de l'hypothèse**
+  - *En tant qu'* équipe produit, *je veux* enregistrer si le candidat s'est déplacé physiquement lors de sa candidature *afin de* mesurer le taux de complétion sans déplacement.
+  - **Critères d'acceptation (Gherkin) :**
+    - *Lorsque* le candidat arrive à la dernière étape du formulaire
+    - *Quand* il répond "Non" à la question "Avez-vous dû vous déplacer ?"
+    - *Alors* la valeur "false" est sauvegardée dans le champ `deplacement_physique` en base.
 
 ### 6.3 User Stories Sécurité
 
@@ -395,11 +449,11 @@ sequenceDiagram
 
 Puisque nos User Stories impliquent de lier un Candidat à des Documents, notre modèle de données reflète ce besoin (Normalisation 3NF).
 
-**Distinction métier et table partagée**
+**Le Concept de System of Record (SoR)**
 
-La table `Utilisateur` est une ressource transverse partagée à l'échelle de la plateforme FDS. Elle centralise l'identité et les rôles des acteurs internes (administrateurs, agents, responsables) et permet un mécanisme de **Single Sign-On (SSO)** entre les différents modules applicatifs.
+Conformément à l'architecture globale de la faculté, le module **FDS SYS** (et non FDS Portail) est le **System of Record (SoR)** de toutes les identités utilisateurs internes de la plateforme. La table `Utilisateur` présente dans notre modèle ne fait que *consommer* cette donnée pour gérer l'authentification (ex: SSO) et tracer les décisions administratives. FDS Portail n'est pas la source de vérité pour la création ou la modification des comptes administrateurs.
 
-L'entité `Candidat` représente une personne qui soumet un dossier d'admission. Dans le MVP, le candidat peut soumettre un dossier sans créer de compte.
+En revanche, l'entité `Candidat` représente une personne externe qui soumet un dossier d'admission. Dans le MVP, le candidat n'a pas de compte global. Le FDS Portail est donc le SoR exclusif des dossiers de candidature.
 
 ### 8.1 Diagramme de Classes UML
 
@@ -468,6 +522,58 @@ classDiagram
 - Les décisions administratives doivent toujours être auditables (`valide_par`, `date_validation`).
 - À chaque soumission, `deplacement_physique` est obligatoire : `false` si le candidat n'a pas eu besoin de se déplacer, `true` sinon. Ce champ alimente l'indicateur « taux de complétion sans déplacement » (§3.5). Les dossiers antérieurs à l'introduction du champ peuvent avoir `NULL` (non renseigné).
 - La contrainte `UNIQUE (candidat_id, document_requis_id)` sur `documents_soumis` garantit l'upsert sans doublon lors d'un remplacement.
+
+### 8.3 Modèle Physique (Schéma SQL PostgreSQL)
+
+Le modèle physique ci-dessous traduit l'ERD 3NF en commandes DDL (`CREATE TABLE`), en imposant strictement l'intégrité référentielle et les règles métier au niveau de la base de données.
+
+```sql
+-- Table consommatrice du SoR externe (FDS SYS)
+CREATE TABLE utilisateurs (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email VARCHAR(255) UNIQUE NOT NULL,
+    mot_de_passe_hash VARCHAR(255) NOT NULL,
+    role VARCHAR(50) DEFAULT 'admin',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE candidats (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reference_dossier VARCHAR(20) UNIQUE NOT NULL,
+    nom VARCHAR(100) NOT NULL,
+    prenom VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    statut_paiement VARCHAR(50) DEFAULT 'en_attente',
+    methode_paiement VARCHAR(50),
+    reference_paiement VARCHAR(100),
+    notifications_actives BOOLEAN DEFAULT TRUE,
+    deplacement_physique BOOLEAN, -- Pour la mesure d'hypothèse
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE documents_requis (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nom VARCHAR(255) NOT NULL,
+    description TEXT,
+    format_accepte VARCHAR(100) DEFAULT 'pdf,jpg,jpeg',
+    est_obligatoire BOOLEAN DEFAULT TRUE,
+    mis_a_jour_le TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE documents_soumis (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidat_id UUID NOT NULL REFERENCES candidats(id) ON DELETE CASCADE,
+    document_requis_id UUID NOT NULL REFERENCES documents_requis(id) ON DELETE CASCADE,
+    fichier_url VARCHAR(500) NOT NULL,
+    statut_validation VARCHAR(50) DEFAULT 'en_attente',
+    soumis_le TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    valide_par UUID REFERENCES utilisateurs(id) ON DELETE SET NULL,
+    date_validation TIMESTAMP WITH TIME ZONE,
+    
+    -- Contrainte d'unicité pour empêcher les doublons de pièces justificatives
+    CONSTRAINT unique_document_par_candidat UNIQUE (candidat_id, document_requis_id)
+);
+```
 
 ---
 
