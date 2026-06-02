@@ -15,11 +15,12 @@ Une bonne présentation d'un projet d'ingénierie devant un jury ne doit pas êt
 - Présentez le **Portail FDS** comme la solution de dématérialisation.
 - Montrez le périmètre strict (le MVP) : *"Notre but n'est pas de tout faire (pas de cours en ligne, pas de paiement réel en V1), notre but est de permettre à un étudiant de s'informer et de soumettre un dossier complet depuis son smartphone."*
 
-### 3. La Démonstration (Le "Walking Skeleton") (4 min)
-*Si vous avez un prototype ou l'application fonctionnelle, montrez-la ! Sinon, utilisez des captures d'écran du design.*
-- Montrez l'expérience mobile-first.
-- Montrez le parcours fluide : le formulaire, l'upload de document, la génération de la référence `CAN-2026-X`.
-- Côté Admin : montrez comment l'administration valide un document en 1 clic.
+### 3. L'Effet "Wow" : La Démonstration (Le Bonus du Projet 2 en avance) (4 min)
+*Le professeur évalue le Cahier des Charges (Projet 1), mais a promis un bonus à ceux qui codent l'app. C'est ici que vous sortez votre carte maîtresse.*
+- **Transition :** *"Nous savons que le Projet 1 s'arrête au cahier des charges. Mais pour valider que notre architecture et notre 'Walking Skeleton' tenaient la route, nous l'avons implémenté et déployé. Voici notre MVP en production."*
+- Montrez l'expérience mobile-first et le remplissage du formulaire.
+- Montrez l'upload du document et l'envoi de la référence `CAN-2026-X`.
+- Côté Admin : montrez la validation d'un document en 1 clic.
 
 ### 4. Architecture et Choix Techniques (3 min)
 *C'est ici que vous gagnez vos points techniques avec le professeur.*
