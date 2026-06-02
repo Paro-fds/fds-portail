@@ -13,7 +13,11 @@ La Faculté des Sciences (FDS) de l'UEH forme l'élite de l'ingénierie en Haït
 
 ## §2. Solution Proposée
 
-Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralem## §3. Argumentation (Customer Journey & Hypothèse)
+Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralement en ligne depuis son smartphone.
+
+---
+
+## §3. Argumentation (Customer Journey & Hypothèse)
 
 ### 3.1 Persona principal
 
