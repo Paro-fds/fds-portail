@@ -167,14 +167,13 @@ flowchart LR
         UC2["Soumettre une candidature"]
         UC3["Simuler le paiement"]
         UC4["Téléverser les pièces justificatives"]
-        UC5["Suivre l'état du dossier"]
-        UC6["Visualiser la progression du dossier"]
-        UC7["Remplacer un document rejeté"]
+        UC5["Suivre l'état du dossier (et progression)"]
+        UC6["Remplacer un document rejeté"]
 
-        UC8["Se connecter au tableau de bord"]
-        UC9["Consulter les candidatures"]
-        UC10["Valider ou rejeter un document"]
-        UC11["Auditer les décisions"]
+        UC7["Se connecter au tableau de bord"]
+        UC8["Consulter les candidatures"]
+        UC9["Valider ou rejeter un document"]
+        UC10["Auditer les décisions"]
     end
 
     Candidat --> UC1
@@ -183,16 +182,15 @@ flowchart LR
 
     UC2 -->|inclut| UC3
     UC2 -->|inclut| UC4
-    UC5 -->|inclut| UC6
-    UC5 -->|si rejet| UC7
+    UC5 -->|si rejet| UC6
 
+    Admin --> UC7
     Admin --> UC8
     Admin --> UC9
-    Admin --> UC10
 
-    UC8 -->|protège| UC9
-    UC9 -->|inclut| UC10
-    UC10 -->|trace| UC11
+    UC7 -->|protège| UC8
+    UC8 -->|inclut| UC9
+    UC9 -->|trace| UC10
 ```
 
 **Lecture du diagramme :** le candidat n'a pas besoin de compte pour postuler ; il utilise sa référence pour suivre son dossier. L'administrateur, lui, doit obligatoirement passer par l'authentification avant d'accéder aux dossiers et de prendre une décision.
