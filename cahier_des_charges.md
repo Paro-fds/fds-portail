@@ -747,7 +747,7 @@ engine = create_engine(
 - **Scale Up (Phase MVP)** : augmentation de la puissance de la machine hôte si le trafic croît.
 - **Scale Out (Phase post-MVP)** : ajout d'instances FastAPI derrière Nginx / AWS ELB avec Round Robin. Prérequis : déplacer les sessions vers Redis et les fichiers vers S3/MinIO.
 
-### 10.4 Accessibilité — WCAG 2.1 (Cible : Niveau AA)
+### 10.5 Accessibilité — WCAG 2.1 (Cible : Niveau AA)
 
 Le portail cible le niveau **AA** des Web Content Accessibility Guidelines 2.1, selon les 4 principes **P.O.U.R.** :
 
@@ -758,7 +758,7 @@ Le portail cible le niveau **AA** des Web Content Accessibility Guidelines 2.1, 
 | **Compréhensible** | Labels explicites sur tous les champs. Messages d'erreur indiquant comment corriger. `<html lang='fr'>` déclaré. Navigation prévisible. |
 | **Robuste** | HTML sémantique (`header`, `nav`, `main`, `footer`). ARIA roles si nécessaire. Composants natifs HTML préférés aux custom. |
 
-### 10.5 Stack Documentée — Checklist technique (GL-EN3-2026)
+### 10.6 Stack Documentée — Checklist technique (GL-EN3-2026)
 
 | Couche | Technologie | Justification |
 |---|---|---|
