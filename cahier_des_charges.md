@@ -236,12 +236,12 @@ flowchart LR
 
 ### 6.2 User Stories (Backlog MVP)
 
-- **US1 : Consulter les cursus**
-  - *En tant que* candidat, *je veux* consulter la liste des documents requis *afin de* préparer mon dossier d'admission.
+- **US1 : S'informer sur les cursus et prérequis**
+  - *En tant que* candidat, *je veux* consulter la description d'un cursus et la liste de ses documents requis *afin de* préparer mon dossier d'admission avant de postuler.
   - **Critères d'acceptation (Gherkin) :**
-    - *Lorsque* je suis sur la page d'accueil
+    - *Lorsque* je suis sur la page d'accueil du portail
     - *Quand* je clique sur le cursus "Génie Informatique"
-    - *Alors* la liste exacte des documents requis s'affiche à l'écran.
+    - *Alors* la page affiche la présentation du cursus, les dates clés d'admission, et la liste exacte des pièces justificatives à fournir.
 
 - **US2 : Téléverser les fichiers**
   - *En tant que* candidat, *je veux* téléverser mes fichiers (PDF/JPG) en ligne *afin de* ne pas avoir à les apporter physiquement au secrétariat.
