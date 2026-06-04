@@ -46,3 +46,46 @@ Ce fichier contient les réponses aux questions "pièges" posées dans le chat, 
 **Réponse attendue :**
 > "Sans le Code Splitting, lorsque Louismy ouvre la page d'accueil, son téléphone devrait télécharger un seul énorme fichier JavaScript (`bundle.js`) contenant tout le code de l'application (l'accueil, les formulaires, le tableau de bord admin, les graphiques), ce qui prendrait 10 secondes en 3G.
 > Avec le Code Splitting (implémenté via `React.lazy`), Vite découpe notre code en plusieurs petits morceaux ('chunks'). Quand Louismy ouvre l'accueil, il ne télécharge que les 50 Ko nécessaires pour l'accueil. L'affichage est instantané. C'est seulement lorsqu'il clique sur le bouton 'Postuler' que React va télécharger de manière asynchrone le 'chunk' correspondant au composant du formulaire."
+
+---
+
+## 5. Problème et Persona (Le Pourquoi)
+
+**Question du Jury :**
+*"Pourquoi avoir pris le temps de construire une Customer Journey Map et d'interviewer un profil comme 'Louismy' ? N'aurait-il pas été plus simple et plus rapide de lister directement les fonctionnalités techniques dont l'administration de la FDS a besoin ?"*
+
+**Réponse attendue :**
+> "C'est toute la différence entre la complexité accidentelle et la complexité essentielle (comme enseigné par Fred Brooks). Si nous avions commencé directement par coder ce que voulait l'administration, nous aurions probablement bâti un système lourd que les lycéens de province ne sauraient pas utiliser sur mobile. La CJM et le Persona nous ont permis de cibler la véritable 'douleur' : le déplacement physique et le manque d'information, pour construire le 'Walking Skeleton' (MVP) strictement autour de ce besoin vital."
+
+---
+
+## 6. Priorisation et MVP (MoSCoW)
+
+**Question du Jury :**
+*"Dans votre méthode MoSCoW, vous avez classé les vraies transactions MonCash dans 'Won't Have'. Pourquoi avoir délibérément exclu le paiement réel du MVP alors que c'est une étape cruciale de l'admission à l'université ?"*
+
+**Réponse attendue :**
+> "L'objectif du MVP ('Build to Learn') est de tester notre hypothèse principale le plus vite possible avec un minimum de risques. Intégrer de vraies transactions bancaires implique des contrats tiers, des délais légaux et des failles critiques potentielles. Cela aurait retardé le Time-to-Market de plusieurs mois. 
+> En simulant le paiement (US7), nous validons que le parcours candidat fonctionne de bout en bout, tout en déléguant la responsabilité financière stricte au futur module FDS Pay."
+
+---
+
+## 7. Diagrammes de Séquence et Résilience
+
+**Question du Jury :**
+*"Dans votre diagramme de séquence (Section 7.2), l'envoi de l'email via Resend se fait après l'enregistrement en base de données. Que se passe-t-il exactement si l'API Resend tombe en panne au moment précis où le candidat clique sur 'Soumettre' ?"*
+
+**Réponse attendue :**
+> "C'est l'avantage de l'asynchronisme. Si Resend tombe en panne, le serveur tentera d'envoyer l'email et échouera, mais **après** que les données ont été commitées dans PostgreSQL. 
+> Par conséquent, le candidat ne perd pas sa progression : la référence `CAN-2026-X` s'affichera quand même sur son écran, et l'administrateur verra bien son dossier. Une panne sur un service d'email externe ne fait pas crasher notre cœur de métier."
+
+---
+
+## 8. Choix Technologiques (REST vs GraphQL - ADR-002)
+
+**Question du Jury :**
+*"Vous avez choisi REST avec FastAPI dans votre ADR-002. Pourtant, GraphQL est réputé pour éviter l''over-fetching' (télécharger trop de données), ce qui est idéal pour les connexions 3G lentes de vos utilisateurs. Pourquoi avoir rejeté GraphQL ?"*
+
+**Réponse attendue :**
+> "GraphQL est un outil puissant, mais il introduit une 'complexité accidentelle' élevée : courbe d'apprentissage, sécurisation difficile et surtout une mauvaise gestion du cache HTTP natif. 
+> Notre portail FDS est avant tout un CRUD simple dont les données sont très prévisibles (un nom, un diplôme, un statut). Le risque d'over-fetching est donc extrêmement minime. De plus, REST via FastAPI nous offre gratuitement la génération de la documentation OpenAPI, ce qui valide notre approche 'Contract-First'."
