@@ -101,3 +101,18 @@ Ce fichier contient les réponses aux questions "pièges" posées dans le chat, 
 > "Nous avons appliqué deux principes fondamentaux de l'ingénierie logicielle.
 > Premièrement, le **Langage Ubiquitaire** issu du Domain-Driven Design (DDD). Nous n'avons pas appelé nos entités 'UserFile' ou 'Upload' de manière générique. Nous avons utilisé exactement les mots du métier ('Candidat', 'Document Requis', 'Document Soumis') pour que le code et la base de données parlent le même langage que le secrétariat.
 > Deuxièmement, la **Normalisation 3NF**. Si nous n'avions fait qu'une seule table, nous aurions eu énormément de redondance (répéter le format exigé pour chaque dossier). En séparant le 'modèle' (DocumentRequis) de l'instance (DocumentSoumis), nous évitons les anomalies de mise à jour et respectons la Troisième Forme Normale."
+
+---
+
+## 10. Méthodologie et Pragmatisme (Pourquoi pas tous les diagrammes UML ?)
+
+**Question du Jury :**
+*"UML propose de nombreux diagrammes (Activité, État-Transition, Composants, etc.). Pourquoi n'avez-vous pas inclus les 5 grands diagrammes UML dans votre cahier des charges, comme on le faisait traditionnellement en génie logiciel ?"*
+
+**Réponse attendue :**
+> "C'est un choix délibéré basé sur l'Agilité et le principe du 'Just Enough Design Up Front' (JEDUF). 
+> Dans l'approche traditionnelle (Waterfall), on modélisait tout à l'excès ('Big Design Up Front'), ce qui figeait le projet et créait de la documentation inutile. Dans notre approche moderne, nous utilisons les modèles **uniquement pour résoudre une complexité spécifique de communication** :
+> 1. Le **Cas d'Utilisation** pour montrer 'Qui fait Quoi' aux parties prenantes.
+> 2. Le **Diagramme de Séquence** car nous avions une complexité temporelle asynchrone (l'envoi de l'email Resend et l'upload Cloudinary).
+> 3. Le **Diagramme de Classes / ERD** car la structure de la base de données (le System of Record) est critique et difficile à changer plus tard.
+> Pour le reste (comme les états simples d'un document : en_attente -> valide), le texte en Gherkin suffit amplement. Dessiner un diagramme d'état ou d'activité aurait été une perte de temps sans valeur ajoutée. C'est l'essence même de l'ingénierie pragmatique."
