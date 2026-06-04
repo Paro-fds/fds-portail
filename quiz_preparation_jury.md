@@ -89,3 +89,15 @@ Ce fichier contient les réponses aux questions "pièges" posées dans le chat, 
 **Réponse attendue :**
 > "GraphQL est un outil puissant, mais il introduit une 'complexité accidentelle' élevée : courbe d'apprentissage, sécurisation difficile et surtout une mauvaise gestion du cache HTTP natif. 
 > Notre portail FDS est avant tout un CRUD simple dont les données sont très prévisibles (un nom, un diplôme, un statut). Le risque d'over-fetching est donc extrêmement minime. De plus, REST via FastAPI nous offre gratuitement la génération de la documentation OpenAPI, ce qui valide notre approche 'Contract-First'."
+
+---
+
+## 9. Ingénierie des Données (Langage Ubiquitaire et 3NF)
+
+**Question du Jury :**
+*"Comment justifiez-vous le nom de vos tables et la façon dont vous avez modélisé les documents dans votre diagramme de classes ? Pourquoi avoir séparé `DocumentRequis` et `DocumentSoumis` ?"*
+
+**Réponse attendue :**
+> "Nous avons appliqué deux principes fondamentaux de l'ingénierie logicielle.
+> Premièrement, le **Langage Ubiquitaire** issu du Domain-Driven Design (DDD). Nous n'avons pas appelé nos entités 'UserFile' ou 'Upload' de manière générique. Nous avons utilisé exactement les mots du métier ('Candidat', 'Document Requis', 'Document Soumis') pour que le code et la base de données parlent le même langage que le secrétariat.
+> Deuxièmement, la **Normalisation 3NF**. Si nous n'avions fait qu'une seule table, nous aurions eu énormément de redondance (répéter le format exigé pour chaque dossier). En séparant le 'modèle' (DocumentRequis) de l'instance (DocumentSoumis), nous évitons les anomalies de mise à jour et respectons la Troisième Forme Normale."

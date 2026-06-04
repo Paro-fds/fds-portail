@@ -447,7 +447,11 @@ sequenceDiagram
 
 ## §8. Modèle de Données (Structure)
 
-Puisque nos User Stories impliquent de lier un Candidat à des Documents, notre modèle de données reflète ce besoin (Normalisation 3NF).
+### Principes fondateurs : Langage Ubiquitaire et Normalisation 3NF
+
+Le modèle de données de FDS Portail a été conçu en respectant deux principes fondamentaux de l'ingénierie logicielle :
+1. **Le Langage Ubiquitaire (Domain-Driven Design) :** Les noms des entités (`Candidat`, `DocumentRequis`, `DocumentSoumis`) ne sont pas des termes techniques génériques (ex: `UserFile`, `Upload`). Ils reprennent le vocabulaire exact utilisé par le secrétariat de la FDS lors des interviews, garantissant que le code reflète parfaitement la réalité métier.
+2. **Normalisation 3NF (Troisième Forme Normale) :** Afin d'éviter la redondance et les anomalies de mise à jour, nous avons séparé la notion de *ce qui est exigé* (`DocumentRequis`, géré par l'administration) de *ce qui est fourni* (`DocumentSoumis`, envoyé par le candidat). Chaque attribut ne dépend que de sa clé primaire absolue.
 
 **Le Concept de System of Record (SoR)**
 
