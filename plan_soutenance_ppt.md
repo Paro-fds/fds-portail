@@ -218,12 +218,12 @@ FDS.com          Cursus,          Formulaire,     Référence        Barre de
 **Visuel : 3 blocs + 1 flèche entre chaque :**
 
 ```
-  📱 FRONTEND          🖥️ BACKEND           🗄️ BASE DE DONNÉES
-  React + Vite    →   FastAPI (Python)  →   PostgreSQL
+  Architecture Physique (3-Tiers) :
+  📱 TIER 1 (Présentation)   🖥️ TIER 2 (Logique)      🗄️ TIER 3 (Données)
+  React + Vite          →   FastAPI (Python)    →   PostgreSQL
   
-  Mobile-First        Contract-First        3NF + Contraintes
-  Code Splitting      API REST              ACID
-  (3G optimisé)       Sécurité JWT          System of Record
+  Pattern MVC Distribué :
+  "View" (UI Mobile)        "Controller" (API)      "Model" (SQLAlchemy/3NF)
 ```
 
 **Discours oral exact (VOUS) :**
