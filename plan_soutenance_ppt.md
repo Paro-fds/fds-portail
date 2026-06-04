@@ -1,54 +1,96 @@
-# Structure du PowerPoint et Répartition de la Parole
+# Plan de Soutenance (Spécial Direction & Jury) - Groupe de 4
 
-Ce document est votre "Script de mise en scène" pour la soutenance. Il part du principe que vous êtes un groupe de 3 personnes (ajustez si vous êtes 2 ou 4).
+Puisque des membres de la direction seront présents, votre présentation doit avoir un double impact :
+1. **Convaincre le jury (le Professeur) sur l'ingénierie stricte (UML, Code, Base de données).**
+2. **Convaincre la direction sur la valeur métier (Gain de temps, Sécurité, Image de marque de la FDS).**
 
-## 1. La Répartition des Rôles (Le "Casting")
-
-Ne faites jamais l'erreur du "chacun parle 3 minutes à tour de rôle sur chaque slide". Découpez la présentation par **expertise** :
-- **Orateur A (Le Product Manager / Métier) :** Il/Elle maîtrise le problème, le persona (Louismy), la Customer Journey Map et le MVP. C'est la personne qui a le plus d'empathie et qui "vend" l'idée.
-- **Orateur B (L'Architecte / Tech Lead) :** Il/Elle maîtrise l'UML, l'architecture (FastAPI/React), la base de données (3NF/System of Record) et la sécurité. C'est la personne qui prouve au professeur que le code est robuste.
-- **Orateur C (Le Démonstrateur) :** Il/Elle prend le contrôle pour la surprise finale (le Projet 2 en avance), fait la démonstration live fluide, et conclut.
+Étant donné que vous êtes le membre qui maîtrise le plus le projet (le "Lead Tech"), vous devez prendre la partie la plus critique et la plus risquée : l'Architecture, la Sécurité, et la Démonstration Finale. C'est là que les questions pièges vont tomber.
 
 ---
 
-## 2. Le Plan du PowerPoint (10 Slides Maximum)
+## 1. Répartition des Rôles (Groupe de 4)
 
-Voici exactement ce que vous devez mettre sur vos slides (pas de longs textes, uniquement des schémas et des mots-clés).
-
-### Introduction & Métier (Par Orateur A)
-*Durée : 4-5 minutes*
-
-- **Slide 1 : Titre.** "Portail FDS : Dématérialisation de l'admission". Noms du groupe.
-- **Slide 2 : Le Problème.** Ne mettez pas de texte. Mettez une photo d'une file d'attente ou un design minimaliste avec les 3 "Pain points" (Inconfort, Déplacement, Asymétrie d'information).
-- **Slide 3 : Le Persona & La CJM.** Mettez une photo représentant "Louismy" (17 ans, mobile-only). Montrez très rapidement le tableau de la CJM avec le gros point rouge sur "Déplacement physique".
-- **Slide 4 : La Solution (Le MVP).** Expliquez le "Job to be Done". Montrez la liste "Must Have" (Le Walking Skeleton) et dites fièrement ce que vous avez exclu (Won't Have : vrai paiement) pour aller vite.
-
-### Technique & Ingénierie (Par Orateur B)
-*Durée : 5-6 minutes*
-
-- **Slide 5 : Choix Technologiques.** Logos de React, Vite, FastAPI, PostgreSQL. Expliquez le choix du "Monolithe Modulaire" et du "Mobile-First" (ADR-001 et ADR-002).
-- **Slide 6 : Modélisation des Données.** Affichez l'ERD (Diagramme de classes). **Mettez en gras** les mots "Langage Ubiquitaire" et "Normalisation 3NF". Expliquez que la table `Utilisateur` ne fait que consommer le "System of Record" (FDS SYS).
-- **Slide 7 : Cinématique Asynchrone.** Affichez le Diagramme de Séquence. Montrez comment l'API Resend (email) intervient *après* la sauvegarde en base pour garantir la résilience.
-- **Slide 8 : Sécurité.** Citez 2 failles de l'OWASP que vous avez bloquées (A01: Broken Access Control via JWT, et A05: Injection SQL via SQLAlchemy).
-
-### Le Coup de Théâtre & Conclusion (Par Orateur C)
-*Durée : 5 minutes*
-
-- **Slide 9 : Une diapositive noire avec juste écrit : "Et si on allait plus loin ?"**
-  > **La Phrase de Transition EXACTE :** *"Monsieur le Professeur, nous savons que le livrable attendu aujourd'hui pour le Projet 1 s'arrête strictement au cahier des charges. Cependant, l'ingénierie logicielle ne vaut rien si elle n'est pas testée face à la réalité. Pour valider notre architecture, nous avons anticipé le Projet 2 et nous avons implémenté notre Walking Skeleton. Nous aimerions vous faire une démonstration en direct de ce que verra Louismy."*
-- **Slide 10 (Pas de slide, l'écran montre le navigateur web) : La Démo.** 
-  - Orateur C montre l'UI sur un téléphone (ou simule le mode mobile sur Chrome `F12`). 
-  - Il remplit le formulaire.
-  - Il montre le faux paiement.
-  - Il uploade le fichier PDF.
-  - Il montre l'écran "Dossier reçu CAN-2026-X".
-  - (Bonus) Il ouvre l'espace admin et clique sur "Valider".
-- **Slide 11 : Conclusion.** Rappel de l'hypothèse de départ : "Nous saurons que c'est un succès si nous atteignons 70% d'inscriptions sans déplacement."
-- **Slide 12 : Q&A (Questions).** "Merci de votre attention."
+- **Orateur 1 (L'Enquêteur) - 3 min :** Parle du constat, du problème actuel de la FDS, et présente le "Persona" (Louismy). Son but est de faire ressentir la douleur du processus actuel à la direction.
+- **Orateur 2 (Le Stratège Produit) - 3 min :** Présente la solution (la CJM), le "Job-to-be-Done" et le périmètre du MVP (MoSCoW). Il explique pourquoi on ne fait pas le paiement réel tout de suite (gestion des risques).
+- **Orateur 3 (L'Architecte Data) - 3 min :** Montre les diagrammes (Cas d'utilisation, ERD). Explique la normalisation 3NF et le "System of Record". Il prouve que la structure de la base de données est solide.
+- **Orateur 4 (VOUS - Le Lead Tech / Démonstrateur) - 5 min :** Vous clôturez. Vous montrez l'Architecture (FastAPI/React), la Sécurité (pour rassurer la direction sur les données des étudiants). Puis vous lancez le fameux "Coup de théâtre" et faites la démo live. Vous gérez ensuite les questions/réponses.
 
 ---
 
-## 3. Conseils de préparation du PowerPoint
-- **Règle du 6x6 :** Pas plus de 6 lignes de texte par slide, pas plus de 6 mots par ligne. Le professeur ne doit pas "lire" vos slides, il doit vous écouter.
-- **Contraste :** Utilisez les couleurs de l'université (si possible) ou un thème très sobre et professionnel.
-- **La Démo de secours :** Internet peut tomber en panne pendant votre oral. Orateur C doit OBLIGATOIREMENT avoir enregistré une vidéo de 2 minutes de la démonstration sur son PC (capture d'écran vidéo). Si le site ne charge pas, vous lancez la vidéo en disant : *"Les aléas du direct font que la connexion flanche, heureusement nous avons un backup vidéo de notre application en production."* C'est très professionnel.
+## 2. Contenu exact des Slides (À copier-coller dans PowerPoint)
+
+*Astuce pour NotebookLM : Vous pouvez copier tout ce texte et le coller dans NotebookLM pour générer des fiches de révision pour vos camarades.*
+
+### SLIDE 1 : Titre (Orateur 1)
+- **Titre principal :** FDS Portail : Dématérialisation de l'admission
+- **Sous-titre :** Projet de fin de module - Ingénierie Logicielle
+- **Texte :** Noms des 4 membres du groupe.
+
+### SLIDE 2 : Le Constat (Orateur 1)
+- **Titre :** Un processus d'admission devenu inadapté
+- **Puces (Texte sur le slide) :**
+  - Forte dépendance au déplacement physique.
+  - Asymétrie d'information (site non mis à jour).
+  - Inégalités pour les candidats de province (risques sécuritaires et coûts).
+- **Notes pour l'oral :** *(Ne pas lire le slide. Expliquer que la FDS forme l'élite mais recrute de manière analogique. Présenter brièvement Louismy, 17 ans, qui habite loin).*
+
+### SLIDE 3 : La Solution : Le MVP (Orateur 2)
+- **Titre :** Notre Solution : Un "Walking Skeleton" Ciblé
+- **Puces :**
+  - **Job-to-be-Done :** Permettre de s'informer et de postuler 100% en ligne depuis un smartphone.
+  - **Ce qu'on FAIT (Must Have) :** Formulaire, Upload de PDF, Tracking, Dashboard Admin.
+  - **Ce qu'on NE FAIT PAS (Won't Have) :** Transactions bancaires réelles (simulation uniquement pour éviter les risques financiers en V1).
+
+### SLIDE 4 : Parcours Utilisateur (CJM) (Orateur 2)
+- **Titre :** Transformation de l'Expérience Candidat
+- **Visuel :** *Capture d'écran ou tableau simplifié de la Customer Journey Map de votre cahier des charges.*
+- **Notes pour l'oral :** *(Expliquer que le point de rupture actuel est le déplacement physique, et que le portail transforme cette étape en une opportunité de conversion numérique).*
+
+### SLIDE 5 : Modélisation et Ingénierie des Données (Orateur 3)
+- **Titre :** Une Base de Données Robuste et Normalisée
+- **Visuel :** *Insérer le diagramme de classes UML (ERD) du cahier des charges.*
+- **Puces :**
+  - Langage Ubiquitaire (Vocabulaire métier : `DocumentRequis`, `DocumentSoumis`).
+  - Normalisation 3NF pour éviter les redondances.
+  - **Le System of Record (SoR) :** La gestion des identités reste déléguée à FDS SYS.
+
+### SLIDE 6 : Cinématique Asynchrone (Orateur 3)
+- **Titre :** Résilience du flux de candidature
+- **Visuel :** *Insérer le diagramme de séquence UML du cahier des charges.*
+- **Notes pour l'oral :** *(Expliquer au jury que l'envoi d'emails via Resend est asynchrone. Si le système d'email tombe en panne, la base de données enregistre quand même la candidature).*
+
+### SLIDE 7 : Architecture Technique (VOUS / Orateur 4)
+- **Titre :** Architecture : Monolithe Modulaire
+- **Visuel :** *Logos de FastAPI (Backend), React (Frontend), PostgreSQL (BDD).*
+- **Puces :**
+  - Découplage strict (API REST Contract-First).
+  - Frontend "Mobile-First" adapté aux connexions 3G (Code Splitting).
+  - Évolutivité future vers des microservices garantie.
+
+### SLIDE 8 : Sécurité by Design (VOUS / Orateur 4)
+- **Titre :** Protection des données de la FDS
+- **Puces :**
+  - Protection contre l'injection SQL (ORM SQLAlchemy).
+  - Contrôle d'accès strict (JWT) contre les failles d'accès (Broken Access Control).
+  - Upload sécurisé et validation du type MIME (Cloudinary).
+- **Notes pour l'oral :** *(Rassurer la direction : le système est hermétique, un étudiant ne peut pas uploader un virus à la place d'un PDF, ni pirater les accès admin).*
+
+### SLIDE 9 : Le Coup de Théâtre (VOUS / Orateur 4)
+- **Titre :** Et si on allait plus loin ? (L'application en production)
+- **Visuel :** *Slide très épuré, presque vide.*
+- **Votre discours exact :** *"Membres du jury, membres de la direction. Le Projet 1 exigeait un cahier des charges rigoureux. Mais pour prouver que notre architecture technique tenait la route face à la réalité, nous avons pris l'initiative d'implémenter ce Walking Skeleton. Voici à quoi ressemble l'avenir de l'admission à la FDS."*
+
+### SLIDE 10 : Démonstration Live (VOUS / Orateur 4)
+- **Visuel :** *Quitter PowerPoint et ouvrir le navigateur web.*
+- **Action :** Vous faites la démo sur l'application React.
+  1. Montrer l'UI.
+  2. Remplir un faux dossier avec un PDF.
+  3. Montrer la génération de la référence CAN-2026.
+  4. Basculer côté Admin et valider le dossier.
+
+### SLIDE 11 : Conclusion (VOUS / Orateur 4)
+- **Titre :** Conclusion
+- **Puces :**
+  - Hypothèse validée : La candidature peut être 100% dématérialisée.
+  - Fondation technique posée pour le module "FDS Pay" futur.
+- **Texte :** Merci de votre attention. Avez-vous des questions ?
