@@ -4,14 +4,14 @@
 
 ---
 
-## §1. Problème Observé
+## §1. Le problème
 
 La Faculté des Sciences (FDS) de l'UEH forme l'élite de l'ingénierie en Haïti. Pourtant, elle fait face à une complexité majeure dans sa relation avec les futurs étudiants :
 - **Déficit d'information :** Les informations sur les cursus, les prérequis et les dates circulent via des canaux informels (WhatsApp, bouche-à-oreille). Il n'y a pas de source de vérité officielle accessible sur mobile.
 - **Friction géographique :** Un candidat résidant hors de Port-au-Prince (ex: Gonaïves, Jacmel) doit obligatoirement se déplacer physiquement pour obtenir une information fiable ou déposer une fiche papier.
 - **Opérations manuelles :** Le secrétariat gère des piles de dossiers physiques, générant un manque de traçabilité et une impossibilité pour le candidat de suivre l'avancement de son dossier.
 
-## §2. Solution Proposée
+## §2. La solution
 
 Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralement en ligne depuis son smartphone.
 
@@ -19,13 +19,13 @@ Le **FDS Portail (Module 2)** est la réponse technologique à cette complexité
 
 ## §3. Argumentation (Customer Journey & Hypothèse)
 
-### 3.1 Persona principal
+### 3.1 Le persona
 
 **Louismy, 17 ans**, élève en Terminale à Pétion-Ville. Il possède un smartphone Android avec une connexion 3G intermittente. Il souhaite s’inscrire en génie informatique à la FDS, mais ne trouve pas facilement d’informations officielles sur les dates, les modalités d’admission et les prérequis.
 
 ---
 
-### 3.2 Interviews et verbatims
+### 3.2 L'interview
 
 Afin de valider la réalité du terrain, une interview a été menée auprès d’un profil correspondant au persona principal. La consigne d’ouverture était :
 
@@ -75,7 +75,7 @@ Afin de valider la réalité du terrain, une interview a été menée auprès d�
 
 ---
 
-### 3.3 Customer Journey Map (État actuel – *As-Is*)
+### 3.3 Le Customer Journey
 
 À partir des interviews réalisées, le parcours utilisateur actuel d’un candidat à la FDS peut être représenté comme suit :
 
@@ -95,21 +95,7 @@ Le principal problème observé est une **forte dépendance au déplacement phys
 
 ---
 
-### 3.4 Customer Journey cible (*To-Be* avec le MVP)
-
-Le portail FDS proposé transforme ce parcours en une expérience numérique simplifiée :
-
-1. **Recherche :** Louismy accède directement au portail officiel FDS depuis son smartphone.
-2. **Information :** Il consulte les cursus, prérequis, frais et dates importantes.
-3. **Candidature :** Il remplit le formulaire en ligne et téléverse ses documents.
-4. **Confirmation :** Il reçoit immédiatement un numéro de référence (`CAN-2026-XXXX`) ainsi qu’un email de confirmation.
-5. **Suivi :** Il suit l’évolution de son dossier en ligne et peut remplacer un document rejeté sans déplacement.
-
-**Résultat attendu :** une réduction significative des déplacements physiques, une meilleure accessibilité pour les candidats de province et une amélioration de la transparence administrative.
-
----
-
-### 3.5 Hypothèse testable
+### 3.4 L'hypothèse
 
 | Élément                                 | Formulation                                                                                                                                                                      |
 | --------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -118,9 +104,7 @@ Le portail FDS proposé transforme ce parcours en une expérience numérique sim
 | **Afin de**                             | réduire les déplacements physiques, économiser du temps et améliorer l’accès aux études d’ingénierie.                                                                            |
 | **Nous saurons que cela fonctionne si** | au moins **20 candidatures** sont soumises en ligne durant les deux premières semaines et que **70 % des candidats** complètent le processus sans déplacement physique.          |
 
-### 3.6 Plan de mesure de l'hypothèse
-
-L'hypothèse sera évaluée à partir d'indicateurs simples, observables et reliés directement au parcours candidat :
+**Plan de mesure de l'hypothèse :**
 
 | Indicateur | Méthode de collecte | Seuil de validation |
 |---|---|---|
@@ -132,7 +116,7 @@ L'hypothèse sera évaluée à partir d'indicateurs simples, observables et reli
 
 Ces métriques permettent d'éviter une validation subjective du MVP : le succès n'est pas seulement "le site fonctionne", mais "le site réduit effectivement la dépendance au déplacement physique".
 
-### 3.7 Job to be Done (JTBD)
+### 3.5 Le JTBD
 
 Le "Job to be Done" résume la motivation profonde du persona lorsqu'il interagit avec le système :
 
@@ -179,14 +163,14 @@ Le "Job to be Done" résume la motivation profonde du persona lorsqu'il interagi
 
 ---
 
-## §5. MVP et Walking Skeleton
+## §5. Walking Skeleton
 
 ### Le Walking Skeleton (Le parcours minimal de bout en bout)
 > Louismy ouvre le portail FDS sur son téléphone Android. Il consulte la page du cursus Ingénierie. Il clique sur "Postuler" et remplit ses informations personnelles (nom, prénom, email). **Il est ensuite redirigé vers une interface simulant le paiement des frais de dossier (MonCash/NatCash). Une fois le paiement virtuel validé, il accède à l'étape finale où il uploade une photo de son diplôme du baccalauréat et soumet sa candidature.** Le système lui affiche immédiatement son numéro de référence `CAN-2026-0089` **et lui envoie un email de confirmation** contenant ce même numéro et un lien vers la page de suivi. Plus tard, Louismy saisit cette référence dans l'espace de suivi et voit une **barre de progression** indiquant que son dossier est reçu et **"en attente de validation"**. L'administration voit le dossier apparaître dans son tableau de bord, valide ou rejette un document — **Louismy reçoit immédiatement un email** lui indiquant le statut. Si un document est rejeté, la progression affiche **"Correction requise"** et il peut remplacer le document directement depuis la page de suivi.
 
 ---
 
-## §6. Use Cases et User Stories
+## §6. Use Cases & User Stories
 
 ### Conventions de lecture des diagrammes
 
@@ -348,7 +332,7 @@ Ces stories traduisent les exigences de sécurité en besoins compréhensibles p
 
 ---
 
-## §7. Scénarios et Séquences (Comportement)
+## §7. Diagrammes de séquence
 
 ### 7.1 Diagramme d'Activités (Parcours de candidature et suivi)
 
@@ -445,7 +429,7 @@ sequenceDiagram
 
 ---
 
-## §8. Modèle de Données (Structure)
+## §9. Classes & ERD
 
 ### Principes fondateurs : Langage Ubiquitaire et Normalisation 3NF
 
@@ -459,7 +443,7 @@ Conformément à l'architecture globale de la faculté, le module **FDS SYS** (e
 
 En revanche, l'entité `Candidat` représente une personne externe qui soumet un dossier d'admission. Dans le MVP, le candidat n'a pas de compte global. Le FDS Portail est donc le SoR exclusif des dossiers de candidature.
 
-### 8.1 Diagramme de Classes UML
+### 9.1 Diagramme de Classes UML
 
 Le diagramme ci-dessous représente les entités persistantes nécessaires au MVP. Il distingue les **candidats**, qui peuvent postuler sans compte, des **utilisateurs administratifs**, qui doivent s'authentifier pour traiter les dossiers.
 
@@ -514,7 +498,7 @@ classDiagram
 
 **Lecture du diagramme :** `DocumentSoumis` est l'entité centrale du suivi. Son `statut_validation` alimente la barre de progression côté candidat, tandis que `valide_par` et `date_validation` assurent la traçabilité côté administration.
 
-### 8.2 Contraintes métier
+### 9.2 Contraintes métier
 - Chaque dossier possède une référence unique.
 - Un candidat ne peut avoir qu'un dossier actif par campagne d'admission.
 - Les formats autorisés sont PDF, JPG et JPEG.
@@ -527,7 +511,7 @@ classDiagram
 - À chaque soumission, `deplacement_physique` est obligatoire : `false` si le candidat n'a pas eu besoin de se déplacer, `true` sinon. Ce champ alimente l'indicateur « taux de complétion sans déplacement » (§3.5). Les dossiers antérieurs à l'introduction du champ peuvent avoir `NULL` (non renseigné).
 - La contrainte `UNIQUE (candidat_id, document_requis_id)` sur `documents_soumis` garantit l'upsert sans doublon lors d'un remplacement.
 
-### 8.3 Modèle Physique (Schéma SQL PostgreSQL)
+### 9.3 Modèle Physique (Schéma SQL PostgreSQL)
 
 Le modèle physique ci-dessous traduit l'ERD 3NF en commandes DDL (`CREATE TABLE`), en imposant strictement l'intégrité référentielle et les règles métier au niveau de la base de données.
 
@@ -581,7 +565,7 @@ CREATE TABLE documents_soumis (
 
 ---
 
-## §9. Architecture et Composants
+## §10. Architecture
 
 Le modèle de données et les séquences s'exécutent au sein d'une **architecture 3-tiers (Déploiement)** combinée au **pattern MVC (Organisation du code)** — deux niveaux d'abstraction complémentaires qui coexistent dans la même application.
 
@@ -739,7 +723,7 @@ Le portail intègre un service de notification transactionnel par email via **Re
 
 ---
 
-## §10. Choix Technologiques & Architecture de Qualité
+## §11. Choix technologiques
 
 > Cette section documente les décisions d'architecture selon la méthode **ATAM simplifiée** (Architecture Tradeoff Analysis Method) et fournit les choix raisonnés pour la performance, la sécurité et l'accessibilité.
 
@@ -913,7 +897,7 @@ npm audit
 
 ---
 
-## §11. Validation, Risques et Limites
+##  Bonus. Validation, Risques et Limites
 
 Cette section transforme le cahier des charges en outil de pilotage : elle précise comment prouver que le MVP est acceptable, quels risques restent ouverts et quelles limites sont assumées en phase 1.
 
