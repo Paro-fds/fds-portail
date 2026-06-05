@@ -1,0 +1,642 @@
+Table des matières
+§1. Problème Observé
+La Faculté des Sciences (FDS) de l'UEH forme l'élite de l'ingénierie en Haïti. Pourtant, elle fait face à une complexité majeure dans sa relation avec les futurs étudiants :
+Déficit d'information : Les informations sur les cursus, les prérequis et les dates circulent via des canaux informels (WhatsApp, bouche-à-oreille). Il n'y a pas de source de vérité officielle accessible sur mobile.
+Friction géographique : Un candidat résidant hors de Port-au-Prince (ex: Gonaïves, Jacmel) doit obligatoirement se déplacer physiquement pour obtenir une information fiable ou déposer une fiche papier.
+Opérations manuelles : Le secrétariat gère des piles de dossiers physiques, générant un manque de traçabilité et une impossibilité pour le candidat de suivre l'avancement de son dossier.
+§2. Solution Proposée
+Le FDS Portail (Module 2) est la réponse technologique à cette complexité. Il s'agit de la vitrine publique officielle de la FDS et de la plateforme dématérialisée d'inscription. La solution transforme le chaos informationnel en "Certitude" pour le candidat, qui peut désormais s'informer, postuler et suivre son dossier intégralement en ligne depuis son smartphone.
+§3. Argumentation (Customer Journey & Hypothèse)
+3.1 Persona principal
+Louismy, 17 ans, élève en Terminale à Pétion-Ville. Il possède un smartphone Android avec une connexion 3G intermittente. Il souhaite s'inscrire en génie informatique à la FDS, mais ne trouve pas facilement d'informations officielles sur les dates, les modalités d'admission et les prérequis.
+3.2 Interviews et verbatims
+Afin de valider la réalité du terrain, une interview a été menée auprès d'un profil correspondant au persona principal. La consigne d'ouverture était :
+« Racontez-moi ce que vous avez fait pour trouver des informations sur la FDS et comprendre comment postuler, depuis le moment où vous avez décidé de vous y intéresser jusqu'au moment où vous avez soumis votre candidature ou abandonné l'idée. »
+Q1. Première recherche
+« J'ai cherché sur Google. J'ai tapé "FDS Haïti". J'ai trouvé un ancien site web avec les cursus, mais les informations semblaient peu à jour et le site était difficile à naviguer. Le formulaire de contact ne fonctionnait pas et je n'avais pas de numéro de téléphone direct. »
+Q2. Recherche d'alternative
+« J'ai cherché à nouveau en tapant "FDS Haïti adresse". J'ai trouvé l'adresse de la faculté avec un numéro de téléphone. J'ai appelé, mais je n'ai obtenu aucune réponse. J'ai donc compris qu'il fallait me rendre sur place. Je m'y suis rendu deux jours plus tard. »
+Q3. Déplacement à la faculté
+« Aujourd'hui, chaque déplacement comporte une certaine appréhension à cause du contexte sécuritaire. Heureusement, la FDS étant actuellement située à Delmas 33, cela restait relativement accessible pour moi qui habite à Pétion-Ville. Mais j'imagine difficilement la situation des candidats venant de province. Je me demandais aussi comment une école d'ingénieurs aussi reconnue pouvait ne pas disposer d'un site moderne permettant de s'informer et de s'inscrire en ligne. »
+Q4. Informations sur place
+« Je me suis d'abord renseigné auprès d'étudiants qui m'ont orienté vers le secrétariat. On m'a remis une brochure photocopiée avec des corrections écrites à la main. J'ai enfin obtenu des informations concrètes sur les modalités d'inscription et les matières enseignées. Cependant, le calendrier n'était pas encore disponible et l'on m'a demandé de revenir dans deux semaines ou de rappeler plus tard. »
+Q5. Dépôt de candidature
+« Oui. Je suis revenu quelques semaines plus tard pour remplir un formulaire papier. On m'a confirmé mon admissibilité, remis un numéro d'inscription et communiqué la date du concours. Il ne me restait plus qu'à attendre. »
+Q6. Suggestions d'amélioration
+« Il faudrait déjà un site web à jour avec les informations sur les cursus, les prérequis, les dates et les frais. Ensuite, la possibilité de postuler en ligne permettrait d'économiser du temps et d'éviter un déplacement. »
+Verbatims clés retenus pour justifier le MVP
+« J'ai trouvé un ancien site web avec les cursus, mais les informations semblaient peu à jour et le site était difficile à naviguer. »
+« Je me demandais comment une école d'ingénieurs de renom pouvait ne pas disposer d'un site moderne avec la possibilité de faire des inscriptions en ligne. »
+3.3 Customer Journey Map (État actuel – As-Is)
+À partir des interviews réalisées, le parcours utilisateur actuel d'un candidat à la FDS peut être représenté comme suit. La ligne rouge indique le point de rupture potentiel et la ligne verte le moment de vérité décisif :
+Figure 1 — Parcours candidat : État actuel (As-Is) vs. État cible (To-Be)
+Le tableau ci-dessous détaille les 5 dimensions du parcours (actions, émotions, pain points et opportunités To-Be) pour chaque étape :
+Figure 2 — Customer Journey Map détaillée : 7 étapes, 5 dimensions
+Étape
+Actions du candidat
+Émotions
+Pain Points
+Opportunités (To-Be)
+Recherche d'infos
+Google "FDS Haïti"
+😤 Frustré
+Site obsolète, pas de contact
+Portail officiel + SEO — source unique, mobile-first
+Contact
+Tente d'appeler, aucune réponse
+😠 Frustré
+Aucun canal de communication fiable
+FAQ + contacts affichés — réponses en ligne 24/7
+Déplacement physique
+Se rend à Delmas 33 depuis Pétion-Ville
+😰 Stressé 🚨
+Risque sécuritaire, coût, temps perdu
+Candidature 100% en ligne — 0 déplacement requis
+Info sur place
+Brochure papier corrigée à la main
+😐 Perplexe
+Infos peu fiables, format non officiel
+Fiches cursus digitales — infos claires + dates CMS
+Attente administrative
+Revenir 2 semaines plus tard
+😩 Agacé
+Pas de calendrier accessible
+Dates clés publiées — mises à jour par admin
+Dépôt candidature
+Formulaire papier au secrétariat
+😮‍💨 Résigné 🎯
+Procédure lente, entièrement manuelle
+Upload + formulaire mobile — simulation paiement incluse
+Confirmation
+Numéro d'inscription papier uniquement
+😌 Soulagé
+Aucun suivi numérique, dossier opaque
+Réf. CAN-2026-XXXX — Tracking + email auto
+Principal problème identifié
+Le principal problème observé est une forte dépendance au déplacement physique, causée par un déficit d'information numérique fiable et centralisée. Cette situation crée une inégalité d'accès, particulièrement pour les candidats vivant hors de Port-au-Prince.
+3.4 Customer Journey cible (To-Be avec le MVP)
+Recherche : Louismy accède directement au portail officiel FDS depuis son smartphone.
+Information : Il consulte les cursus, prérequis, frais et dates importantes.
+Candidature : Il remplit le formulaire en ligne et téléverse ses documents.
+Confirmation : Il reçoit immédiatement un numéro de référence (CAN-2026-XXXX) ainsi qu'un email de confirmation.
+Suivi : Il suit l'évolution de son dossier en ligne et peut remplacer un document rejeté sans déplacement.
+Résultat attendu : une réduction significative des déplacements physiques, une meilleure accessibilité pour les candidats de province et une amélioration de la transparence administrative.
+3.5 Hypothèse testable
+Élément
+Formulation
+Nous croyons que
+les lycéens, notamment ceux vivant hors de Port-au-Prince, rencontrent des difficultés importantes pour obtenir des informations fiables et soumettre leur candidature à la FDS.
+Ils ont besoin de
+consulter des informations officielles et postuler entièrement en ligne depuis un smartphone.
+Afin de
+réduire les déplacements physiques, économiser du temps et améliorer l'accès aux études d'ingénierie.
+Nous saurons que cela fonctionne si
+au moins 20 candidatures sont soumises en ligne durant les deux premières semaines et que 70 % des candidats complètent le processus sans déplacement physique.
+3.6 Plan de mesure de l'hypothèse
+Indicateur
+Méthode de collecte
+Seuil de validation
+Candidatures soumises
+Comptage des dossiers créés en base (candidats.reference_dossier)
+≥ 20 dossiers en 14 jours
+Taux sans déplacement
+COUNT(*) WHERE deplacement_physique = false / COUNT(*) WHERE deplacement_physique IS NOT NULL
+≥ 70 %
+Taux d'abandon
+Comparaison entre candidats ayant commencé et dossiers soumis
+≤ 30 %
+Temps moyen de soumission
+Horodatage début/fin du parcours de candidature
+≤ 20 min sur mobile
+Documents rejetés puis remplacés
+Suivi des documents passés de rejete à en_attente
+≥ 80 % corrigés en ligne
+3.7 Job to be Done (JTBD)
+« Quand je dois m'inscrire à l'université depuis ma province sans information claire, je veux pouvoir m'informer, soumettre mon dossier et payer virtuellement les frais entièrement en ligne afin de sécuriser ma candidature à la FDS sans perdre de temps ni risquer ma sécurité dans un déplacement physique. »
+§4. Priorisation MoSCoW
+🟢 Must Have (Requis pour le MVP)
+Pages de présentation des cursus (Informatique, Physique, etc.) et dates clés.
+Formulaire de candidature en ligne avec upload de pièces justificatives (PDF/JPG).
+Génération d'un numéro de référence de dossier (ex: CAN-2026-X).
+Suivi du dossier (tracking) en ligne par le candidat via sa référence.
+Interface sécurisée pour l'administration (changer le statut d'un document).
+Notifications automatiques par email au candidat :
+Confirmation de réception après soumission.
+Notification de validation d'un document.
+Notification de rejet d'un document (avec lien pour le remplacer).
+Possibilité pour le candidat de remplacer un document rejeté depuis la page de suivi.
+Simulation du paiement des frais (MonCash / NatCash) avec génération d'une référence transactionnelle.
+Mesure de l'hypothèse §3.5 : question obligatoire sur le déplacement physique, enregistrée en candidats.deplacement_physique.
+🟡 Should Have (Important)
+Notifications push (SMS) en complément de l'email.
+🔴 Won't Have (Hors Scope Phase 1)
+Transactions monétaires réelles (déléguées au Module FDS Pay).
+Plateforme de cours (déléguée à FDS Akademi).
+4.1 Exigences non fonctionnelles du MVP
+Qualité attendue
+Exigence mesurable
+Justification métier
+Mobile-first
+Pages critiques utilisables sur écran 360 px de large
+Le persona utilise principalement un smartphone Android
+Performance 3G
+Chargement < 3 secondes sur connexion lente simulée
+L'accès réseau est intermittent pour une partie des candidats
+Disponibilité
+Cible 99 % hors maintenance annoncée pendant la période d'inscription
+Une indisponibilité bloque directement les candidatures
+Accessibilité
+WCAG 2.1 AA : labels, contraste, navigation clavier, messages d'erreur explicites
+Le service est public et doit rester inclusif
+Sécurité des fichiers
+Aucun fichier > 5 Mo ni format hors PDF/JPG/JPEG accepté côté serveur
+Les documents contiennent des données personnelles
+Traçabilité
+Toute validation/rejet admin enregistre l'administrateur, la date et le nouveau statut
+Le secrétariat doit pouvoir justifier les décisions
+Résilience email
+Une erreur d'envoi email ne doit pas annuler la candidature ou la validation
+L'email est une notification, pas la source de vérité
+§5. MVP et Walking Skeleton
+Le Walking Skeleton (Le parcours minimal de bout en bout)
+Louismy ouvre le portail FDS sur son téléphone Android. Il consulte la page du cursus Ingénierie. Il clique sur "Postuler" et remplit ses informations personnelles. Il est ensuite redirigé vers une interface simulant le paiement des frais de dossier (MonCash/NatCash). Une fois le paiement virtuel validé, il accède à l'étape finale où il uploade une photo de son diplôme du baccalauréat et répond à la question sur le déplacement physique. Le système lui affiche immédiatement son numéro de référence CAN-2026-0089 et lui envoie un email de confirmation. Plus tard, Louismy saisit cette référence dans l'espace de suivi et voit une barre de progression indiquant que son dossier est "en attente de validation". L'administration valide ou rejette un document — Louismy reçoit immédiatement un email. Si un document est rejeté, la progression affiche "Correction requise" et il peut remplacer le document directement depuis la page de suivi.
+§6. Use Cases et User Stories
+6.1 Diagramme de Cas d'Utilisation
+Ce diagramme présente les interactions principales entre les deux acteurs du MVP : le candidat et l'administrateur FDS.
+Figure 3 — Diagramme de cas d'utilisation : Candidat et Admin FDS
+6.2 User Stories — format INVEST + critères Gherkin
+US1 — En tant que candidat, je veux consulter la liste des documents requis afin de préparer mon dossier d'admission.
+Lorsque je suis sur la page d'accueil — quand je clique sur le cursus "Génie Informatique" — alors la liste exacte des documents requis s'affiche, avec nom, format et caractère obligatoire.
+Lorsque je suis sur la page de la liste — quand aucun document n'est disponible — alors un message clair m'indique que la liste sera publiée prochainement.
+US2 — En tant que candidat, je veux téléverser mes fichiers (PDF/JPG) en ligne afin de ne pas avoir à les apporter physiquement.
+Lorsque je remplis mon formulaire — quand j'attache un fichier PDF < 5 Mo — alors le fichier est accepté et stocké sur Cloudinary.
+Lorsque je tente d'uploader — quand le fichier dépasse 5 Mo — alors le serveur rejette la demande avec un message d'erreur explicite.
+Lorsque je tente d'uploader — quand le format est .exe ou .zip — alors le serveur rejette le fichier avant stockage.
+US3 — En tant que candidat, je veux modifier le statut d'un document (valide, rejete) afin de que le candidat connaisse l'état de sa demande.
+Lorsque je suis connecté au tableau de bord — quand je clique sur "Rejeter" pour un document spécifique — alors le statut passe à "rejete" et valide_par + date_validation sont enregistrés.
+Lorsque je tente d'accéder sans JWT valide — quand j'envoie la requête PUT — alors je reçois 401 Unauthorized.
+US4 — En tant que candidat, je veux recevoir un email de confirmation après soumission afin de avoir une trace officielle de mon dossier.
+Lorsque ma candidature est soumise avec succès — quand le serveur génère la référence dossier — alors la référence est affichée immédiatement à l'écran.
+Lorsque l'envoi email échoue — quand le serveur rencontre une erreur Resend — alors le dossier reste créé et aucune rollback n'est effectuée.
+US6 — En tant que candidat, je veux remplacer un document rejeté depuis la page de suivi afin de corriger mon dossier sans me déplacer.
+Lorsque je suis sur la page de suivi — quand un document a le statut "rejete" — alors l'action de remplacement est disponible uniquement pour ce document.
+Lorsque j'uploade un nouveau fichier valide — quand je confirme le remplacement — alors le statut repasse à "en_attente" pour révision.
+US7 — En tant que candidat, je veux simuler le paiement de mes frais via MonCash/NatCash afin de finaliser mon inscription avant de téléverser.
+Lorsque j'ai validé mes informations personnelles — quand je confirme la simulation de paiement — alors une référence transactionnelle est générée et je peux passer à l'étape upload.
+Lorsque je tente de passer à l'upload sans simuler le paiement — quand j'envoie le formulaire — alors le système me renvoie à l'étape de paiement.
+US9 — En tant que candidat, je veux enregistrer si le candidat s'est déplacé physiquement afin de mesurer le taux de complétion sans déplacement.
+Lorsque le candidat arrive à la dernière étape du formulaire — quand il répond "Non" — alors la valeur false est sauvegardée dans candidats.deplacement_physique.
+Lorsque la question est ignorée — quand il tente de soumettre — alors le champ est requis et la soumission est bloquée.
+6.3 User Stories Sécurité
+US-S1 : En tant qu'administrateur, je veux devoir m'authentifier avant d'accéder au tableau de bord afin d'empêcher l'accès non autorisé aux dossiers des candidats.
+US-S2 : En tant qu'administrateur autorisé, je veux que mes actions de validation ou de rejet soient enregistrées avec mon identité et la date afin d'assurer la traçabilité des décisions.
+US-S3 : En tant que candidat, je veux que mes documents soient accessibles uniquement aux administrateurs autorisés afin de protéger mes données personnelles.
+US-S4 : En tant que système, je veux refuser les fichiers dangereux, trop volumineux ou dans un format non autorisé afin de prévenir les uploads malveillants.
+US-S5 : En tant que responsable, je veux que les tentatives de connexion échouées soient limitées afin de réduire le risque d'attaque par force brute.
+US-S6 : En tant que responsable, je veux que les secrets applicatifs restent hors du code source afin d'éviter l'exposition des clés d'API et tokens.
+US-S7 : En tant que système, je veux retourner des messages d'erreur contrôlés afin de ne pas exposer les détails internes de l'application.
+6.4 Matrice de traçabilité MVP
+Besoin métier
+Fonctionnalité
+Donnée/API
+Preuve attendue
+Réduire le déplacement physique
+Candidature en ligne + upload
+POST /api/candidature, POST /api/upload
+Dossier complet créé sans dépôt papier
+Mesurer l'impact du portail
+Question déplacement + persistance
+candidats.deplacement_physique
+≥ 70 % avec deplacement_physique = false
+Donner une source officielle
+Pages cursus + documents requis
+GET /api/documents-requis
+Informations visibles avant candidature
+Rassurer le candidat
+Référence dossier + email
+reference_dossier, Resend
+Référence affichée et envoyée
+Rendre le suivi compréhensible
+Barre de progression du dossier
+statut_paiement, statut_validation
+Étapes affichées selon l'état réel
+Traçabilité au secrétariat
+Tableau admin + audit validation
+valide_par, date_validation
+Décision admin historisée
+Corriger sans revenir sur place
+Remplacement d'un document rejeté
+Upsert DocumentSoumis
+Nouveau fichier en attente de validation
+Protéger les données
+Auth admin + contrôle d'accès
+JWT, GET /api/admin/proxy-document
+Aucun document visible sans authentification
+Réduire les attaques
+Validation fichiers + rate limiting
+POST /api/upload, POST /api/auth/token
+Fichiers dangereux rejetés
+§7. Scénarios et Séquences (Comportement)
+7.1 Diagramme d'Activités (Parcours de candidature)
+Ce diagramme décrit le parcours de bout en bout, depuis la consultation du portail jusqu'à la validation ou correction du dossier. Les flèches rouges représentent les boucles de correction, les flèches vertes le chemin nominal.
+Figure 4 — Diagramme d'activités : parcours complet de candidature
+Lecture : deux points de décision critiques — la validation du paiement simulé (gate d'entrée) et la conformité des fichiers (contrôle serveur) — garantissent que seuls les dossiers complets et valides progressent.
+7.2 Diagramme de Séquence (Soumission, upload et notifications)
+Ce diagramme précise la collaboration technique entre le frontend React, le backend FastAPI, PostgreSQL, Cloudinary et Resend, en montrant l'ordre exact des échanges pour le scénario nominal.
+Figure 5 — Diagramme de séquence : soumission, upload et notifications
+Lecture : si l'email échoue, le dossier et ses statuts restent enregistrés en base de données. L'email est une notification asynchrone, pas la source de vérité du dossier.
+§8. Modèle de Données (Structure)
+8.0 Principes fondateurs : Langage Ubiquitaire et Normalisation 3NF
+Le modèle de données de FDS Portail a été conçu en respectant deux principes fondamentaux de l'ingénierie logicielle :
+Le Langage Ubiquitaire (Domain-Driven Design) : Les noms des entités (Candidat, DocumentRequis, DocumentSoumis) ne sont pas des termes techniques génériques (ex: UserFile, Upload). Ils reprennent le vocabulaire exact utilisé par le secrétariat de la FDS lors des interviews, garantissant que le code reflète parfaitement la réalité métier.
+Normalisation 3NF (Troisième Forme Normale) : Afin d'éviter la redondance et les anomalies de mise à jour, nous avons séparé la notion de ce qui est exigé (DocumentRequis, géré par l'administration) de ce qui est fourni (DocumentSoumis, envoyé par le candidat). Chaque attribut ne dépend que de sa clé primaire absolue.
+8.1 Le Concept de System of Record (SoR)
+Conformément à l'architecture globale de la faculté, le module FDS SYS est le System of Record (SoR) de toutes les identités utilisateurs internes. La table Utilisateur de FDS Portail consomme cette donnée — elle ne la détient pas. En revanche, l'entité Candidat (personne externe soumettant un dossier) est le SoR exclusif de FDS Portail.
+8.2 Diagramme de Classes UML
+Figure 6 — Diagramme de classes UML : entités et relations
+Lecture : DocumentSoumis est l'entité centrale du suivi. Son statut_validation alimente la barre de progression côté candidat, tandis que valide_par et date_validation assurent la traçabilité côté administration.
+8.3 Contraintes métier
+Chaque dossier possède une référence unique.
+Un candidat ne peut avoir qu'un dossier actif par campagne d'admission.
+Les formats autorisés sont PDF, JPG et JPEG.
+La taille maximale d'un fichier est fixée à 5 Mo.
+Le backend vérifie le type MIME réel avant enregistrement.
+L'admission nécessite la validation préalable d'une étape de paiement simulé.
+Un document remplacé conserve le même couple logique (candidat_id, document_requis_id) afin d'éviter les doublons.
+Le statut d'un document remplacé repasse automatiquement à en_attente.
+Les décisions administratives sont toujours auditables (valide_par, date_validation).
+À chaque soumission, deplacement_physique est obligatoire (false = pas de déplacement, true = déplacement, NULL = dossiers antérieurs).
+La contrainte UNIQUE (candidat_id, document_requis_id) sur documents_soumis garantit l'upsert sans doublon lors d'un remplacement.
+8.4 Modèle Physique (Schéma SQL PostgreSQL — DDL)
+Le modèle physique ci-dessous traduit l'ERD 3NF en DDL PostgreSQL, en imposant l'intégrité référentielle et les règles métier au niveau de la base de données.
+-- Table consommatrice du SoR externe (FDS SYS)
+CREATE TABLE utilisateurs (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email               VARCHAR(255) UNIQUE NOT NULL,
+    mot_de_passe_hash   VARCHAR(255) NOT NULL,
+    role                VARCHAR(50) DEFAULT 'admin'
+                        CHECK (role IN ('admin', 'agent')),
+    created_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+ 
+-- SoR exclusif de FDS Portail : les dossiers de candidature
+CREATE TABLE candidats (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reference_dossier   VARCHAR(20) UNIQUE NOT NULL,
+    nom                 VARCHAR(100) NOT NULL,
+    prenom              VARCHAR(100) NOT NULL,
+    email               VARCHAR(255) UNIQUE NOT NULL,
+    statut_paiement     VARCHAR(50) DEFAULT 'en_attente'
+                        CHECK (statut_paiement IN ('en_attente', 'simule')),
+    methode_paiement    VARCHAR(50),
+    reference_paiement  VARCHAR(100),
+    notifications_actives BOOLEAN DEFAULT TRUE,
+    deplacement_physique  BOOLEAN,           -- NULL = dossier antérieur
+    created_at          TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+ 
+CREATE TABLE documents_requis (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    nom             VARCHAR(255) NOT NULL,
+    description     TEXT,
+    format_accepte  VARCHAR(100) DEFAULT 'pdf,jpg,jpeg',
+    est_obligatoire BOOLEAN DEFAULT TRUE,
+    mis_a_jour_le   TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+ 
+CREATE TABLE documents_soumis (
+    id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    candidat_id         UUID NOT NULL
+                        REFERENCES candidats(id) ON DELETE CASCADE,
+    document_requis_id  UUID NOT NULL
+                        REFERENCES documents_requis(id) ON DELETE CASCADE,
+    fichier_url         VARCHAR(500) NOT NULL,
+    statut_validation   VARCHAR(50) DEFAULT 'en_attente'
+                        CHECK (statut_validation IN ('en_attente', 'valide', 'rejete')),
+    soumis_le           TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    valide_par          UUID REFERENCES utilisateurs(id) ON DELETE SET NULL,
+    date_validation     TIMESTAMP WITH TIME ZONE,
+    CONSTRAINT unique_document_par_candidat
+        UNIQUE (candidat_id, document_requis_id)
+);
+ 
+-- Index B-Tree sur colonnes fréquemment interrogées
+CREATE INDEX idx_candidats_reference  ON candidats(reference_dossier);
+CREATE INDEX idx_candidats_email      ON candidats(email);
+CREATE INDEX idx_docs_soumis_candidat ON documents_soumis(candidat_id);
+§9. Architecture et Composants
+9.1 Pattern Architectural : Monolithe Modulaire
+Déploiement unique (1 artefact — frontend + backend séparés mais coordonnés).
+Modules internes découplés : candidature, documents, admin, auth.
+Base de données partagée PostgreSQL : cohérence ACID garantie.
+Migration future possible vers Microservices sans refactoring majeur.
+9.2 Style d'API : REST (Contract-First)
+Méthode HTTP
+Action
+Exemple endpoint
+GET
+Lire une ressource (idempotent)
+GET /api/candidature/{ref}
+POST
+Créer une ressource
+POST /api/candidature
+PUT
+Remplacer (idempotent)
+PUT /api/admin/documents/{id}/statut
+DELETE
+Supprimer
+(hors scope MVP)
+9.3 Diagramme de Composants
+Figure 7 — Diagramme de composants : architecture FDS Portail
+Lecture : Cloudinary et Resend sont externes. PostgreSQL reste la source de vérité : les emails et les URLs de fichiers ne remplacent jamais les statuts enregistrés en base.
+9.4 Justification Technologique (Stack)
+Frontend : React 19 / Vite. SPA Mobile-First, essentielle pour les utilisateurs en 3G.
+Backend : FastAPI (Python). Performance asynchrone (async/await) pour les uploads Cloudinary et les appels email. Auto-génère la documentation OpenAPI.
+Base de données : PostgreSQL. ACID, intégrité référentielle stricte, index B-Tree.
+SSO : JWT validés contre la table partagée Utilisateurs, liant FDS Portail et FDS Admin.
+9.5 Sécurité applicative — Security by Design
+Principe
+Application dans FDS Portail
+Least Privilege
+Chaque endpoint vérifie que l'utilisateur a le droit d'accéder à LA ressource demandée. Un candidat ne voit que son propre dossier.
+Defense in Depth
+Validation côté client (UX) + côté serveur (FastAPI) + contraintes SQL (UNIQUE, FK) + type MIME réel + pare-feu Cloudinary.
+Fail Secure
+En cas d'exception dans le contrôle d'accès → 403 Forbidden. Jamais d'accès accordé par défaut.
+OWASP Top 10 : 2025 — Mitigations appliquées
+Code
+Vulnérabilité
+Mitigation dans FDS Portail
+A01
+Broken Access Control
+get_current_admin() vérifie le rôle sur chaque endpoint. Deny by default.
+A02
+Security Misconfiguration
+Secrets dans .env (hors repo Git). Headers HTTP configurés.
+A03
+Supply Chain Failures
+pip check / npm audit à chaque sprint.
+A04
+Cryptographic Failures
+Mots de passe hashés bcrypt. HTTPS obligatoire. Secrets hors du code.
+A05
+Injection
+SQLAlchemy ORM (requêtes paramétrées). Validation Pydantic.
+A06
+Insecure Design
+Threat Modeling STRIDE appliqué. Rate limiting sur les routes sensibles.
+A07
+Authentication Failures
+JWT à durée de vie courte. Lib éprouvée (python-jose).
+A08
+Integrity Failures
+JWT signé avec secret fort (≥ 256 bits).
+A09
+Logging Failures
+Middleware de logging : chaque requête HTTP loggée (hors données sensibles).
+A10
+Exceptional Conditions
+try/catch global → retourne 400/403/500 sans exposer les détails internes.
+Threat Modeling STRIDE
+Menace
+Scénario d'abus
+Surface
+Mitigation
+Spoofing
+Forger un JWT admin
+Authorization: Bearer
+Signature HS256 validée à chaque requête
+Tampering
+Modifier la référence dossier
+GET /api/candidature/{ref}
+Seul le statut public est retourné par référence
+Repudiation
+Admin nie avoir rejeté un document
+PUT /api/admin/documents/{id}/statut
+valide_par + date_validation immuables en BDD
+Info Disclosure
+Stack trace exposée en cas d'erreur
+Tous les endpoints
+Messages génériques côté client, détails dans les logs
+DoS
+Soumissions massives
+POST /api/candidature, POST /api/upload
+Rate limiting : 5 req/60s login, 10 req/60s candidature
+EoP
+Accès aux routes /api/admin/ sans rôle
+Toutes les routes admin
+get_current_admin() + deny by default → 403
+9.6 Système de notification par email
+Événement
+Destinataire
+Contenu de l'email
+Soumission de candidature
+Candidat
+Confirmation HTML avec numéro de référence CAN-XXXX et lien vers la page de suivi
+Document validé par l'admin
+Candidat
+Notification verte indiquant le nom du document validé
+Document rejeté par l'admin
+Candidat
+Notification rouge avec le nom du document et un bouton "Remplacer le document →"
+§10. Choix Technologiques & Architecture de Qualité
+Cette section documente les décisions d'architecture selon la méthode ATAM simplifiée (Architecture Tradeoff Analysis Method).
+10.1 ADR-001 — Monolithe Modulaire vs Microservices
+ADR-001 : Monolithe Modulaire vs Microservices  |  Statut : Accepté
+ 
+Contexte
+  Équipe < 5 personnes. Domaine métier en cours de définition (MVP).
+  Budget DevOps limité. Compétences en opérations distribuées absentes.
+ 
+Options
+  A — Monolithe Modulaire : déploiement simple, ACID, debugging facile (+)
+      scalabilité uniforme seulement (-)
+  B — Microservices : scalabilité indépendante (+)
+      complexité opérationnelle élevée, coût infra, équipe 10+ requis (-)
+ 
+Décision : Option A — Monolithe Modulaire
+ 
+Conséquences
+  + Livraison rapide, maintenabilité élevée, cohérence ACID
+  - Surveiller si le trafic devient différencié par module
+10.2 ADR-002 — REST vs GraphQL
+ADR-002 : REST vs GraphQL  |  Statut : Accepté
+ 
+Contexte : CRUD classique exposé à un frontend React.
+ 
+Options
+  A — REST : standard universel, cache HTTP natif, OpenAPI auto-généré (+)
+      over-fetching possible (-)
+  B — GraphQL : pas d'over-fetching (+)
+      cache HTTP difficile, overkill pour CRUD simple (-)
+ 
+Décision : Option A — REST stateless avec FastAPI
+ 
+Conséquences
+  + Documentation /docs disponible immédiatement (Contract-First sans effort)
+  - Si besoins clients hétérogènes → envisager GraphQL (ADR à créer)
+10.3 Performance
+Frontend (MVP 3G)
+CSS Critique Inline (Anti-FOUC) : ossature stylistique injectée dans le <head>.
+Code Splitting via React.lazy() : charge initiale réduite de plus de 60%.
+Cache HTTP : GET /api/documents-requis retourne Cache-Control: public, max-age=300.
+Indexation Base de Données
+Table
+Colonne indexée
+Type
+Justification
+candidats
+reference_dossier
+B-Tree UNIQUE
+Recherche de suivi par référence
+candidats
+email
+B-Tree UNIQUE
+Déduplication à l'inscription
+documents_soumis
+candidat_id
+B-Tree
+JOIN fréquent pour afficher le dossier
+documents_soumis
+(candidat_id, document_requis_id)
+Composite UNIQUE
+Contrainte métier upsert
+10.4 Accessibilité — WCAG 2.1 (Cible : Niveau AA)
+Principe
+Exigences appliquées
+Perceptible
+Alt text sur toutes les images. Contraste ≥ 4.5:1. Information non transmise par la couleur seule.
+Opérable
+Navigation clavier complète. Focus visible. Pas de limite de temps stricte sur les formulaires.
+Compréhensible
+Labels explicites sur tous les champs. Messages d'erreur indiquant comment corriger. <html lang='fr'> déclaré.
+Robuste
+HTML sémantique (header, nav, main, footer). ARIA roles si nécessaire. Composants natifs préférés.
+10.5 Stack Documentée — Checklist GL-EN3-2026
+Couche
+Technologie
+Justification
+Frontend
+React 19 / Vite / TypeScript
+SPA Mobile-First, typage fort, HMR rapide
+Backend
+FastAPI 0.x / Python 3.11
+Async natif, OpenAPI auto-généré, Pydantic
+Base de données
+PostgreSQL 15
+ACID, intégrité référentielle, index B-Tree
+ORM
+SQLAlchemy 2.x
+Requêtes paramétrées (anti-injection A05)
+Auth
+python-jose (JWT HS256) + passlib (bcrypt)
+Lib éprouvée (anti-A07), hash sécurisé
+Stockage fichiers
+Cloudinary
+Upload sécurisé, URL signée, sans infra propre
+Email
+Resend (API REST)
+Notifications transactionnelles non-bloquantes
+Frontend deploy
+Vercel
+CDN global, HTTPS automatique
+Backend deploy
+Railway (PaaS)
+CI/CD depuis GitHub, Stateless
+Secrets
+.env hors repo + .gitignore
+Anti-A02, Anti-A04
+§11. Validation, Risques et Limites
+11.1 Définition de terminé (Definition of Done)
+Un candidat peut consulter les cursus, simuler un paiement, répondre à la question sur le déplacement physique, soumettre ses informations et téléverser tous les documents depuis un mobile.
+Le système génère une référence unique et permet de retrouver le dossier depuis la page de suivi.
+Un administrateur authentifié peut consulter les candidatures, ouvrir les documents et valider ou rejeter chaque document.
+Un document rejeté peut être remplacé par le candidat sans créer un second dossier.
+Les emails de confirmation, validation et rejet sont déclenchés sans bloquer les opérations principales.
+Les contrôles serveur refusent les fichiers non autorisés, trop lourds et les accès admin non authentifiés.
+Les pages critiques sont testées sur mobile et desktop, avec navigation clavier possible sur les formulaires.
+11.2 Plan de tests fonctionnels
+Scénario
+Données d'entrée
+Résultat attendu
+Soumission complète
+Nom, prénom, email, paiement simulé, documents PDF/JPG
+Dossier créé, référence affichée, documents en en_attente
+Référence invalide
+CAN-2026-0000 inexistante
+Message clair : dossier introuvable
+Upload invalide
+Fichier .exe ou fichier > 5 Mo
+Rejet serveur avec message explicite
+Validation admin
+Admin connecté, document en attente
+Statut valide, audit enregistré, email déclenché
+Rejet admin
+Admin connecté, document en attente
+Statut rejete, audit enregistré, email de rejet déclenché
+Remplacement candidat
+Document rejeté + nouveau PDF/JPG valide
+Même document logique mis à jour, statut repassé à en_attente
+Accès non autorisé
+Requête admin sans JWT
+Réponse 401/403, aucune donnée sensible exposée
+11.3 Risques identifiés et mitigations
+Risque
+Impact
+Mitigation prévue
+Connexion Internet faible
+Abandon du formulaire
+Interface mobile légère, fichiers limités à 5 Mo
+Échec Cloudinary
+Document non transmis
+Message explicite, possibilité de réessayer
+Échec Resend
+Candidat non notifié
+Email non bloquant, référence affichée à l'écran
+Perte de la référence
+Difficulté à retrouver le dossier
+Email de confirmation + affichage clair
+Mauvais fichier envoyé
+Rejet du dossier
+Validation format/taille côté serveur + remplacement en ligne
+Données personnelles exposées
+Risque légal
+Auth admin, URLs contrôlées, secrets hors dépôt
+Croissance du volume
+Lenteur admin et suivi
+Index sur référence/email/candidat, scale out post-MVP
+11.4 Limites assumées en phase 1
+Le paiement est une simulation : aucune transaction réelle n'est exécutée dans FDS Portail.
+Le candidat ne possède pas de compte complet : le suivi repose sur la référence dossier.
+Les SMS/push notifications sont hors MVP.
+Le portail ne gère pas les cours, les notes ou l'espace étudiant complet.
+Refresh tokens absents : le JWT admin expire après 60 min. Un endpoint POST /api/auth/refresh est prévu en post-MVP.
+Cache Redis absent : le caching repose uniquement sur les headers Cache-Control HTTP dans cette phase.
+11.5 Évolutions post-MVP
+Priorité
+Évolution
+Bénéfice
+P1
+Intégration réelle avec FDS Pay
+Encaisser et réconcilier automatiquement les frais
+P1
+Découpage backend en routeurs FastAPI par domaine
+Renforcer le monolithe modulaire annoncé
+P1
+Refresh tokens (POST /api/auth/refresh)
+Sessions admin continues sans reconnexion toutes les 60 min
+P1
+Cache Redis (Cache-Aside sur DocumentRequis)
+Réduire la charge BDD sur les lectures fréquentes
+P2
+Tableau de bord statistique des candidatures
+Suivre les volumes, rejets, délais et programmes demandés
+P2
+Notifications SMS
+Atteindre les candidats qui consultent rarement leur email
+P3
+Espace candidat complet
+Historique, profil, documents persistants et communications
+P3
+Export administratif CSV/PDF
+Faciliter les commissions d'admission et l'archivage
